@@ -122,3 +122,4 @@ La matriz completa de los 100 distritos exportada en [`data/exports/matriz_gober
 - **ODS 2 (Hambre Cero — Meta 2.2) $\leftrightarrow$ OEI.01 y OEI.08 del PEI 2020–2027:** Erradicación de la desnutrición crónica y anemia en menores de 5 años mediante focalización temprana de controles CRED, suplementación preventiva de hierro y protección de la agricultura familiar altoandina.
 - **ODS 3 (Salud y Bienestar — Meta 3.2) $\leftrightarrow$ OEI.01 y OEI.03 del PEI 2020–2027:** Coordinación interprovincial (**S2**) de las 7 Redes de Salud de la DIRESA Huancavelica y mejora de la calidad de ejecución del Programa Articulado Nutricional (`0001`).
 - **ODS 6 (Agua Limpia y Saneamiento — Meta 6.1) $\leftrightarrow$ OEI.04 del PEI 2020–2027:** Intervención prioritaria sobre los sistemas de cloración rural (donde los valores SHAP demuestran el segundo mayor impacto estructural sobre la DCI regional, $|\text{SHAP}| = 1,1306$ puntos porcentuales).
+
