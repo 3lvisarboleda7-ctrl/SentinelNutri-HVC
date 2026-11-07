@@ -42,11 +42,11 @@
 - [x] Crear los scripts PowerShell de aprovisionamiento para el Equipo 2 en `deploy/scripts_equipo2/`.
 - [x] Implementar detector automático de máquina (`python -m sentinelnutri.cli whoami` en `src/sentinelnutri/config/node_detector.py`) por huella de hardware/SO (`i7-1355U` vs `i7-7700HQ` + `GTX 1050`).
 - [x] Inicializar el repositorio Git local (`git init` + commits en rama `main`).
-- [ ] Subir el repositorio local a **GitHub** (`git remote add origin ...` + `git push -u origin main`) para clonarlo fácilmente desde el Equipo 2.
+- [x] Subir el repositorio local a **GitHub** (`https://github.com/3lvisarboleda7-ctrl/SentinelNutri-HVC`) para clonarlo desde el Equipo 2 y abrir los notebooks directamente en Google Colab.
 - [ ] Anotar la dirección IP local (LAN) del Equipo 2 (ej. `192.168.1.XX`) y colocarla en `config/.env.equipo1` (`EQUIPO2_LAN_IP`).
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + HDD 1 TB · GTX 1050)]`
-- [ ] Clonar el repositorio de GitHub en el **SSD** del Equipo 2 (ej. `C:\SentinelNutri\repo`).
+- [ ] Clonar el repositorio de GitHub en el **SSD** del Equipo 2 (`git clone https://github.com/3lvisarboleda7-ctrl/SentinelNutri-HVC.git C:\SentinelNutri\repo`).
 - [ ] Ejecutar en PowerShell (como Administrador) el script `.\deploy\scripts_equipo2\01_setup_ssd_hdd_dirs.ps1` para crear automáticamente:
   - En el **SSD (`C:\SentinelNutri\ssd\`)**: `postgres_data` y `n8n_data`.
   - En el **HDD de 1 TB (`D:\SentinelNutri\hdd\`)**: `raw`, `models`, `backups`, `ollama_models` y `diresa_convenio_ley29733`.

@@ -43,3 +43,4 @@ def test_catboost_shap_local_additivity_and_s5_threshold() -> None:
     assert len(pred.top_contribuciones_shap) >= 5
     assert "agua_cloro_adecuado_pct" in pred.valores_shap
     assert "dias_heladas_anual" in pred.valores_shap
+

@@ -84,11 +84,28 @@ def run_bootstrap() -> int:
     return 0
 
 
+def run_verify_env() -> int:
+    import os
+
+    node = detect_current_node()
+    checks = {
+        "node_id": node.node_id,
+        "recommended_env_file": node.recommended_env_file,
+        "GEMINI_API_KEY": "CONFIGURADO" if os.getenv("GEMINI_API_KEY") else "PENDIENTE (Usando plantilla/fallback)",
+        "TELEGRAM_BOT_TOKEN": "CONFIGURADO" if os.getenv("TELEGRAM_BOT_TOKEN") else "SIMULACION_LOCAL (Dry-Run)",
+        "GMAIL_APP_PASSWORD": "CONFIGURADO" if os.getenv("GMAIL_APP_PASSWORD") else "SIMULACION_LOCAL (Dry-Run)",
+        "CLOUDFLARE_TUNNEL_TOKEN": "CONFIGURADO" if os.getenv("CLOUDFLARE_TUNNEL_TOKEN") else "PENDIENTE_EN_EQUIPO_2",
+        "OLLAMA_BASE_URL": os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+    }
+    print(json.dumps(checks, ensure_ascii=False, indent=2))
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="CLI de SentinelNutri-HVC")
     parser.add_argument(
         "command",
-        choices=["whoami", "bootstrap", "export-artifacts"],
+        choices=["whoami", "verify-env", "bootstrap", "export-artifacts"],
         help="Comando a ejecutar",
     )
     parser.add_argument("--env", default="dev", help="Entorno de ejecución")
@@ -96,6 +113,8 @@ def main() -> None:
 
     if args.command == "whoami":
         sys.exit(run_whoami())
+    if args.command == "verify-env":
+        sys.exit(run_verify_env())
     if args.command == "bootstrap":
         sys.exit(run_bootstrap())
     if args.command == "export-artifacts":

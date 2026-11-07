@@ -22,8 +22,11 @@ Este archivo es leído automáticamente por Antigravity en cada sesión y turno 
   - `C:\Users\arbol\OneDrive\Univesidad_Nacional_de_Ingenieria\Ciclo_8\MSV\Brain of the Firm - Stafford Beer.pdf`
 
 ### B. Documentos de Gestión y Planificación Dentro del Repositorio
+- **Repositorio Remoto Oficial en GitHub:** `https://github.com/3lvisarboleda7-ctrl/SentinelNutri-HVC`
 - `README.md`: Visión general, arquitectura híbrida y comandos rápidos para Equipo 1 y Equipo 2.
 - `PENDIENTES_POR_FASE_EQUIPOS.md`: Checklist detallado por fases (Semanas 2 a 7) separado por `[EQUIPO 1]`, `[EQUIPO 1 -> COLAB]` y `[EQUIPO 2]`.
+- `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md`: Redacción académica completa en formato APA 7 de los Capítulos 5, 6 y 7 con tablas de métricas, valores SHAP, distritos críticos S5 y alineación PEI/ODS.
+- `docs/GUIA_PASO_A_PASO_EQUIPO1_Y_EQUIPO2.md`: Guía operativa con enlaces directos a Google Colab y comandos para Equipo 2.
 
 ---
 
