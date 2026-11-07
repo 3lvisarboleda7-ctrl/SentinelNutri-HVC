@@ -23,9 +23,8 @@
 - [x] **Implementación de las 3 Reglas Fijas y Guardarraíl Ley N.º 29733** (`[EQUIPO 1]` — **Completado y testeado 14/14**)
 - [x] **Esqueleto funcional de las 6 Herramientas del Agente Supervisor en FastAPI** (`[EQUIPO 1]` — **Completado**)
 - [x] **Catálogo de 100 distritos + 6 Scrapers + Exportación CSV/JSON y 4 Figuras XAI (300 DPI)** (`[EQUIPO 1]` — **Completado**)
-- [ ] **Fase 1 (Semana 2):** Aprovisionamiento físico del servidor local (`[EQUIPO 2]`) y red entre ambos equipos.
-- [ ] **Fase 2 (Semana 3):** Primera corrida masiva en el servidor local (`[EQUIPO 2]` guardando en HDD 1 TB).
-- [ ] **Fase 3 (Semana 4):** Ejecución del notebook en Google Colab (`[EQUIPO 1 -> COLAB]`) y copia del `.cbm` al Equipo 2.
+- [x] **Fase 3 (Semana 4): Ejecución de los 3 notebooks en Google Colab y modelo `.cbm` integrado** (`[EQUIPO 1 -> COLAB]` — **Completado**)
+- [ ] **Fase 1 y 2 (Semanas 2–3):** Aprovisionamiento del servidor local (`[EQUIPO 2]`: SSD + HDD 1 TB + Ollama GTX 1050 + Docker).
 - [ ] **Fase 4 (Semana 5):** Configuración del Agente Supervisor en `n8n`, Gemini API, Ollama GTX 1050 y bots de Telegram/Gmail.
 - [ ] **Fase 5 (Semana 6):** Publicación de `Cloudflare Tunnel`, aprobación desde celular y pruebas con el Dashboard Streamlit.
 - [ ] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 al informe final.
