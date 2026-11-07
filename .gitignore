@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Entorno y secretos
+.env
+config/.env.equipo1
+config/.env.equipo2
+
+# Datos locales y artefactos pesados (van en el HDD de 1 TB del Equipo 2)
+data/raw/
+data/processed/
+data/*.db
+data/*.sqlite3
+models/*.cbm
+models/*.pkl
+backups/
+
+# Pytest / IDEs
+.pytest_cache/
+.ruff_cache/
+.vscode/
+.idea/
+

@@ -1,0 +1,14 @@
+{
+  "type": "FeatureCollection",
+  "name": "huancavelica_distritos_monitoreados",
+  "features": [
+    {"type": "Feature", "properties": {"ubigeo": "090101", "provincia": "Huancavelica", "distrito": "Huancavelica"}, "geometry": {"type": "Point", "coordinates": [-74.9764, -12.7861]}},
+    {"type": "Feature", "properties": {"ubigeo": "090206", "provincia": "Acobamba", "distrito": "Paucará"}, "geometry": {"type": "Point", "coordinates": [-74.6711, -12.7239]}},
+    {"type": "Feature", "properties": {"ubigeo": "090301", "provincia": "Angaraes", "distrito": "Lircay"}, "geometry": {"type": "Point", "coordinates": [-74.7208, -12.9894]}},
+    {"type": "Feature", "properties": {"ubigeo": "090411", "provincia": "Castrovirreyna", "distrito": "Santa Ana"}, "geometry": {"type": "Point", "coordinates": [-75.1419, -13.0681]}},
+    {"type": "Feature", "properties": {"ubigeo": "090501", "provincia": "Churcampa", "distrito": "Churcampa"}, "geometry": {"type": "Point", "coordinates": [-74.3881, -12.7258]}},
+    {"type": "Feature", "properties": {"ubigeo": "090606", "provincia": "Huaytará", "distrito": "Pilpichaca"}, "geometry": {"type": "Point", "coordinates": [-75.0169, -13.3328]}},
+    {"type": "Feature", "properties": {"ubigeo": "090704", "provincia": "Tayacaja", "distrito": "Colcabamba"}, "geometry": {"type": "Point", "coordinates": [-74.6775, -12.4119]}}
+  ]
+}
+

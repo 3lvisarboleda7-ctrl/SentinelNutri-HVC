@@ -1,0 +1,168 @@
+{
+  "name": "SentinelNutri-HVC: Ciclo Principal del Agente Supervisor S4 y Reglas Fijas MSV",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "rule-fixed-1-schedule",
+      "name": "Regla Fija 1: Schedule Trigger (Inicio Semanal)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "agent": "toolsAgent",
+        "promptType": "define",
+        "text": "Ejecuta el ciclo semanal de vigilancia nutricional del Sistema 4 (GORE Huancavelica): 1) Invoca extraer_fuentes, 2) Si hay cambios o es revisión programada, invoca predecir_riesgo, 3) Para los distritos de mayor riesgo, consulta consultar_bd y explicar_riesgo (SHAP), 4) Invoca redactar_informe y 5) Invoca notificar.",
+        "options": {
+          "systemMessage": "Eres el Agente Supervisor del Sistema 4 (Inteligencia) de SentinelNutri-HVC para el GORE Huancavelica (Wang et al., 2026). Decides el orden de las 6 herramientas, pero NUNCA estimas valores numéricos de DCI por tu cuenta (eso lo hace predecir_riesgo con CatBoost) ni omites alertas críticas."
+        }
+      },
+      "id": "supervisor-ai-agent",
+      "name": "Agente Supervisor (AI Agent de n8n)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash"
+      },
+      "id": "llm-primary-gemini",
+      "name": "Gemini (Nivel Gratuito Google AI Studio)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [440, 520]
+    },
+    {
+      "parameters": {
+        "model": "llama3.2",
+        "baseUrl": "http://host.docker.internal:11434"
+      },
+      "id": "llm-backup-ollama-gtx1050",
+      "name": "Ollama Local Respaldo (Llama 3.2 en GTX 1050 Equipo 2)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [620, 520]
+    },
+    {
+      "parameters": {
+        "name": "extraer_fuentes",
+        "description": "Revisa los portales públicos (SIEN-HIS, ENDES, INEI, MEF, MIDIS, SENAMHI), detecta publicaciones nuevas por hash SHA-256 y las descarga al HDD.",
+        "method": "POST",
+        "url": "http://api_engine:8000/tools/extraer_fuentes"
+      },
+      "id": "tool-1-extraer",
+      "name": "Tool 1: extraer_fuentes",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [220, 100]
+    },
+    {
+      "parameters": {
+        "name": "consultar_bd",
+        "description": "Lee las series históricas 2014-2024 por distrito y el registro de cargas desde PostgreSQL.",
+        "method": "GET",
+        "url": "http://api_engine:8000/tools/consultar_bd"
+      },
+      "id": "tool-2-bd",
+      "name": "Tool 2: consultar_bd",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [380, 100]
+    },
+    {
+      "parameters": {
+        "name": "predecir_riesgo",
+        "description": "Calcula el índice de riesgo de DCI por distrito con el motor CatBoost (/predict).",
+        "method": "POST",
+        "url": "http://api_engine:8000/predict"
+      },
+      "id": "tool-3-predict",
+      "name": "Tool 3: predecir_riesgo (CatBoost /predict)",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [540, 100]
+    },
+    {
+      "parameters": {
+        "name": "explicar_riesgo",
+        "description": "Identifica las variables que explican el riesgo de cada distrito mediante SHAP (Auditoría S3*).",
+        "method": "GET",
+        "url": "http://api_engine:8000/tools/explicar_riesgo/090206"
+      },
+      "id": "tool-4-explain",
+      "name": "Tool 4: explicar_riesgo (SHAP)",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [700, 100]
+    },
+    {
+      "parameters": {
+        "name": "redactar_informe",
+        "description": "Elabora la síntesis narrativa S4 y las recomendaciones por provincia y sector alineadas al PEI 2020-2027 (solo datos agregados Ley 29733).",
+        "method": "POST",
+        "url": "http://api_engine:8000/tools/redactar_informe"
+      },
+      "id": "tool-5-redactar",
+      "name": "Tool 5: redactar_informe",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [860, 100]
+    },
+    {
+      "parameters": {
+        "name": "notificar",
+        "description": "Registra en el dashboard y prepara el envío de alertas hacia los canales S3 y S5.",
+        "method": "POST",
+        "url": "http://api_engine:8000/tools/notificar"
+      },
+      "id": "tool-6-notificar",
+      "name": "Tool 6: notificar",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [1020, 100]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.dci_proyectada_pct }}",
+              "operation": "larger",
+              "value2": 25.0
+            }
+          ]
+        }
+      },
+      "id": "rule-fixed-2-if-algedonic",
+      "name": "Regla Fija 2: Nodo IF · Umbral de Riesgo (DCI proyectada > 25% -> S5)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID_S3_APROBACION }}",
+        "message": "📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?"
+      },
+      "id": "rule-fixed-3-human-approval",
+      "name": "Regla Fija 3: Aprobación Humana (Telegram / Gmail con espera de respuesta vía Cloudflare Tunnel)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1140, 400]
+    }
+  ],
+  "connections": {}
+}
+

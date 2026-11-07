@@ -1,0 +1,26 @@
+{
+  "name": "SentinelNutri-HVC: Autodiagnóstico y Notificación de Fallas de Extracción por Telegram",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error-trigger-node",
+      "name": "Error Trigger (Fallo en Scraper por Cambio de Diseño de Portal)",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [260, 260]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID_ADMIN_TECH }}",
+        "text": "⚠️ [SentinelNutri-HVC · Autodiagnóstico S4]\nFallo detectado en flujo de extracción automatizada.\nFlujo: {{ $json.workflow.name }}\nNodo: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}"
+      },
+      "id": "telegram-error-notify",
+      "name": "Notificar Desviación por Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [560, 260]
+    }
+  ],
+  "connections": {}
+}
+

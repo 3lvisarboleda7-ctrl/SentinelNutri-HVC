@@ -1,0 +1,29 @@
+# ============================================================================
+# DOCKER COMPOSE DE DESARROLLO LIGERO (Para pruebas locales sin HDD separado)
+# ============================================================================
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sentinelnutri_dev_pg
+    environment:
+      POSTGRES_USER: sentinel_user
+      POSTGRES_PASSWORD: sentinel_pass_2026
+      POSTGRES_DB: sentinelnutri_hvc
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../database/migrations:/docker-entrypoint-initdb.d:ro
+
+  api_engine:
+    build:
+      context: ..
+      dockerfile: src/sentinelnutri/interfaces/api/Dockerfile
+    container_name: sentinelnutri_dev_api
+    depends_on:
+      - postgres
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg2://sentinel_user:sentinel_pass_2026@postgres:5432/sentinelnutri_hvc
+    ports:
+      - "8000:8000"
+
