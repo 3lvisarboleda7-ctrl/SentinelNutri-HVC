@@ -1,9 +1,11 @@
 """
 CLI de Administración y Orquestación Local — SentinelNutri-HVC (Ejecutable desde Equipo 1 o Equipo 2).
 
-Permite:
-- `bootstrap`: Inicializar la BD, ejecutar el Backfill Histórico (2014-2024), evaluar el motor CatBoost+SHAP
-  y simular un ciclo completo del Agente Supervisor con las 6 herramientas y las 3 reglas fijas.
+Comandos:
+- `whoami`: Detecta e imprime automáticamente si estás en el EQUIPO 1 (Estación de Desarrollo)
+  o en el EQUIPO 2 (Servidor Local con SSD + HDD 1TB + GTX 1050).
+- `bootstrap`: Inicializa la BD, ejecuta el Backfill Histórico (2014-2024), evalúa el motor CatBoost+SHAP
+  y simula un ciclo completo del Agente Supervisor con las 6 herramientas y las 3 reglas fijas.
 """
 
 import argparse
@@ -18,6 +20,7 @@ from sentinelnutri.application import (
     Tool5RedactarInformeUseCase,
     Tool6NotificarUseCase,
 )
+from sentinelnutri.config import detect_current_node
 from sentinelnutri.infrastructure.ml_xai import CatBoostShapPredictor
 from sentinelnutri.infrastructure.notifications import (
     GmailNotificationAdapter,
@@ -30,10 +33,19 @@ from sentinelnutri.infrastructure.persistence import (
 from sentinelnutri.infrastructure.scrapers import MultiSourceScraperOrchestrator
 
 
+def run_whoami() -> int:
+    node = detect_current_node()
+    print(json.dumps(node.to_dict(), ensure_ascii=False, indent=2))
+    return 0
+
+
 def run_bootstrap() -> int:
+    node = detect_current_node()
+    print(f"=== [NODO DETECTADO: {node.node_id}] {node.role_name} ===")
+    print(f"    Hostname: {node.hostname} | Detección: {node.detection_method}")
     _, session_factory = create_db_engine_and_session()
     repo = SqlAlchemyRepository(session_factory)
-    scraper = MultiSourceScraperOrchestrator(repository=repo)
+    scraper = MultiSourceScraperOrchestrator(repository=repo, raw_data_dir=node.active_raw_data_dir)
     predictor = CatBoostShapPredictor()
     telegram = TelegramNotificationAdapter()
     gmail = GmailNotificationAdapter()
@@ -73,14 +85,15 @@ def run_bootstrap() -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="CLI de SentinelNutri-HVC")
-    parser.add_argument("command", choices=["bootstrap"], help="Comando a ejecutar")
+    parser.add_argument("command", choices=["whoami", "bootstrap"], help="Comando a ejecutar")
     parser.add_argument("--env", default="dev", help="Entorno de ejecución")
     args = parser.parse_args()
 
+    if args.command == "whoami":
+        sys.exit(run_whoami())
     if args.command == "bootstrap":
         sys.exit(run_bootstrap())
 
 
 if __name__ == "__main__":
     main()
-

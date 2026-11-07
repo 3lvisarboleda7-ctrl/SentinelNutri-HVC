@@ -39,12 +39,9 @@
 - [x] Diseñar la arquitectura Clean/Hexagonal (`domain`, `application`, `infrastructure`, `interfaces`).
 - [x] Crear `deploy/docker-compose.equipo2.yml` separando volúmenes SSD (`C:\`) y HDD (`D:\`).
 - [x] Crear los scripts PowerShell de aprovisionamiento para el Equipo 2 en `deploy/scripts_equipo2/`.
-- [ ] Inicializar el repositorio Git local y subirlo a un repositorio privado/público en **GitHub** para clonarlo fácilmente desde el Equipo 2:
-  ```powershell
-  git init
-  git add .
-  git commit -m "feat: arquitectura base SentinelNutri-HVC para Equipo 1 y Equipo 2"
-  ```
+- [x] Implementar detector automático de máquina (`python -m sentinelnutri.cli whoami` en `src/sentinelnutri/config/node_detector.py`) por huella de hardware/SO (`i7-1355U` vs `i7-7700HQ` + `GTX 1050`).
+- [x] Inicializar el repositorio Git local (`git init` + commits en rama `main`).
+- [ ] Subir el repositorio local a **GitHub** (`git remote add origin ...` + `git push -u origin main`) para clonarlo fácilmente desde el Equipo 2.
 - [ ] Anotar la dirección IP local (LAN) del Equipo 2 (ej. `192.168.1.XX`) y colocarla en `config/.env.equipo1` (`EQUIPO2_LAN_IP`).
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + HDD 1 TB · GTX 1050)]`
@@ -67,7 +64,7 @@
 ### FASE 2 (Semana 3 del Cronograma): Extracción Automatizada (Web Scraping) y Preprocesamiento
 
 #### En el `[EQUIPO 1 · Estación de Desarrollo (Windows 11)]`
-- [ ] **Catálogo completo de Ubigeos:** Ampliar `database/migrations/V2__seed_ubigeos_huancavelica.sql` y `src/sentinelnutri/infrastructure/persistence/database.py` de los 28 distritos representativos actuales a los **100–102 distritos completos** de las 7 provincias de Huancavelica (`090101` al `090723`).
+- [x] **Catálogo completo de Ubigeos:** Ampliar `src/sentinelnutri/infrastructure/persistence/database.py` a los **100 distritos oficiales de las 7 provincias de Huancavelica** (`090101` al `090721`, integrando `1 100` registros históricos 2014–2024).
 - [ ] **Scraper 1 — SIEN-HIS (INS/CENAN) y Datos Abiertos (`sien_ins_scraper.py`):**
   - Programar la descarga automática de los archivos CSV/XLSX de la Plataforma Nacional de Datos Abiertos (`datosabiertos.gob.pe`) y reportes PDF del INS (2014–2024), extrayendo las tablas distritales de DCI, anemia y bajo peso con `pdfplumber` / `pymupdf`.
 - [ ] **Scraper 2 — ENDES INEI (`endes_inei_scraper.py`):**

@@ -1,0 +1,30 @@
+{
+  "nodes": {
+    "EQUIPO_1": {
+      "node_id": "EQUIPO_1",
+      "role_name": "Equipo 1 — Estación de Desarrollo (VS Code + Pruebas + Google Colab)",
+      "hostnames": ["ELVIS"],
+      "cpu_substrings": ["i7-1355U", "1355U"],
+      "os_substrings": ["Windows 11"],
+      "gpu_expected": "Intel Iris Xe (Entrenamiento pesado delegado a Google Colab)",
+      "default_env_template": "config/.env.equipo1.example",
+      "default_database_url": "sqlite:///./data/sentinelnutri_dev.db",
+      "raw_data_dir": "./data/raw",
+      "models_dir": "./data/models"
+    },
+    "EQUIPO_2": {
+      "node_id": "EQUIPO_2",
+      "role_name": "Equipo 2 — Servidor Local (Docker en SSD + Datos/Backups en HDD 1TB + Ollama GTX 1050 + Cloudflare Tunnel)",
+      "hostnames": ["SERVIDOR-HVC", "EQUIPO2", "DESKTOP-SERVER"],
+      "cpu_substrings": ["i7-7700HQ", "7700HQ"],
+      "os_substrings": ["Windows 10"],
+      "gpu_expected": "NVIDIA GeForce GTX 1050 (4 GB VRAM)",
+      "default_env_template": "config/.env.equipo2.example",
+      "default_database_url": "postgresql+psycopg2://sentinel_user:sentinel_pass_2026@localhost:5432/sentinelnutri_hvc",
+      "ssd_root": "C:/SentinelNutri/ssd",
+      "hdd_root": "D:/SentinelNutri/hdd",
+      "raw_data_dir": "D:/SentinelNutri/hdd/raw",
+      "models_dir": "D:/SentinelNutri/hdd/models"
+    }
+  }
+}

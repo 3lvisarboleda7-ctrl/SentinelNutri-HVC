@@ -27,9 +27,17 @@ Este archivo es leído automáticamente por Antigravity en cada sesión y turno 
 
 ---
 
-## 2. Infraestructura Dual de Costo Cero (Tabla 3 del Proyecto)
+## 2. Infraestructura Dual de Costo Cero y Detección Automática de Nodo (Tabla 3)
 
-1. **Equipo 1 — Estación de Desarrollo (ESTA PC):**
+> **Regla de Detección Automática (Equipo 1 vs Equipo 2):** Como la carpeta del proyecto puede sincronizarse por **OneDrive** o clonarse por **Git** entre ambas computadoras, Antigravity y el código Python detectan automáticamente en qué máquina están corriendo mediante [`src/sentinelnutri/config/node_detector.py`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/src/sentinelnutri/config/node_detector.py) y el comando:
+> ```powershell
+> $env:PYTHONPATH="src;."; python -m sentinelnutri.cli whoami
+> ```
+> - Si detecta `Hostname=ELVIS` o CPU `i7-1355U` o `Windows 11 Pro` $\rightarrow$ **`EQUIPO_1` (Estación de Desarrollo)**.
+> - Si detecta CPU `i7-7700HQ` o GPU `NVIDIA GTX 1050` o `D:\SentinelNutri\hdd` $\rightarrow$ **`EQUIPO_2` (Servidor Local)**.
+> - También se puede forzar localmente creando un archivo `.node_override` (ignorado por Git) con el texto `EQUIPO_1` o `EQUIPO_2`.
+
+1. **Equipo 1 — Estación de Desarrollo (Hostname: `ELVIS`):**
    - **Hardware/SO:** Intel Core i7-1355U · 16 GB RAM · SSD 477 GB · Windows 11 Pro.
    - **Rol:** Desarrollo en VS Code, pruebas (`python tests/run_all_tests.py`), ejecución de notebooks pesados en **Google Colab** y acceso por red local (LAN) a `n8n` (`:5678`) y `Streamlit` (`:8501`) del Equipo 2.
 2. **Equipo 2 — Servidor Local:**
@@ -110,3 +118,4 @@ Mapeadas 1 a 1 con la **Tabla 5** del documento de perfil:
   ```powershell
   $env:PYTHONPATH="src;."; python tests/run_all_tests.py
   ```
+
