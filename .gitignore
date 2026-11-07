@@ -20,6 +20,7 @@ data/processed/
 data/*.db
 data/*.sqlite3
 models/*.cbm
+!data/models/catboost_dci_hvc.cbm
 models/*.pkl
 backups/
 

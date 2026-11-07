@@ -47,5 +47,11 @@ foreach ($path in $HddPaths) {
     }
 }
 
+$RepoModel = Join-Path $PSScriptRoot "..\..\data\models\catboost_dci_hvc.cbm"
+if (Test-Path $RepoModel) {
+    Copy-Item $RepoModel "D:\SentinelNutri\hdd\models\catboost_dci_hvc.cbm" -Force
+    Write-Host "[HDD 1TB] Modelo CatBoost (catboost_dci_hvc.cbm) copiado a D:\SentinelNutri\hdd\models\" -ForegroundColor Green
+}
+
 Write-Host "Estructura lista en Equipo 2." -ForegroundColor Cyan
 

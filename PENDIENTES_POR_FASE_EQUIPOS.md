@@ -95,7 +95,7 @@
 #### En el `[EQUIPO 1 -> GOOGLE COLAB (Entrenamiento Pesado en la Nube)]`
 - [x] Exportar el dataset histórico consolidado `2014–2024` a [`data/exports/panel_distrital_hvc_2014_2024.csv`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/data/exports/panel_distrital_hvc_2014_2024.csv) (`1 100` filas × 24 columnas) mediante `python -m sentinelnutri.cli export-artifacts`.
 - [x] Preparar los 3 notebooks completos en `notebooks_colab/` (`01_backfill_y_exploracion_sien_2014_2024.ipynb`, `02_entrenamiento_catboost_shap_colab.ipynb`, `03_evaluacion_xai_y_gobernanza.ipynb`).
-- [ ] Abrir Google Colab desde el navegador del **Equipo 1**, subir `notebooks_colab/02_entrenamiento_catboost_shap_colab.ipynb` (y opcionalmente `data/exports/panel_distrital_hvc_2014_2024.csv`) y ejecutar todas las celdas para descargar `catboost_dci_hvc.cbm`.
+- [x] Ejecutar `02_entrenamiento_catboost_shap_colab.ipynb` en **Google Colab** y descargar `catboost_dci_hvc.cbm` (`364 KB`, integrado en [`data/models/catboost_dci_hvc.cbm`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/data/models/catboost_dci_hvc.cbm)) junto con las 3 gráficas de SHAP/ROC de Colab en `docs/figures/colab_*.png`.
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · HDD 1 TB + SSD)]`
 - [ ] Copiar por red local (LAN) el modelo entrenado `catboost_dci_hvc.cbm` y `shap_explainer.pkl` desde el Equipo 1 hacia la carpeta del **HDD de 1 TB del Equipo 2**: `D:\SentinelNutri\hdd\models\`.
