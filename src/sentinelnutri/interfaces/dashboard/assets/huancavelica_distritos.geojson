@@ -1,14 +1,1705 @@
 {
   "type": "FeatureCollection",
-  "name": "huancavelica_distritos_monitoreados",
   "features": [
-    {"type": "Feature", "properties": {"ubigeo": "090101", "provincia": "Huancavelica", "distrito": "Huancavelica"}, "geometry": {"type": "Point", "coordinates": [-74.9764, -12.7861]}},
-    {"type": "Feature", "properties": {"ubigeo": "090206", "provincia": "Acobamba", "distrito": "Paucará"}, "geometry": {"type": "Point", "coordinates": [-74.6711, -12.7239]}},
-    {"type": "Feature", "properties": {"ubigeo": "090301", "provincia": "Angaraes", "distrito": "Lircay"}, "geometry": {"type": "Point", "coordinates": [-74.7208, -12.9894]}},
-    {"type": "Feature", "properties": {"ubigeo": "090411", "provincia": "Castrovirreyna", "distrito": "Santa Ana"}, "geometry": {"type": "Point", "coordinates": [-75.1419, -13.0681]}},
-    {"type": "Feature", "properties": {"ubigeo": "090501", "provincia": "Churcampa", "distrito": "Churcampa"}, "geometry": {"type": "Point", "coordinates": [-74.3881, -12.7258]}},
-    {"type": "Feature", "properties": {"ubigeo": "090606", "provincia": "Huaytará", "distrito": "Pilpichaca"}, "geometry": {"type": "Point", "coordinates": [-75.0169, -13.3328]}},
-    {"type": "Feature", "properties": {"ubigeo": "090704", "provincia": "Tayacaja", "distrito": "Colcabamba"}, "geometry": {"type": "Point", "coordinates": [-74.6775, -12.4119]}}
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090101",
+        "provincia": "Huancavelica",
+        "distrito": "Huancavelica",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3676
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9764,
+          -12.7861
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090102",
+        "provincia": "Huancavelica",
+        "distrito": "Acobambilla",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3795
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2819,
+          -12.6542
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090103",
+        "provincia": "Huancavelica",
+        "distrito": "Acoria",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3167
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.8614,
+          -12.6378
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090104",
+        "provincia": "Huancavelica",
+        "distrito": "Conayca",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3682
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0083,
+          -12.5667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090105",
+        "provincia": "Huancavelica",
+        "distrito": "Cuenca",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3167
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0681,
+          -12.5931
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090106",
+        "provincia": "Huancavelica",
+        "distrito": "Huachocolpa",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3956
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9917,
+          -13.0569
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090107",
+        "provincia": "Huancavelica",
+        "distrito": "Huayllahuara",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3896
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1583,
+          -12.6208
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090108",
+        "provincia": "Huancavelica",
+        "distrito": "Huando",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3562
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9453,
+          -12.5625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090109",
+        "provincia": "Huancavelica",
+        "distrito": "Izcuchaca",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 2939
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9961,
+          -12.4969
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090110",
+        "provincia": "Huancavelica",
+        "distrito": "Laria",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3861
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.025,
+          -12.6056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090111",
+        "provincia": "Huancavelica",
+        "distrito": "Manta",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3727
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1889,
+          -12.6278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090112",
+        "provincia": "Huancavelica",
+        "distrito": "Mariscal Cáceres",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 2847
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9528,
+          -12.5361
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090113",
+        "provincia": "Huancavelica",
+        "distrito": "Moya",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3162
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1389,
+          -12.5333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090114",
+        "provincia": "Huancavelica",
+        "distrito": "Nuevo Occoro",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3825
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.075,
+          -12.5861
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090115",
+        "provincia": "Huancavelica",
+        "distrito": "Palca",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3650
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9778,
+          -12.6611
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090116",
+        "provincia": "Huancavelica",
+        "distrito": "Pilchaca",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3584
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.075,
+          -12.5222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090117",
+        "provincia": "Huancavelica",
+        "distrito": "Vilca",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3275
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1778,
+          -12.5889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090118",
+        "provincia": "Huancavelica",
+        "distrito": "Yauli",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3391
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.8511,
+          -12.7697
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090119",
+        "provincia": "Huancavelica",
+        "distrito": "Ascensión",
+        "red_salud": "Red de Salud Huancavelica",
+        "altitud_msnm": 3650
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.98,
+          -12.78
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090201",
+        "provincia": "Acobamba",
+        "distrito": "Acobamba",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3423
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5694,
+          -12.8419
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090202",
+        "provincia": "Acobamba",
+        "distrito": "Andabamba",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3460
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6214,
+          -12.7483
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090203",
+        "provincia": "Acobamba",
+        "distrito": "Anta",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3600
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6528,
+          -12.8111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090204",
+        "provincia": "Acobamba",
+        "distrito": "Caja",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3512
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5028,
+          -12.9278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090205",
+        "provincia": "Acobamba",
+        "distrito": "Marcas",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3394
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.525,
+          -12.9667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090206",
+        "provincia": "Acobamba",
+        "distrito": "Paucará",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3806
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6711,
+          -12.7239
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090207",
+        "provincia": "Acobamba",
+        "distrito": "Pomacocha",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3150
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5361,
+          -12.8889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090208",
+        "provincia": "Acobamba",
+        "distrito": "Rosario",
+        "red_salud": "Red de Salud Acobamba",
+        "altitud_msnm": 3640
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6142,
+          -12.7686
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090301",
+        "provincia": "Angaraes",
+        "distrito": "Lircay",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3278
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.7208,
+          -12.9894
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090302",
+        "provincia": "Angaraes",
+        "distrito": "Anchonga",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3298
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.745,
+          -12.9369
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090303",
+        "provincia": "Angaraes",
+        "distrito": "Callanmarca",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3526
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6667,
+          -12.9167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090304",
+        "provincia": "Angaraes",
+        "distrito": "Ccochaccasa",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 4150
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.7981,
+          -12.9278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090305",
+        "provincia": "Angaraes",
+        "distrito": "Chincho",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3134
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4778,
+          -13.0111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090306",
+        "provincia": "Angaraes",
+        "distrito": "Congalla",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3528
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5972,
+          -13.0278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090307",
+        "provincia": "Angaraes",
+        "distrito": "Huanca-Huanca",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3567
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6528,
+          -12.9667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090308",
+        "provincia": "Angaraes",
+        "distrito": "Huayllay Grande",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3625
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6917,
+          -12.9389
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090309",
+        "provincia": "Angaraes",
+        "distrito": "Julcamarca",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3418
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4417,
+          -13.025
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090310",
+        "provincia": "Angaraes",
+        "distrito": "San Antonio de Antaparco",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 2771
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5167,
+          -13.1167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090311",
+        "provincia": "Angaraes",
+        "distrito": "Santo Tomás de Pata",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3156
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4583,
+          -13.1056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090312",
+        "provincia": "Angaraes",
+        "distrito": "Secclla",
+        "red_salud": "Red de Salud Angaraes",
+        "altitud_msnm": 3340
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5819,
+          -13.0956
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090401",
+        "provincia": "Castrovirreyna",
+        "distrito": "Castrovirreyna",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3956
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.3183,
+          -13.2806
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090402",
+        "provincia": "Castrovirreyna",
+        "distrito": "Arma",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3336
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4667,
+          -13.1667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090403",
+        "provincia": "Castrovirreyna",
+        "distrito": "Aurahuá",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3470
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5333,
+          -13.0833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090404",
+        "provincia": "Castrovirreyna",
+        "distrito": "Capillas",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3218
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5333,
+          -13.3667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090405",
+        "provincia": "Castrovirreyna",
+        "distrito": "Chupamarca",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3325
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5833,
+          -13.0333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090406",
+        "provincia": "Castrovirreyna",
+        "distrito": "Cocas",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3246
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.3833,
+          -13.2667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090407",
+        "provincia": "Castrovirreyna",
+        "distrito": "Huachos",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 2737
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5347,
+          -13.2325
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090408",
+        "provincia": "Castrovirreyna",
+        "distrito": "Huamatambo",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 3056
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.55,
+          -13.1833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090409",
+        "provincia": "Castrovirreyna",
+        "distrito": "Mollepampa",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 2465
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4667,
+          -13.3167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090410",
+        "provincia": "Castrovirreyna",
+        "distrito": "San Juan",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 1916
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.6,
+          -13.25
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090411",
+        "provincia": "Castrovirreyna",
+        "distrito": "Santa Ana",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 4473
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1419,
+          -13.0681
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090412",
+        "provincia": "Castrovirreyna",
+        "distrito": "Tantara",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 2882
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5667,
+          -13.1333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090413",
+        "provincia": "Castrovirreyna",
+        "distrito": "Ticrapo",
+        "red_salud": "Red de Salud Castrovirreyna",
+        "altitud_msnm": 2184
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4333,
+          -13.3833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090501",
+        "provincia": "Churcampa",
+        "distrito": "Churcampa",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 3262
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.3881,
+          -12.7258
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090502",
+        "provincia": "Churcampa",
+        "distrito": "Anco",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 2404
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5875,
+          -12.6331
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090503",
+        "provincia": "Churcampa",
+        "distrito": "Chinchihuasi",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 2800
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.55,
+          -12.5
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090504",
+        "provincia": "Churcampa",
+        "distrito": "El Carmen",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 3114
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.45,
+          -12.6833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090505",
+        "provincia": "Churcampa",
+        "distrito": "La Merced",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 2632
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.35,
+          -12.7667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090506",
+        "provincia": "Churcampa",
+        "distrito": "Locroja",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 3379
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4167,
+          -12.6667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090507",
+        "provincia": "Churcampa",
+        "distrito": "Paucarbamba",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 3370
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5361,
+          -12.5594
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090508",
+        "provincia": "Churcampa",
+        "distrito": "San Miguel de Mayocc",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 2212
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.3833,
+          -12.8
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090509",
+        "provincia": "Churcampa",
+        "distrito": "San Pedro de Coris",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 3580
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4056,
+          -12.5681
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090510",
+        "provincia": "Churcampa",
+        "distrito": "Pachamarca",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 2730
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4833,
+          -12.4833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090511",
+        "provincia": "Churcampa",
+        "distrito": "Cosme",
+        "red_salud": "Red de Salud Churcampa",
+        "altitud_msnm": 3465
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6167,
+          -12.6167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090601",
+        "provincia": "Huaytará",
+        "distrito": "Huaytará",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 2658
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.3531,
+          -13.6042
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090602",
+        "provincia": "Huaytará",
+        "distrito": "Ayaví",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3758
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.25,
+          -13.5667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090603",
+        "provincia": "Huaytará",
+        "distrito": "Córdova",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3216
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1833,
+          -13.9833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090604",
+        "provincia": "Huaytará",
+        "distrito": "Huayacundo Arma",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3150
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.3667,
+          -13.5333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090605",
+        "provincia": "Huaytará",
+        "distrito": "Laramarca",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3342
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1167,
+          -13.9167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090606",
+        "provincia": "Huaytará",
+        "distrito": "Ocoyo",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 1953
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2,
+          -13.8833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090607",
+        "provincia": "Huaytará",
+        "distrito": "Pilpichaca",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 4092
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0169,
+          -13.3328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090608",
+        "provincia": "Huaytará",
+        "distrito": "Querco",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 2856
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0333,
+          -13.8
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090609",
+        "provincia": "Huaytará",
+        "distrito": "Quito-Arma",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 2956
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4,
+          -13.5167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090610",
+        "provincia": "Huaytará",
+        "distrito": "San Antonio de Cusicancha",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3223
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.3,
+          -13.4833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090611",
+        "provincia": "Huaytará",
+        "distrito": "San Francisco de Sangayaico",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3380
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2333,
+          -13.6833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090612",
+        "provincia": "Huaytará",
+        "distrito": "San Isidro",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3615
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2667,
+          -13.7333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090613",
+        "provincia": "Huaytará",
+        "distrito": "Santiago de Chocorvos",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 2570
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2758,
+          -13.8286
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090614",
+        "provincia": "Huaytará",
+        "distrito": "Santiago de Quirahuara",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 2802
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.15,
+          -13.7833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090615",
+        "provincia": "Huaytará",
+        "distrito": "Santo Domingo de Capillas",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3367
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2,
+          -13.6167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090616",
+        "provincia": "Huaytará",
+        "distrito": "Tambo",
+        "red_salud": "Red de Salud Huaytará",
+        "altitud_msnm": 3141
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2333,
+          -13.5833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090701",
+        "provincia": "Tayacaja",
+        "distrito": "Pampas",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3276
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.8689,
+          -12.3986
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090702",
+        "provincia": "Tayacaja",
+        "distrito": "Acostambo",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3597
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0542,
+          -12.3611
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090703",
+        "provincia": "Tayacaja",
+        "distrito": "Acraquia",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3287
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.95,
+          -12.3833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090704",
+        "provincia": "Tayacaja",
+        "distrito": "Ahuaycha",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3280
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9167,
+          -12.3833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090705",
+        "provincia": "Tayacaja",
+        "distrito": "Colcabamba",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2979
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6775,
+          -12.4119
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090706",
+        "provincia": "Tayacaja",
+        "distrito": "Daniel Hernández",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3280
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.85,
+          -12.3833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090707",
+        "provincia": "Tayacaja",
+        "distrito": "Huachocolpa",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2907
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5944,
+          -12.1592
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090708",
+        "provincia": "Tayacaja",
+        "distrito": "Huaribamba",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2996
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9667,
+          -12.3167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090709",
+        "provincia": "Tayacaja",
+        "distrito": "Ñahuimpuquio",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3630
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0667,
+          -12.3333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090710",
+        "provincia": "Tayacaja",
+        "distrito": "Pazos",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3840
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.0667,
+          -12.25
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090711",
+        "provincia": "Tayacaja",
+        "distrito": "Quishuar",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3130
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.7667,
+          -12.35
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090712",
+        "provincia": "Tayacaja",
+        "distrito": "Salcabamba",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3037
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.7833,
+          -12.2167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090713",
+        "provincia": "Tayacaja",
+        "distrito": "Salcahuasi",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3150
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.7333,
+          -12.1667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090714",
+        "provincia": "Tayacaja",
+        "distrito": "San Marcos de Rocchac",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3182
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.8833,
+          -12.15
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090715",
+        "provincia": "Tayacaja",
+        "distrito": "Surcubamba",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2585
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6292,
+          -12.1219
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090716",
+        "provincia": "Tayacaja",
+        "distrito": "Tintay Puncu",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2350
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.5333,
+          -12.0833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090717",
+        "provincia": "Tayacaja",
+        "distrito": "Quichuas",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3050
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.7333,
+          -12.4667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090718",
+        "provincia": "Tayacaja",
+        "distrito": "Andaymarca",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2850
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.65,
+          -12.3333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090719",
+        "provincia": "Tayacaja",
+        "distrito": "Roble",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 2480
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4833,
+          -12.0667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090720",
+        "provincia": "Tayacaja",
+        "distrito": "Pichos",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3200
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.9167,
+          -12.2833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ubigeo": "090721",
+        "provincia": "Tayacaja",
+        "distrito": "Santiago de Tucuma",
+        "red_salud": "Red de Salud Tayacaja",
+        "altitud_msnm": 3310
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.8833,
+          -12.3667
+        ]
+      }
+    }
   ]
 }
-

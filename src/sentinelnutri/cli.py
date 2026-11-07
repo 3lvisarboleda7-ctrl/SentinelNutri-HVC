@@ -20,6 +20,7 @@ from sentinelnutri.application import (
     Tool5RedactarInformeUseCase,
     Tool6NotificarUseCase,
 )
+from sentinelnutri.application.export_artifacts_service import export_all_equipo1_artifacts
 from sentinelnutri.config import detect_current_node
 from sentinelnutri.infrastructure.ml_xai import CatBoostShapPredictor
 from sentinelnutri.infrastructure.notifications import (
@@ -85,7 +86,11 @@ def run_bootstrap() -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="CLI de SentinelNutri-HVC")
-    parser.add_argument("command", choices=["whoami", "bootstrap"], help="Comando a ejecutar")
+    parser.add_argument(
+        "command",
+        choices=["whoami", "bootstrap", "export-artifacts"],
+        help="Comando a ejecutar",
+    )
     parser.add_argument("--env", default="dev", help="Entorno de ejecución")
     args = parser.parse_args()
 
@@ -93,6 +98,10 @@ def main() -> None:
         sys.exit(run_whoami())
     if args.command == "bootstrap":
         sys.exit(run_bootstrap())
+    if args.command == "export-artifacts":
+        summary = export_all_equipo1_artifacts()
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+        sys.exit(0)
 
 
 if __name__ == "__main__":

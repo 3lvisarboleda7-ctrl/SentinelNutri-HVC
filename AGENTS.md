@@ -109,12 +109,33 @@ Mapeadas 1 a 1 con la **Tabla 5** del documento de perfil:
 
 ---
 
-## 4. Comandos Clave de Verificación en Equipo 1
+## 4. Artefactos Exportados, Dataset para Google Colab y Figuras de 300 DPI (`data/exports/` y `docs/figures/`)
+Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_service.py`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/src/sentinelnutri/application/export_artifacts_service.py):
+- `data/exports/panel_distrital_hvc_2014_2024.csv`: Panel histórico consolidado de `1 100` registros (100 distritos × 11 años × 24 columnas), listo para subir a Google Colab.
+- `data/exports/metrics_report.json`: Reporte completo de validación ($\text{AUC-ROC} = 0,9993 \ge 0,90$, $\text{F1} = 0,8917$, matriz de confusión, importancia global SHAP y resumen de las 7 provincias S2).
+- `data/exports/matriz_gobernanza_oei_ods_hvc.csv`: Matriz de los 100 distritos con proyección DCI, canal MSV (`S5_ALGEDONICO` vs `S3_CONTROL`), factor SHAP principal, recomendaciones sectoriales (Salud, Agua, Agricultura) y vinculación con los **OEI del PEI 2020–2027** y **ODS 2, 3 y 6**.
+- `docs/figures/`: 4 figuras académicas en `300 DPI` listas para los Capítulos 5, 6 y 7 del informe:
+  - `fig1_roc_cv5_catboost_hvc.png`
+  - `fig2_shap_importancia_global_s3_star.png`
+  - `fig3_shap_waterfall_distrito_critico.png`
+  - `fig4_homeostato_s3_s4_7_provincias.png`
+
+---
+
+## 5. Comandos Clave de Verificación en Equipo 1
+- Detectar automáticamente si estás en el Equipo 1 o en el Equipo 2:
+  ```powershell
+  $env:PYTHONPATH="src;."; python -m sentinelnutri.cli whoami
+  ```
 - Ejecutar bootstrap completo (Backfill 100 distritos 2014–2024 + Evaluación ML + Ciclo Supervisor):
   ```powershell
   $env:PYTHONPATH="src;."; python -m sentinelnutri.cli bootstrap --env dev
   ```
-- Ejecutar las 10 pruebas unitarias y de integración E2E:
+- Regenerar el CSV para Google Colab, reporte de métricas, matriz OEI/ODS y las 4 figuras de 300 DPI:
+  ```powershell
+  $env:PYTHONPATH="src;."; python -m sentinelnutri.cli export-artifacts
+  ```
+- Ejecutar las 14 pruebas unitarias y de integración E2E:
   ```powershell
   $env:PYTHONPATH="src;."; python tests/run_all_tests.py
   ```

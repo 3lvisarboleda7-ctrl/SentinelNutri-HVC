@@ -21,6 +21,14 @@ from tests.unit.test_ethical_scraper_hash import (
 from tests.unit.test_privacy_ley29733 import (
     test_non_strict_privacy_guard_strips_nominal_fields_cleanly,
 )
+from tests.unit.test_catboost_shap_contract import (
+    test_catboost_shap_local_additivity_and_s5_threshold,
+)
+from tests.unit.test_scrapers_and_ubigeo import (
+    test_node_detector_identifies_equipo1_or_equipo2,
+    test_sien_mef_midis_and_senamhi_parsers,
+    test_ubigeo_harmonizer_covers_100_huancavelica_districts,
+)
 from sentinelnutri.domain.rules.privacy_guard import (
     PrivacyViolationError,
     sanitize_district_payload_for_llm,
@@ -50,6 +58,10 @@ def main() -> None:
         ("Ética de Scraping: Huella digital SHA-256", test_sha256_hash_change_detection),
         ("Ética de Scraping: Respeto a robots.txt", test_robots_txt_compliance),
         ("Ética de Scraping: User-Agent académico FIIS-UNI", test_academic_user_agent_validation),
+        ("Motor CatBoost + SHAP: Aditividad local y umbral S5 (>25%)", test_catboost_shap_local_additivity_and_s5_threshold),
+        ("Infraestructura Dual: Detección automática Equipo 1 vs Equipo 2", test_node_detector_identifies_equipo1_or_equipo2),
+        ("Armonizador ETL: Catálogo de los 100 distritos de Huancavelica", test_ubigeo_harmonizer_covers_100_huancavelica_districts),
+        ("Scrapers Especializados: Parsers SIEN-HIS, MEF PAN, MIDIS y SENAMHI", test_sien_mef_midis_and_senamhi_parsers),
     ]
 
     for name, fn in tests:
@@ -63,9 +75,8 @@ def main() -> None:
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
-    print("\n=== TODAS LAS PRUEBAS (10/10) PASARON EXITOSAMENTE EN EL EQUIPO 1 ===")
+    print(f"\n=== TODAS LAS PRUEBAS ({len(tests) + 1}/{len(tests) + 1}) PASARON EXITOSAMENTE EN EL EQUIPO 1 ===")
 
 
 if __name__ == "__main__":
     main()
-

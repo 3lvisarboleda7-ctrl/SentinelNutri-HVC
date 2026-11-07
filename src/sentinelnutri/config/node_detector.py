@@ -153,3 +153,4 @@ def detect_current_node() -> NodeIdentity:
         active_models_dir=os.getenv("MODELS_DIR", "./data/models"),
         pending_tags_for_this_machine=["[EQUIPO 1]", "[EQUIPO 1 -> COLAB]"],
     )
+

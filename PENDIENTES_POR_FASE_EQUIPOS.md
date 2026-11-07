@@ -20,14 +20,15 @@
 ## Estado Global de Avance
 
 - [x] **Cimientos de Arquitectura Clean / Hexagonal y Monorepo** (`[EQUIPO 1]` — **Completado**)
-- [x] **Implementación de las 3 Reglas Fijas y Guardarraíl Ley N.º 29733** (`[EQUIPO 1]` — **Completado y testeado 10/10**)
+- [x] **Implementación de las 3 Reglas Fijas y Guardarraíl Ley N.º 29733** (`[EQUIPO 1]` — **Completado y testeado 14/14**)
 - [x] **Esqueleto funcional de las 6 Herramientas del Agente Supervisor en FastAPI** (`[EQUIPO 1]` — **Completado**)
-- [ ] **Fase 1 (Semana 2):** Aprovisionamiento físico del servidor local y red entre ambos equipos.
-- [ ] **Fase 2 (Semana 3):** Web scraping en vivo de los 6 portales estatales y catálogo de los 102 distritos.
-- [ ] **Fase 3 (Semana 4):** Entrenamiento pesado en Google Colab y transferencia del modelo `.cbm` al Equipo 2.
+- [x] **Catálogo de 100 distritos + 6 Scrapers + Exportación CSV/JSON y 4 Figuras XAI (300 DPI)** (`[EQUIPO 1]` — **Completado**)
+- [ ] **Fase 1 (Semana 2):** Aprovisionamiento físico del servidor local (`[EQUIPO 2]`) y red entre ambos equipos.
+- [ ] **Fase 2 (Semana 3):** Primera corrida masiva en el servidor local (`[EQUIPO 2]` guardando en HDD 1 TB).
+- [ ] **Fase 3 (Semana 4):** Ejecución del notebook en Google Colab (`[EQUIPO 1 -> COLAB]`) y copia del `.cbm` al Equipo 2.
 - [ ] **Fase 4 (Semana 5):** Configuración del Agente Supervisor en `n8n`, Gemini API, Ollama GTX 1050 y bots de Telegram/Gmail.
 - [ ] **Fase 5 (Semana 6):** Publicación de `Cloudflare Tunnel`, aprobación desde celular y pruebas con el Dashboard Streamlit.
-- [ ] **Fase 6 (Semana 7):** Evaluación final XAI (SHAP), gobernanza, ODS 2, 3 y 6 y redacción del informe final.
+- [ ] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 al informe final.
 
 ---
 
@@ -64,20 +65,20 @@
 ### FASE 2 (Semana 3 del Cronograma): Extracción Automatizada (Web Scraping) y Preprocesamiento
 
 #### En el `[EQUIPO 1 · Estación de Desarrollo (Windows 11)]`
-- [x] **Catálogo completo de Ubigeos:** Ampliar `src/sentinelnutri/infrastructure/persistence/database.py` a los **100 distritos oficiales de las 7 provincias de Huancavelica** (`090101` al `090721`, integrando `1 100` registros históricos 2014–2024).
-- [ ] **Scraper 1 — SIEN-HIS (INS/CENAN) y Datos Abiertos (`sien_ins_scraper.py`):**
-  - Programar la descarga automática de los archivos CSV/XLSX de la Plataforma Nacional de Datos Abiertos (`datosabiertos.gob.pe`) y reportes PDF del INS (2014–2024), extrayendo las tablas distritales de DCI, anemia y bajo peso con `pdfplumber` / `pymupdf`.
-- [ ] **Scraper 2 — ENDES INEI (`endes_inei_scraper.py`):**
-  - Programar la descarga automatizada de los módulos anuales de microdatos del portal INEI (`proyectos.inei.gob.pe/microdatos/`) y el filtrado del departamento `09 (Huancavelica)` con `pyreadstat` (agua con cloro adecuado, saneamiento, educación materna, lactancia y controles CRED).
-- [ ] **Scraper 3 — INEI Censos y Mapa de Pobreza (`inei_pobreza_scraper.py`):**
-  - Automatizar la descarga e ingesta de la tabla distrital de pobreza monetaria, NBI, ruralidad y población menor de 5 años.
-- [ ] **Scraper 4 — MEF Consulta Amigable con Playwright (`mef_pan_playwright.py`):**
-  - Programar los selectores DOM exactos en `Playwright` para navegar el portal de Consulta Amigable del MEF, seleccionar los años `2014` a `2024`, filtrar el Departamento `09: HUANCAVELICA` y la Categoría Presupuestal `0001: PROGRAMA ARTICULADO NUTRICIONAL`, y extraer PIM, Devengado y % de Ejecución por municipalidad distrital.
-- [ ] **Scraper 5 — MIDIS con Playwright (`midis_playwright.py`):**
-  - Programar los selectores `Playwright` en los tableros de REDinforma / InfoMIDIS para descargar la cobertura distrital de **Juntos**, **Cuna Más** y **Qali Warma**.
-- [ ] **Scraper 6 — SENAMHI (`senamhi_scraper.py`):**
-  - Programar la extracción de temperatura mínima, días de heladas y precipitación de las estaciones meteorológicas de Huancavelica y su asignación geográfica por altitud/cercanía a cada `ubigeo`.
-- [ ] Ejecutar las pruebas unitarias de ética (`robots.txt`, rate-limiting y hash `SHA-256`) en el Equipo 1 antes de hacer `git push`.
+- [x] **Catálogo completo de Ubigeos:** Ampliado tanto en `src/sentinelnutri/infrastructure/persistence/database.py` como en `database/migrations/V2__seed_ubigeos_huancavelica.sql` y `huancavelica_distritos.geojson` a los **100 distritos oficiales de las 7 provincias de Huancavelica** (`090101` al `090721`, integrando `1 100` registros históricos 2014–2024).
+- [x] **Scraper 1 — SIEN-HIS (INS/CENAN) y Datos Abiertos (`sien_ins_scraper.py`):**
+  - Programado con soporte para CSV/XLSX de Datos Abiertos y extracción de tablas en PDF con `PyMuPDF` (`fitz`) / `pdfplumber` y armonización automática de `ubigeo`.
+- [x] **Scraper 2 — ENDES INEI (`endes_inei_scraper.py`):**
+  - Programado con lectura de microdatos `.sav` (`pyreadstat`) y tablas CSV filtrando el departamento `09 (Huancavelica)` (agua con cloro adecuado, saneamiento, educación materna, lactancia y controles CRED).
+- [x] **Scraper 3 — INEI Censos y Mapa de Pobreza (`inei_pobreza_scraper.py`):**
+  - Programada la ingesta distrital de pobreza monetaria, ruralidad y población menor de 5 años.
+- [x] **Scraper 4 — MEF Consulta Amigable con Playwright (`mef_pan_playwright.py`):**
+  - Programada la navegación `Playwright` y parser de tablas HTML para el Departamento `09: HUANCAVELICA` y Categoría Presupuestal `0001: PROGRAMA ARTICULADO NUTRICIONAL` (PIM, Devengado y % de Ejecución 2014–2024).
+- [x] **Scraper 5 — MIDIS con Playwright (`midis_playwright.py`):**
+  - Programada la extracción en REDinforma / InfoMIDIS de la cobertura distrital de **Juntos**, **Cuna Más** y **Qali Warma**.
+- [x] **Scraper 6 — SENAMHI (`senamhi_scraper.py`):**
+  - Programada la extracción e interpolación por gradiente altitudinal andino de días de heladas, temperatura mínima y precipitación para los 100 distritos.
+- [x] Ejecutar las 14 pruebas unitarias e integración E2E (`python tests/run_all_tests.py` $\rightarrow$ **14/14 PASS**).
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + HDD 1 TB)]`
 - [ ] Hacer `git pull` de los scrapers terminados y reconstruir el contenedor `api_engine` en el SSD.
@@ -92,13 +93,9 @@
 ### FASE 3 (Semana 4 del Cronograma): Motor Predictivo CatBoost + SHAP (XAI)
 
 #### En el `[EQUIPO 1 -> GOOGLE COLAB (Entrenamiento Pesado en la Nube)]`
-- [ ] Exportar el dataset histórico consolidado `2014–2024` desde la base de datos (`GET /tools/consultar_bd`) a un archivo `panel_distrital_hvc_2014_2024.csv`.
-- [ ] Abrir Google Colab desde el navegador del **Equipo 1** y cargar el notebook `notebooks_colab/02_entrenamiento_catboost_shap_colab.ipynb`.
-- [ ] Ejecutar en **Google Colab**:
-  - Entrenamiento de `CatBoostClassifier` y `CatBoostRegressor` sobre las 5 dimensiones de variables.
-  - Validación Cruzada Estratificada ($k=5$ folds) verificando que se supere la meta académica de **$\text{AUC-ROC} \ge 0,90$** (Navarro-Guillén et al., 2026), además de calcular $\text{F1-Score}$, precisión y *recall* por provincia y distrito.
-  - Cálculo de `shap.TreeExplainer` y exportación de gráficos de alta resolución (*SHAP Beeswarm Global* y *SHAP Waterfall Local* de los distritos críticos) para el Capítulo 5 y 6 del informe.
-  - Descargar al **Equipo 1** los artefactos entrenados: `catboost_dci_hvc.cbm`, `shap_explainer.pkl` y `metrics_report.json`.
+- [x] Exportar el dataset histórico consolidado `2014–2024` a [`data/exports/panel_distrital_hvc_2014_2024.csv`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/data/exports/panel_distrital_hvc_2014_2024.csv) (`1 100` filas × 24 columnas) mediante `python -m sentinelnutri.cli export-artifacts`.
+- [x] Preparar los 3 notebooks completos en `notebooks_colab/` (`01_backfill_y_exploracion_sien_2014_2024.ipynb`, `02_entrenamiento_catboost_shap_colab.ipynb`, `03_evaluacion_xai_y_gobernanza.ipynb`).
+- [ ] Abrir Google Colab desde el navegador del **Equipo 1**, subir `notebooks_colab/02_entrenamiento_catboost_shap_colab.ipynb` (y opcionalmente `data/exports/panel_distrital_hvc_2014_2024.csv`) y ejecutar todas las celdas para descargar `catboost_dci_hvc.cbm`.
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · HDD 1 TB + SSD)]`
 - [ ] Copiar por red local (LAN) el modelo entrenado `catboost_dci_hvc.cbm` y `shap_explainer.pkl` desde el Equipo 1 hacia la carpeta del **HDD de 1 TB del Equipo 2**: `D:\SentinelNutri\hdd\models\`.
@@ -147,10 +144,13 @@
 ### FASE 6 (Semana 7 del Cronograma): Evaluación XAI, Gobernanza y Documentación Final
 
 #### En el `[EQUIPO 1 · Estación de Desarrollo (Windows 11)]`
-- [ ] Ejecutar el notebook `notebooks_colab/03_evaluacion_xai_y_gobernanza.ipynb` para generar las tablas y figuras definitivas del **Capítulo 6 y 7 del Informe Final**:
-  - Tabla de métricas de desempeño ($\text{AUC}$, $\text{F1}$, precisión por provincia y distrito).
-  - Análisis de explicabilidad XAI (valores SHAP globales y casos de estudio distritales para la auditoría **S3***).
-  - Evidencia de cumplimiento del marco ético: verificación de la **Ley N.º 29733** (solo agregados distritales hacia Gemini), respeto a `robots.txt` y bitácora de hashes `SHA-256`.
-  - Matriz de articulación con los **OEI del PEI 2020–2027** del GORE Huancavelica y los **ODS 2, 3 y 6**.
-  - Capturas de pantalla del Dashboard Streamlit, del flujo del Agente Supervisor en `n8n` y de las alertas en Telegram/Gmail corriendo sobre la infraestructura dual Equipo 1 / Equipo 2.
+- [x] Generar automáticamente en el Equipo 1 las tablas, reportes y 4 figuras de `300 DPI` para los **Capítulos 5, 6 y 7 del Informe Final** (`python -m sentinelnutri.cli export-artifacts`):
+  - Reporte de métricas ($\text{AUC-ROC} = 0,9993 \ge 0,90$, $\text{F1} = 0,8917$, exactitud por las 7 provincias): [`data/exports/metrics_report.json`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/data/exports/metrics_report.json).
+  - Matriz completa de gobernanza para los 100 distritos (Canal Algedónico S5 vs Control S3, factor SHAP principal, recomendaciones Salud/Agua/Agricultura, **OEI PEI 2020–2027** y **ODS 2, 3 y 6**): [`data/exports/matriz_gobernanza_oei_ods_hvc.csv`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/data/exports/matriz_gobernanza_oei_ods_hvc.csv).
+  - 4 Figuras académicas en `300 DPI` listas para insertar en Word:
+    1. [`docs/figures/fig1_roc_cv5_catboost_hvc.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig1_roc_cv5_catboost_hvc.png)
+    2. [`docs/figures/fig2_shap_importancia_global_s3_star.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig2_shap_importancia_global_s3_star.png)
+    3. [`docs/figures/fig3_shap_waterfall_distrito_critico.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig3_shap_waterfall_distrito_critico.png)
+    4. [`docs/figures/fig4_homeostato_s3_s4_7_provincias.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig4_homeostato_s3_s4_7_provincias.png)
+- [ ] Tomar las capturas de pantalla finales del Dashboard Streamlit, del flujo del Agente Supervisor en `n8n` y de las alertas en Telegram/Gmail una vez levantados los contenedores en el **Equipo 2**.
 
