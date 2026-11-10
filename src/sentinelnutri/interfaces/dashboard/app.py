@@ -13,7 +13,11 @@ Materializa en una sola interfaz los canales del Modelo de Sistema Viable del GO
 
 import os
 from typing import Any, Dict, Optional
-import streamlit as st
+
+try:
+    import streamlit as st
+except ImportError:  # Permite importar los helpers de estado del Dashboard en runners CI ligeros sin UI
+    st = None  # type: ignore[assignment]
 
 from sentinelnutri.application import (
     Tool1ExtraerFuentesUseCase,
