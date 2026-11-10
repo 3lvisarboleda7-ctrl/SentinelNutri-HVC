@@ -7,18 +7,35 @@
       "name": "Error Trigger (Fallo en Scraper por Cambio de Diseño de Portal)",
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
-      "position": [260, 260]
+      "position": [
+        260,
+        260
+      ]
     },
     {
       "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID_ADMIN_TECH }}",
-        "text": "⚠️ [SentinelNutri-HVC · Autodiagnóstico S4]\nFallo detectado en flujo de extracción automatizada.\nFlujo: {{ $json.workflow.name }}\nNodo: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}"
+        "text": "⚠️ [SentinelNutri-HVC · Autodiagnóstico S4]\nFallo detectado en flujo de extracción automatizada.\nFlujo: {{ $json.workflow.name }}\nNodo: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}",
+        "additionalFields": {}
       },
       "id": "telegram-error-notify",
       "name": "Notificar Desviación por Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [560, 260]
+      "position": [
+        560,
+        260
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "akfJRUcfnGF9qenv",
+          "name": "Telegram Bot SentinelNutri-HVC (S5/S3)"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "webhookId": "3f56c5a0-40d0-486a-a24a-c43d7cb2f207"
     }
   ],
   "connections": {
@@ -35,4 +52,3 @@
     }
   }
 }
-
