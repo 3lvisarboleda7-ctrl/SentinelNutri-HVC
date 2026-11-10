@@ -199,11 +199,15 @@
     },
     {
       "parameters": {
-        "resource": "message",
-        "operation": "sendMessage",
+        "operation": "sendAndWait",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID_S3_APROBACION }}",
-        "text": "📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?",
-        "additionalFields": {}
+        "message": "📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
       },
       "id": "rule-fixed-3-human-approval",
       "name": "Regla Fija 3: Aprobación Humana (Telegram / Gmail con espera de respuesta vía Cloudflare Tunnel)",
@@ -219,7 +223,6 @@
           "name": "Telegram Bot SentinelNutri-HVC (S5/S3)"
         }
       },
-      "onError": "continueRegularOutput",
       "webhookId": "0231679b-1976-4b0e-85d4-dea440a53a79"
     },
     {
@@ -244,19 +247,18 @@
           "name": "Telegram Bot SentinelNutri-HVC (S5/S3)"
         }
       },
-      "onError": "continueRegularOutput",
       "webhookId": "d064ff18-38ec-4f83-83dd-ad9311c02126"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://api_engine:8000/hitl/aprobar/{{ $json.id_alerta }}",
+        "url": "=http://api_engine:8000/hitl/aprobar/{{ $('Regla Fija 2: Nodo IF · Umbral de Riesgo (DCI proyectada > 25% -> S5)').item.json.id_alerta }}",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
             {
               "name": "approved",
-              "value": "={{ $json.approved ?? true }}"
+              "value": "={{ $json.data.approved === true }}"
             },
             {
               "name": "approver_name",
@@ -269,6 +271,26 @@
       "name": "Confirmar Aprobación HITL hacia S3 (/hitl/aprobar/{alert_id})",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
+      "position": [
+        1640,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.data.approved === true }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "rule-fixed-3-approval-gate",
+      "name": "¿Aprobado por Humano S3? (Regla Fija 3)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
       "position": [
         1420,
         400
@@ -413,11 +435,23 @@
       "main": [
         [
           {
-            "node": "Confirmar Aprobación HITL hacia S3 (/hitl/aprobar/{alert_id})",
+            "node": "¿Aprobado por Humano S3? (Regla Fija 3)",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "¿Aprobado por Humano S3? (Regla Fija 3)": {
+      "main": [
+        [
+          {
+            "node": "Confirmar Aprobación HITL hacia S3 (/hitl/aprobar/{alert_id})",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
       ]
     }
   }

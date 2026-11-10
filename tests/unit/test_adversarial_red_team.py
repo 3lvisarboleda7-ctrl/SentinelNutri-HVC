@@ -385,6 +385,17 @@ def test_red_team_6_n8n_workflows_structural_and_rules_audit() -> None:
     hitl_cb = nodes_w1["Confirmar Aprobación HITL hacia S3 (/hitl/aprobar/{alert_id})"]
     assert "/hitl/aprobar/" in hitl_cb["parameters"]["url"]
 
+    # Regla Fija 3: la aprobación humana debe ESPERAR respuesta y nunca autoaprobarse
+    hitl_node = next(n for n in w1["nodes"] if n["id"] == "rule-fixed-3-human-approval")
+    assert hitl_node["parameters"]["operation"] == "sendAndWait"
+    assert hitl_node.get("onError") is None, "Un fallo de Telegram no debe continuar hacia la aprobación S3"
+    approved_expr = next(
+        p["value"] for p in hitl_cb["parameters"]["bodyParameters"]["parameters"] if p["name"] == "approved"
+    )
+    assert "?? true" not in approved_expr and "=== true" in approved_expr
+    gate_targets = [e["node"] for e in conns_w1[hitl_node["name"]]["main"][0]]
+    assert hitl_cb["name"] not in gate_targets, "El callback S3 debe pasar por la compuerta de aprobación"
+
     # 2. Auditoría de 02_vigilancia_fallos_scrapers.json
     nodes_w2 = {n["name"]: n for n in w2["nodes"]}
     assert len(nodes_w2) == 2

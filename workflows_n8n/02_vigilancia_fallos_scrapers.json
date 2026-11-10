@@ -34,7 +34,6 @@
           "name": "Telegram Bot SentinelNutri-HVC (S5/S3)"
         }
       },
-      "onError": "continueRegularOutput",
       "webhookId": "3f56c5a0-40d0-486a-a24a-c43d7cb2f207"
     }
   ],
