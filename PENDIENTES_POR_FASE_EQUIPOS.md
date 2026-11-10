@@ -25,8 +25,8 @@
 - [x] **Catálogo de 100 distritos + 6 Scrapers + Exportación CSV/JSON y 4 Figuras XAI (300 DPI)** (`[EQUIPO 1]` — **Completado**)
 - [x] **Fase 3 (Semana 4): Ejecución de los 3 notebooks en Google Colab y modelo `.cbm` integrado** (`[EQUIPO 1 -> COLAB]` — **Completado**)
 - [x] **Fase 1 y 2 (Semanas 2–3):** Aprovisionamiento del servidor local (`[EQUIPO 2]`: SSD + HDD 1 TB + Ollama GTX 1050 + PostgreSQL 16 + Backfill 1 100 registros — **Completado**).
-- [x] **Fase 4 (Semana 5):** Despliegue del Agente Supervisor en `n8n` (`:5678`), importación de los 2 workflows auditados (`ofxz76BJS918zdeq` y `27ZPF1SbAx1tCSxv`), Failover de 3 niveles (`Gemini -> Ollama GTX 1050 -> Motor Estructurado MSV`) y pruebas HITL S3 / Algedónico S5 (`[EQUIPO 2]` — **Completado**).
-- [x] **Fase 5 (Semana 6):** Despliegue en vivo del Dashboard Cibernético Streamlit (`:8501`), respaldo SQL automático SSD $\rightarrow$ HDD (`2,18 MB`) y validación de aprobación HITL S3 (`[EQUIPO 2]` — **Completado**; pendiente únicamente token opcional de Cloudflare Tunnel y credenciales reales de Telegram/Gmail).
+- [ ] **Fase 4 (Semana 5):** `n8n` (`:5678`) desplegado con cuenta `3lvisarboleda7@gmail.com`, 2 workflows importados (`ofxz76BJS918zdeq` y `27ZPF1SbAx1tCSxv`), credencial Ollama operativa y failover de 3 niveles probado por API (`[EQUIPO 2]` — **Parcial**: faltan claves reales de Gemini/Telegram/Gmail y una ejecución de prueba del flujo dentro de n8n).
+- [ ] **Fase 5 (Semana 6):** Dashboard Streamlit (`:8501`) en vivo, respaldo SQL SSD $\rightarrow$ HDD (`2,18 MB`) y HITL S3 validado por API (`[EQUIPO 2]` — **Parcial**: falta Cloudflare Tunnel; API y Dashboard aún no corren en Docker).
 - [x] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 (`docs/figures/equipo2_live_01_*.png` a `06_*.png`) al informe final (`[EQUIPO 2]` — **Completado**).
 
 ---
@@ -42,7 +42,7 @@
 - [x] Implementar detector automático de máquina (`python -m sentinelnutri.cli whoami` en `src/sentinelnutri/config/node_detector.py`) por huella de hardware/SO (`i7-1355U` vs `i7-7700HQ` + `GTX 1050`).
 - [x] Inicializar el repositorio Git local (`git init` + commits en rama `main`).
 - [x] Subir el repositorio local a **GitHub** (`https://github.com/3lvisarboleda7-ctrl/SentinelNutri-HVC`) para clonarlo desde el Equipo 2 y abrir los notebooks directamente en Google Colab.
-- [ ] Anotar la dirección IP local (LAN) del Equipo 2 (ej. `192.168.1.XX`) y colocarla en `config/.env.equipo1` (`EQUIPO2_LAN_IP`).
+- [ ] Colocar la IP LAN del Equipo 2 en `config/.env.equipo1` del Equipo 1 (`EQUIPO2_LAN_IP=10.36.113.176`, detectada el 2026-11-10; es DHCP, verificar con `ipconfig` en el Equipo 2 si cambia). *El archivo vive solo en el Equipo 1 (gitignored).*
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + HDD 1 TB · GTX 1050)]`
 - [x] Clonar el repositorio de GitHub en el Equipo 2 (`D:\3lvix\SentinelNutri-HVC`).
@@ -109,7 +109,7 @@
   1. **Google AI Studio:** Crear API Key gratuita de **Gemini** (`GEMINI_API_KEY`).
   2. **Telegram (`@BotFather`):** Crear el bot `@SentinelNutriHVC_Bot`, obtener `TELEGRAM_BOT_TOKEN` y los `CHAT_ID` para el **Consejo Regional (S5)**, la **Gerencia Regional de Desarrollo Social (S3)** y **Alertas Técnicas de Fallos de Scraper**.
   3. **Gmail:** Crear una *Contraseña de Aplicación* (`GMAIL_APP_PASSWORD`) en la cuenta de Google del proyecto.
-- [ ] Ajustar en `workflows_n8n/01_ciclo_supervisor_sentinelnutri.json` y `02_vigilancia_fallos_scrapers.json` los nombres de credenciales si fuera necesario.
+- [x] Vincular credenciales en los workflows: `Ollama Local GPU GTX 1050 (Equipo 2)`, `Google Gemini Free Tier (AI Studio)` y `Telegram Bot SentinelNutri-HVC (S5/S3)` ya asignadas a sus nodos (Gemini y Telegram con valor de relleno hasta recibir las claves reales).
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + GPU GTX 1050)]`
 - [x] Configurar `config/.env.equipo2` y dejar listos los conectores para `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` y `GMAIL_APP_PASSWORD` (con simulación segura por defecto).

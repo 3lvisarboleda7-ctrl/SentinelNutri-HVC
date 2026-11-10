@@ -125,7 +125,37 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 
 ---
 
-## 5. Comandos Clave de Verificación en Equipo 1
+## 5. Estado Operativo Real del Equipo 2 (Servidor Local) — Mantener Siempre Actualizado
+
+> **Regla:** Esta sección refleja el estado *real* verificado, no el deseado. Si algo no se probó en vivo, se marca como pendiente.
+
+- **Host detectado:** `DESKTOP-H3C8P9R` · i7-7700HQ · GTX 1050 4 GB (Driver 566.36) · Windows 10 Home · Repo en `D:\3lvix\SentinelNutri-HVC` · `.venv` con CPython 3.12 (`uv`).
+- **IP LAN del Equipo 2:** `10.36.113.176` (asignada por DHCP: verificar con `ipconfig` si cambia de red). Desde el Equipo 1: `http://10.36.113.176:5678` (n8n), `:8501` (Streamlit), `:8000/docs` (API).
+- **Proyecto Docker aislado:** `-p sentinelnutri` con `deploy/docker-compose.equipo2.yml` + `config/.env.equipo2` (gitignored). **No tocar** contenedores ajenos (p. ej. `contextapp-fase1-*`).
+- **Ollama:** `v0.40.16` con `OLLAMA_VULKAN=1` y `CUDA_VISIBLE_DEVICES=-1` (el backend CUDA falla con el driver 566.36; Vulkan usa la GTX 1050). Modelos en `D:\SentinelNutri\hdd\ollama_models` (`llama3.2` Q4_K_M).
+- **n8n (`sentinelnutri_n8n_supervisor`, v2.47.3):** propietario `3lvisarboleda7@gmail.com`. Workflows `ofxz76BJS918zdeq` (Ciclo Supervisor, 15 nodos) y `27ZPF1SbAx1tCSxv` (Vigilancia de scrapers). Credenciales: `Ollama Local GPU GTX 1050` (operativa), `Google Gemini Free Tier` y `Telegram Bot` (**con valores de relleno, faltan claves reales**). Variables: `N8N_SECURE_COOKIE=false` (login por LAN) y `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` (los nodos leen `$env.TELEGRAM_CHAT_ID_*`).
+- **Regla Fija 3 en n8n (crítica):** el nodo `rule-fixed-3-human-approval` debe usar `sendAndWait`, sin `onError: continue`, seguido de la compuerta `¿Aprobado por Humano S3?` antes de `POST /hitl/aprobar/{id}`. Lo audita `test_red_team_6`.
+
+### Registro de Cambios del Equipo 2
+| Fecha | Commit | Cambio |
+| :--- | :--- | :--- |
+| 2026-11-10 | `7390e37` | PostgreSQL 16 dual (psycopg2), backfill 1 100 filas, Vulkan GTX 1050, suite Red-Team 22/22. |
+| 2026-11-10 | `f646766` | CI: `streamlit` opcional en `app.py` para GitHub Actions. |
+| 2026-11-10 | `d9bd783` | 6 capturas en vivo del Equipo 2 en el informe (sección 7.4). |
+| 2026-11-10 | `be12c0b`, `f158994` | n8n: `api_engine -> host-gateway` y `N8N_SECURE_COOKIE=false`. |
+| 2026-11-10 | `16b1aa4` | n8n: credenciales vinculadas a los nodos. **Introdujo una regresión en la Regla Fija 3** (HITL sin espera). |
+| 2026-11-10 | `2cc1421` | Corrige la regresión: `sendAndWait` + compuerta de aprobación + test que lo audita. |
+
+### Pendientes Reales del Equipo 2
+- [ ] Credenciales reales: `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` + chat IDs, `GMAIL_APP_PASSWORD` (requieren al usuario).
+- [ ] Cloudflare Tunnel (`CLOUDFLARE_TUNNEL_TOKEN`, requiere cuenta/dominio del usuario).
+- [ ] API (`:8000`) y Dashboard (`:8501`) dentro de Docker para que sobrevivan reinicios (hoy corren como procesos de la sesión).
+- [ ] Ollama con arranque automático al iniciar Windows.
+- [ ] Ejecución de prueba del flujo `ofxz76BJS918zdeq` dentro de n8n (canal S5 > 25 % y espera HITL S3).
+
+---
+
+## 6. Comandos Clave de Verificación en Equipo 1
 - Detectar automáticamente si estás en el Equipo 1 o en el Equipo 2:
   ```powershell
   $env:PYTHONPATH="src;."; python -m sentinelnutri.cli whoami
