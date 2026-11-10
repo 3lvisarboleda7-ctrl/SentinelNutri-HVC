@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Instala y configura Ollama en el Equipo 2 (Windows 10) aprovechando la GPU NVIDIA GTX 1050 (4 GB VRAM)
     y redirige el almacenamiento de modelos al disco duro de 1 TB (D:\SentinelNutri\hdd\ollama_models).
@@ -26,16 +26,25 @@ if (-not (Test-Path $ModelsDir)) {
 
 [System.Environment]::SetEnvironmentVariable("OLLAMA_MODELS", $ModelsDir, "User")
 [System.Environment]::SetEnvironmentVariable("OLLAMA_HOST", "0.0.0.0:11434", "User")
+[System.Environment]::SetEnvironmentVariable("OLLAMA_VULKAN", "1", "User")
+[System.Environment]::SetEnvironmentVariable("CUDA_VISIBLE_DEVICES", "-1", "User")
 $env:OLLAMA_MODELS = $ModelsDir
 $env:OLLAMA_HOST = "0.0.0.0:11434"
+$env:OLLAMA_VULKAN = "1"
+$env:CUDA_VISIBLE_DEVICES = "-1"
 
 Write-Host "[ENV] OLLAMA_MODELS configurado en: $ModelsDir" -ForegroundColor Green
 Write-Host "[ENV] OLLAMA_HOST configurado en: 0.0.0.0:11434" -ForegroundColor Green
+Write-Host "[ENV] OLLAMA_VULKAN=1 (Backend Vulkan para GTX 1050 Pascal CC 6.1 con Driver 566.36)" -ForegroundColor Green
 
 # 3. Instalar Ollama si no está instalado
 if (-not (Get-Command "ollama" -ErrorAction SilentlyContinue)) {
     Write-Host "[INSTALL] Instalando Ollama mediante winget..." -ForegroundColor Yellow
-    winget install --id Ollama.Ollama -e --accept-source-agreements --accept-package-agreements
+    winget install --id Ollama.Ollama -e --silent --accept-source-agreements --accept-package-agreements
+    $OllamaBin = "$env:LOCALAPPDATA\Programs\Ollama"
+    if ((Test-Path $OllamaBin) -and ($env:PATH -notlike "*$OllamaBin*")) {
+        $env:PATH = "$OllamaBin;$env:PATH"
+    }
 } else {
     Write-Host "[OK] Ollama ya se encuentra instalado." -ForegroundColor Green
 }

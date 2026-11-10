@@ -29,6 +29,16 @@ from tests.unit.test_scrapers_and_ubigeo import (
     test_sien_mef_midis_and_senamhi_parsers,
     test_ubigeo_harmonizer_covers_100_huancavelica_districts,
 )
+from tests.unit.test_adversarial_red_team import (
+    test_red_team_1_privacy_guard_nested_and_variant_keys,
+    test_red_team_2_boundary_and_corrupted_values_in_rules_and_predictor,
+    test_red_team_3_persistence_referential_integrity_and_1100_rows_performance,
+    test_red_team_4_fastapi_endpoints_and_hitl_security,
+    test_red_team_5_llm_gateway_3_tier_failover_and_truncated_json,
+    test_red_team_6_n8n_workflows_structural_and_rules_audit,
+    test_red_team_7_dashboard_4_rooms_and_hitl_approver_guard,
+    test_red_team_8_exported_artifacts_and_figures_integrity,
+)
 from sentinelnutri.domain.rules.privacy_guard import (
     PrivacyViolationError,
     sanitize_district_payload_for_llm,
@@ -62,6 +72,14 @@ def main() -> None:
         ("Infraestructura Dual: Detección automática Equipo 1 vs Equipo 2", test_node_detector_identifies_equipo1_or_equipo2),
         ("Armonizador ETL: Catálogo de los 100 distritos de Huancavelica", test_ubigeo_harmonizer_covers_100_huancavelica_districts),
         ("Scrapers Especializados: Parsers SIEN-HIS, MEF PAN, MIDIS y SENAMHI", test_sien_mef_midis_and_senamhi_parsers),
+        ("Red-Team QA 1: Blindaje recursivo Ley N.° 29733 (anidados y variantes)", test_red_team_1_privacy_guard_nested_and_variant_keys),
+        ("Red-Team QA 2: Límites exactos (25.0%) y rechazo de NaN/Inf en Reglas y CatBoost", test_red_team_2_boundary_and_corrupted_values_in_rules_and_predictor),
+        ("Red-Team QA 3: Integridad referencial FK y rendimiento 1 100 filas SQLite/PG", test_red_team_3_persistence_referential_integrity_and_1100_rows_performance),
+        ("Red-Team QA 4: Blindaje API FastAPI (SQLi, ubigeos 400/404, payloads 422 y HITL)", test_red_team_4_fastapi_endpoints_and_hitl_security),
+        ("Red-Team QA 5: Failover de 3 niveles en LLM Gateway y recuperación JSON truncado", test_red_team_5_llm_gateway_3_tier_failover_and_truncated_json),
+        ("Red-Team QA 6: Auditoría estructural de grafos y reglas en Workflows n8n", test_red_team_6_n8n_workflows_structural_and_rules_audit),
+        ("Red-Team QA 7: Resiliencia de las 4 Salas del Dashboard Streamlit y guardia HITL S3", test_red_team_7_dashboard_4_rooms_and_hitl_approver_guard),
+        ("Red-Team QA 8: Integridad de artefactos exportados (1 100 filas, OEI/ODS, AUC>=0.90 y 300 DPI)", test_red_team_8_exported_artifacts_and_figures_integrity),
     ]
 
     for name, fn in tests:

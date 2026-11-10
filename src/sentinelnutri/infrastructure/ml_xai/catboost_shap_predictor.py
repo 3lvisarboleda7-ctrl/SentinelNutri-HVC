@@ -46,6 +46,29 @@ class CatBoostShapPredictor(PredictorPort):
         self._threshold = algedonic_threshold_pct
         self._baseline_dci = 22.4  # Línea base regional calibrada para el horizonte proyectado
 
+    @staticmethod
+    def _validate_record(record: DistrictIndicatorRecord) -> None:
+        """Valida defensivamente que ningún indicador contenga NaN, Inf o valores fuera de rango físico."""
+        ubigeo = str(record.ubigeo).strip() if record.ubigeo is not None else ""
+        if len(ubigeo) != 6 or not ubigeo.isdigit():
+            raise ValueError(f"Ubigeo inválido en DistrictIndicatorRecord: '{record.ubigeo}'.")
+
+        for var_name, _, _, _ in FEATURE_METADATA:
+            raw_val = getattr(record, var_name, None)
+            if isinstance(raw_val, bool) or not isinstance(raw_val, (int, float)):
+                raise ValueError(f"El indicador '{var_name}' debe ser numérico, se recibió: {raw_val!r}.")
+            val = float(raw_val)
+            if not math.isfinite(val):
+                raise ValueError(f"El indicador '{var_name}' contiene un valor no finito (NaN/Inf): {raw_val}.")
+            if var_name.endswith("_pct") and (val < 0.0 or val > 100.0):
+                raise ValueError(
+                    f"El indicador porcentual '{var_name}' ({val}%) está fuera del rango [0.0%, 100.0%]."
+                )
+            if var_name == "dias_heladas_anual" and (val < 0.0 or val > 366.0):
+                raise ValueError(
+                    f"El indicador '{var_name}' ({val}) está fuera del rango anual válido [0, 366]."
+                )
+
     def _compute_shap_and_projection(
         self, record: DistrictIndicatorRecord
     ) -> Tuple[float, float, Dict[str, float], List[ShapContribution]]:
@@ -55,6 +78,7 @@ class CatBoostShapPredictor(PredictorPort):
         donde cada phi_j mide cuántos puntos porcentuales de DCI proyectada aporta la variable j
         en el distrito evaluado respecto al valor esperado regional.
         """
+        self._validate_record(record)
         shap_dict: Dict[str, float] = {}
         contributions: List[ShapContribution] = []
 

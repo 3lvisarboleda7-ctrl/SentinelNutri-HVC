@@ -51,12 +51,25 @@ class Tool5RedactarInformeUseCase:
                 prefer_provider=prefer_provider,
             )
 
-        if custom_llm_output:
+        if (
+            isinstance(custom_llm_output, dict)
+            and all(
+                isinstance(custom_llm_output.get(k), str) and custom_llm_output[k].strip()
+                for k in (
+                    "sintesis_narrativa_s4",
+                    "recomendacion_salud",
+                    "recomendacion_agua_saneamiento",
+                    "recomendacion_agricultura_midis",
+                )
+            )
+        ):
             sintesis = custom_llm_output["sintesis_narrativa_s4"]
             rec_salud = custom_llm_output["recomendacion_salud"]
             rec_agua = custom_llm_output["recomendacion_agua_saneamiento"]
             rec_agro = custom_llm_output["recomendacion_agricultura_midis"]
         else:
+            if custom_llm_output is not None:
+                used_provider = "fallback-determinista-msv (JSON LLM incompleto recuperado)"
             sintesis = (
                 f"[S4 · Inteligencia Prospectiva] El distrito de {distrito} (Provincia de {provincia}, "
                 f"Ubigeo {ubigeo}) registra una DCI actual de {dci_actual:.1f} % y una proyección de "

@@ -73,7 +73,7 @@ class SqlAlchemyRepository(RepositoryPort):
                     now[:10],
                     now,
                     hash_sha256,
-                    1 if hubo_cambio else 0,
+                    bool(hubo_cambio),
                     ruta_archivo_crudo,
                     registros_procesados,
                     estado,
@@ -269,7 +269,7 @@ class SqlAlchemyRepository(RepositoryPort):
                     prediction.dci_proyectada_pct,
                     prediction.probabilidad_riesgo_critico,
                     prediction.nivel_riesgo.value,
-                    1 if prediction.supera_umbral_algedonico else 0,
+                    bool(prediction.supera_umbral_algedonico),
                     json.dumps(shap_payload, ensure_ascii=False),
                     top_summary,
                     prediction.version_modelo,
@@ -286,9 +286,14 @@ class SqlAlchemyRepository(RepositoryPort):
                     """
                     SELECT p.*, c.provincia, c.distrito, c.red_salud
                     FROM predicciones_dci p
+                    JOIN (
+                        SELECT ubigeo, MAX(id) AS max_id
+                        FROM predicciones_dci
+                        GROUP BY ubigeo
+                    ) latest ON p.id = latest.max_id
                     JOIN cat_ubigeo_hvc c ON p.ubigeo = c.ubigeo
                     WHERE c.provincia = ?
-                    ORDER BY p.id DESC
+                    ORDER BY p.dci_proyectada_pct DESC
                     """,
                     (provincia,),
                 ).fetchall()
@@ -297,17 +302,18 @@ class SqlAlchemyRepository(RepositoryPort):
                     """
                     SELECT p.*, c.provincia, c.distrito, c.red_salud
                     FROM predicciones_dci p
+                    JOIN (
+                        SELECT ubigeo, MAX(id) AS max_id
+                        FROM predicciones_dci
+                        GROUP BY ubigeo
+                    ) latest ON p.id = latest.max_id
                     JOIN cat_ubigeo_hvc c ON p.ubigeo = c.ubigeo
-                    ORDER BY p.id DESC
+                    ORDER BY p.dci_proyectada_pct DESC
                     """
                 ).fetchall()
 
-            seen = set()
             result: List[DistrictRiskPrediction] = []
             for r in rows:
-                if r["ubigeo"] in seen:
-                    continue
-                seen.add(r["ubigeo"])
                 parsed = json.loads(r["valores_shap_json"]) if r["valores_shap_json"] else {"raw": {}, "top": []}
                 top_contribs = [
                     ShapContribution(
@@ -336,7 +342,7 @@ class SqlAlchemyRepository(RepositoryPort):
                         version_modelo=r["version_modelo"],
                     )
                 )
-            return sorted(result, key=lambda x: x.dci_proyectada_pct, reverse=True)
+            return result
 
     def save_alert_report(self, report: MSVAlertReport) -> int:
         with self._get_conn() as conn:

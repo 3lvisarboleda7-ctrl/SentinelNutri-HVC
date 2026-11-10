@@ -116,11 +116,17 @@ class Tool6NotificarUseCase:
         Procesa el webhook de respuesta humana (Evento E6: HumanApprovalResolved).
         Solo si `approved=True`, libera la recomendación hacia el Canal de Control S3 (Dashboard Streamlit).
         """
+        clean_approver = str(approver_name).strip() if approver_name is not None else ""
+        if not clean_approver:
+            raise ValueError(
+                "Regla Fija 3 (HITL): El nombre de la autoridad aprobadora (approver_name) no puede estar vacío."
+            )
+
         new_status = ApprovalStatus.APROBADO_S3 if approved else ApprovalStatus.RECHAZADO
         updated = self._repo.update_alert_approval(
             alert_id=alert_id,
             status=new_status,
-            approved_by=approver_name,
+            approved_by=clean_approver,
         )
         if not updated:
             raise ValueError(f"No se encontró la alerta con ID {alert_id}.")

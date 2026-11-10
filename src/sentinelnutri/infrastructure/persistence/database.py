@@ -172,7 +172,8 @@ CREATE TABLE IF NOT EXISTS serie_historica_distrital (
     dias_heladas_anual INTEGER NOT NULL,
     temp_minima_promedio_c REAL NOT NULL,
     precipitacion_anual_mm REAL NOT NULL,
-    UNIQUE(ubigeo, anio, semestre)
+    UNIQUE(ubigeo, anio, semestre),
+    FOREIGN KEY (ubigeo) REFERENCES cat_ubigeo_hvc(ubigeo) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS predicciones_dci (
@@ -188,7 +189,8 @@ CREATE TABLE IF NOT EXISTS predicciones_dci (
     valores_shap_json TEXT NOT NULL,
     top_factores_riesgo TEXT NOT NULL,
     version_modelo TEXT NOT NULL DEFAULT 'catboost_shap_v1',
-    fecha_prediccion TEXT NOT NULL
+    fecha_prediccion TEXT NOT NULL,
+    FOREIGN KEY (ubigeo) REFERENCES cat_ubigeo_hvc(ubigeo) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS alertas_y_recomendaciones_msv (
@@ -208,17 +210,114 @@ CREATE TABLE IF NOT EXISTS alertas_y_recomendaciones_msv (
     estado_aprobacion_humana TEXT NOT NULL DEFAULT 'PENDIENTE_APROBACION',
     aprobado_por TEXT,
     fecha_creacion TEXT NOT NULL,
-    fecha_resolucion TEXT
+    fecha_resolucion TEXT,
+    FOREIGN KEY (ubigeo) REFERENCES cat_ubigeo_hvc(ubigeo) ON DELETE RESTRICT
 );
+
+CREATE INDEX IF NOT EXISTS idx_serie_anio_ubigeo ON serie_historica_distrital(anio, ubigeo);
+CREATE INDEX IF NOT EXISTS idx_pred_ubigeo_id ON predicciones_dci(ubigeo, id DESC);
+CREATE INDEX IF NOT EXISTS idx_cargas_fuente_url ON registro_cargas(fuente, url_origen, id DESC);
+CREATE INDEX IF NOT EXISTS idx_alertas_ubigeo_id ON alertas_y_recomendaciones_msv(ubigeo, id DESC);
 """
+
+
+def _create_postgres_connection_factory(pg_url: str) -> Any:
+    """Crea un adaptador compatible con DB-API/SQLite sobre psycopg2 para PostgreSQL 16 (Equipo 2)."""
+    import psycopg2
+    import psycopg2.extras
+
+    dsn = pg_url.replace("postgresql+psycopg2://", "postgresql://")
+
+    class _PgCursorWrapper:
+        def __init__(self, cur: Any, lastrowid: int | None = None) -> None:
+            self._cur = cur
+            self.lastrowid = lastrowid
+
+        def fetchall(self) -> List[Any]:
+            return self._cur.fetchall()
+
+        def fetchone(self) -> Any:
+            return self._cur.fetchone()
+
+    class _PgConnectionWrapper:
+        def __init__(self) -> None:
+            self._conn = psycopg2.connect(dsn)
+
+        def __enter__(self) -> "_PgConnectionWrapper":
+            return self
+
+        def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+            try:
+                if exc_type is not None:
+                    self._conn.rollback()
+            finally:
+                self._conn.close()
+
+        def execute(self, sql: str, params: Tuple[Any, ...] = ()) -> _PgCursorWrapper:
+            pg_sql = sql.replace("?", "%s")
+            stripped = pg_sql.strip()
+            needs_returning = (
+                stripped.upper().startswith("INSERT INTO ")
+                and "ON CONFLICT" not in stripped.upper()
+                and "RETURNING" not in stripped.upper()
+            )
+            if needs_returning:
+                pg_sql = stripped.rstrip(";") + " RETURNING id"
+            cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cur.execute(pg_sql, params)
+            lastrowid = None
+            if needs_returning:
+                row = cur.fetchone()
+                if row and "id" in row:
+                    lastrowid = int(row["id"])
+            return _PgCursorWrapper(cur, lastrowid=lastrowid)
+
+        def executemany(self, sql: str, seq_of_params: List[Tuple[Any, ...]]) -> None:
+            pg_sql = sql.replace("?", "%s")
+            cur = self._conn.cursor()
+            psycopg2.extras.execute_batch(cur, pg_sql, seq_of_params, page_size=250)
+
+        def commit(self) -> None:
+            self._conn.commit()
+
+    return _PgConnectionWrapper
 
 
 def create_db_engine_and_session(database_url: str | None = None) -> Tuple[str, Any]:
     """
     Inicializa el almacenamiento relacional y asegura la carga semilla de los 100 distritos
-    de las 7 provincias de Huancavelica.
+    de las 7 provincias de Huancavelica. Soporta tanto PostgreSQL 16 (Equipo 2) como SQLite WAL (Equipo 1).
     """
     url = database_url or os.getenv("DATABASE_URL", "sqlite:///./data/sentinelnutri_dev.db")
+    if url.startswith("postgresql"):
+        pg_factory = _create_postgres_connection_factory(url)
+        with pg_factory() as conn:
+            conn.executemany(
+                """
+                INSERT INTO cat_ubigeo_hvc (
+                    ubigeo, provincia, distrito, red_salud, altitud_msnm,
+                    latitud, longitud, poblacion_menor_5, ruralidad_pct
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (ubigeo) DO NOTHING
+                """,
+                [
+                    (
+                        d.ubigeo,
+                        d.provincia,
+                        d.distrito,
+                        d.red_salud,
+                        d.altitud_msnm,
+                        d.latitud,
+                        d.longitud,
+                        d.poblacion_menor_5,
+                        d.ruralidad_pct,
+                    )
+                    for d in DEFAULT_HUANCAVELICA_DISTRICTS
+                ],
+            )
+            conn.commit()
+        return url, pg_factory
+
     if url.startswith("sqlite:///"):
         db_file = url.replace("sqlite:///", "")
         if db_file != ":memory:":
@@ -230,9 +329,13 @@ def create_db_engine_and_session(database_url: str | None = None) -> Tuple[str, 
     def get_connection() -> sqlite3.Connection:
         conn = sqlite3.connect(db_file, check_same_thread=False)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON;")
+        conn.execute("PRAGMA synchronous = NORMAL;")
+        conn.execute("PRAGMA temp_store = MEMORY;")
         return conn
 
     with get_connection() as conn:
+        conn.execute("PRAGMA journal_mode = WAL;")
         conn.executescript(SQLITE_DDL)
         conn.executemany(
             """

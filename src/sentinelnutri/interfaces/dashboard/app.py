@@ -11,6 +11,8 @@ Materializa en una sola interfaz los canales del Modelo de Sistema Viable del GO
    bandeja de aprobación humana (HITL), registro de cargas (fecha + hash SHA-256) y alineación con ODS 2, 3 y 6.
 """
 
+import os
+from typing import Any, Dict, Optional
 import streamlit as st
 
 from sentinelnutri.application import (
@@ -27,9 +29,12 @@ from sentinelnutri.infrastructure.persistence import (
 )
 from sentinelnutri.infrastructure.scrapers import MultiSourceScraperOrchestrator
 
+_EVAL_METRICS_CACHE: Dict[str, Dict[str, Any]] = {}
 
-def init_services():
-    _, session_factory = create_db_engine_and_session()
+
+def init_services(database_url: Optional[str] = None):
+    """Inicializa los servicios del Dashboard garantizando serie histórica y predicciones no vacías."""
+    db_file, session_factory = create_db_engine_and_session(database_url)
     repo = SqlAlchemyRepository(session_factory)
     scraper = MultiSourceScraperOrchestrator(repository=repo)
     predictor = CatBoostShapPredictor()
@@ -42,9 +47,48 @@ def init_services():
 
     if not repo.get_historical_series(anio_inicio=2014, anio_fin=2024):
         tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
+    if not repo.get_latest_predictions():
         tool3.execute(anio_corte=2024)
 
     return repo, predictor, tool1, tool3, tool4, tool5, tool6
+
+
+def get_cached_evaluation_metrics(
+    repo: SqlAlchemyRepository,
+    predictor: CatBoostShapPredictor,
+    cache_key: str = "default",
+) -> Dict[str, Any]:
+    """Obtiene y almacena en caché las métricas de validación cruzada para evitar recálculo en cada render."""
+    if cache_key not in _EVAL_METRICS_CACHE:
+        series = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        _EVAL_METRICS_CACHE[cache_key] = predictor.train_and_evaluate(series)
+    return _EVAL_METRICS_CACHE[cache_key]
+
+
+def build_dashboard_rooms_snapshot(database_url: Optional[str] = None) -> Dict[str, Any]:
+    """Construye de forma determinista el estado de las 4 salas MSV para pruebas e inspección rápida."""
+    key = database_url or os.getenv("DATABASE_URL", "default")
+    repo, predictor, _, tool3, tool4, _, _ = init_services(database_url)
+    preds = repo.get_latest_predictions()
+    if not preds:
+        tool3.execute(anio_corte=2024)
+        preds = repo.get_latest_predictions()
+
+    options = {f"{p.ubigeo} - {p.distrito} ({p.provincia})": p.ubigeo for p in preds}
+    first_ubigeo = next(iter(options.values())) if options else "090101"
+    shap_audit = tool4.execute(first_ubigeo)
+    alerts = repo.get_all_alerts()
+    metrics = get_cached_evaluation_metrics(repo, predictor, cache_key=key)
+
+    return {
+        "sala_1_homeostato_count": len(preds),
+        "sala_1_criticos_s5_count": sum(1 for p in preds if p.supera_umbral_algedonico),
+        "sala_2_shap_options_count": len(options),
+        "sala_2_sample_explanation": shap_audit,
+        "sala_3_alerts_count": len(alerts),
+        "sala_4_metrics_globales": metrics["metricas_globales"],
+        "sala_4_loads_count": len(repo.get_recent_loads(limit=20)),
+    }
 
 
 def main() -> None:
@@ -110,7 +154,7 @@ def main() -> None:
         st.subheader("Soporte a S3* (Auditoría mediante Explicabilidad XAI - Valores SHAP por Distrito)")
         options = {f"{p.ubigeo} - {p.distrito} ({p.provincia})": p.ubigeo for p in preds}
         selected_label = st.selectbox("Seleccione un distrito para auditar su clasificación:", list(options.keys()))
-        selected_ubigeo = options[selected_label]
+        selected_ubigeo = options.get(selected_label) or next(iter(options.values()), "090101")
         explanation = tool4.execute(selected_ubigeo)
 
         st.markdown(
@@ -130,6 +174,8 @@ def main() -> None:
             st.success("Informe generado y enrutado según las Reglas Fijas del MSV.")
 
         alerts = repo.get_all_alerts()
+        if not alerts:
+            st.info("No existen alertas generadas aún en la bandeja S2/S3.")
         for a in alerts[:10]:
             with st.expander(
                 f"[{a['canal_destino']} | {a['estado_aprobacion_humana']}] "
@@ -143,7 +189,7 @@ def main() -> None:
 
     with tab_s5:
         st.subheader("Canal Algedónico Automatizado (S1/S4 -> S5) y Marco de Gobernanza")
-        metrics = predictor.train_and_evaluate(repo.get_historical_series(anio_inicio=2014, anio_fin=2024))
+        metrics = get_cached_evaluation_metrics(repo, predictor)
         m_glob = metrics["metricas_globales"]
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("AUC-ROC (Meta >= 0.90)", m_glob["auc_roc"])

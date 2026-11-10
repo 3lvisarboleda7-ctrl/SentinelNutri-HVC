@@ -21,6 +21,18 @@
       "position": [560, 260]
     }
   ],
-  "connections": {}
+  "connections": {
+    "Error Trigger (Fallo en Scraper por Cambio de Diseño de Portal)": {
+      "main": [
+        [
+          {
+            "node": "Notificar Desviación por Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
 }
 

@@ -161,8 +161,188 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [1140, 400]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID_S5_CONSEJO_REGIONAL }}",
+        "text": "🚨 [CANAL ALGEDÓNICO DIRECTO S1/S4 -> S5 CONSEJO REGIONAL HVC]\nDistrito Crítico: {{ $json.distrito }} (Ubigeo {{ $json.ubigeo }})\nDCI Proyectada: {{ $json.dci_proyectada_pct }}% (> 25.0%)\nSíntesis S4: {{ $json.sintesis_narrativa_s4 }}"
+      },
+      "id": "rule-fixed-2-s5-algedonic-dispatch",
+      "name": "Canal Algedónico S5: Despacho Inmediato (Consejo Regional)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1140, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://api_engine:8000/hitl/aprobar/{{ $json.id_alerta }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "approved",
+              "value": "={{ $json.approved ?? true }}"
+            },
+            {
+              "name": "approver_name",
+              "value": "Responsable GRDS-S3 (Aprobado vía Cloudflare Tunnel)"
+            }
+          ]
+        }
+      },
+      "id": "rule-fixed-3-hitl-webhook-callback",
+      "name": "Confirmar Aprobación HITL hacia S3 (/hitl/aprobar/{alert_id})",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 400]
     }
   ],
-  "connections": {}
+  "connections": {
+    "Regla Fija 1: Schedule Trigger (Inicio Semanal)": {
+      "main": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini (Nivel Gratuito Google AI Studio)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Local Respaldo (Llama 3.2 en GTX 1050 Equipo 2)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Tool 1: extraer_fuentes": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool 2: consultar_bd": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool 3: predecir_riesgo (CatBoost /predict)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool 4: explicar_riesgo (SHAP)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool 5: redactar_informe": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool 6: notificar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Supervisor (AI Agent de n8n)": {
+      "main": [
+        [
+          {
+            "node": "Regla Fija 2: Nodo IF · Umbral de Riesgo (DCI proyectada > 25% -> S5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Regla Fija 2: Nodo IF · Umbral de Riesgo (DCI proyectada > 25% -> S5)": {
+      "main": [
+        [
+          {
+            "node": "Canal Algedónico S5: Despacho Inmediato (Consejo Regional)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Regla Fija 3: Aprobación Humana (Telegram / Gmail con espera de respuesta vía Cloudflare Tunnel)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Regla Fija 3: Aprobación Humana (Telegram / Gmail con espera de respuesta vía Cloudflare Tunnel)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Regla Fija 3: Aprobación Humana (Telegram / Gmail con espera de respuesta vía Cloudflare Tunnel)": {
+      "main": [
+        [
+          {
+            "node": "Confirmar Aprobación HITL hacia S3 (/hitl/aprobar/{alert_id})",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
 }
 

@@ -13,6 +13,7 @@ y por los recuadros de Reglas Fijas (Figura 1):
 8. GET  /evaluation/metrics      (Validación Cruzada Estratificada: AUC >= 0.90, F1, SHAP global)
 """
 
+import sqlite3
 from typing import Any, Dict, Optional
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -106,6 +107,21 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
     api.state.telegram = telegram_adapter
     api.state.gmail = gmail_adapter
 
+    def _validate_ubigeo_or_raise(ubigeo: str) -> str:
+        clean = str(ubigeo).strip()
+        if len(clean) != 6 or not clean.isdigit() or not clean.startswith("09"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Ubigeo malformado o inválido '{ubigeo}': debe ser un código de 6 dígitos de Huancavelica (09xxxx).",
+            )
+        valid_ubigeos = {d.ubigeo for d in repo.get_all_districts()}
+        if clean not in valid_ubigeos:
+            raise HTTPException(
+                status_code=404,
+                detail=f"El ubigeo '{clean}' no existe en el catálogo oficial de los 100 distritos de Huancavelica.",
+            )
+        return clean
+
     @api.get("/health", tags=["Infraestructura"])
     def health_check() -> Dict[str, object]:
         districts = repo.get_all_districts()
@@ -132,35 +148,54 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
         anio_inicio: int = Query(default=2014),
         anio_fin: int = Query(default=2024),
     ) -> Dict[str, object]:
-        return tool2.execute(ubigeo=ubigeo, anio_inicio=anio_inicio, anio_fin=anio_fin)
+        clean_ubigeo = _validate_ubigeo_or_raise(ubigeo) if ubigeo is not None else None
+        return tool2.execute(ubigeo=clean_ubigeo, anio_inicio=anio_inicio, anio_fin=anio_fin)
 
     @api.post("/predict", tags=["Motor Predictivo CatBoost + SHAP y Herramienta 3"])
     @api.post("/tools/predecir_riesgo", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
     def endpoint_tool_3_predecir_riesgo(req: PredictRequest) -> Dict[str, object]:
+        clean_ubigeo = _validate_ubigeo_or_raise(req.ubigeo) if req.ubigeo is not None else None
         # Si la base de datos aún está vacía, ejecuta automáticamente el backfill inicial 2014-2024
         if not repo.get_historical_series(anio_inicio=2014, anio_fin=2025):
             tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
-        return tool3.execute(ubigeo=req.ubigeo, anio_corte=req.anio_corte)
+        try:
+            return tool3.execute(ubigeo=clean_ubigeo, anio_corte=req.anio_corte)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @api.get("/tools/explicar_riesgo/{ubigeo}", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
     def endpoint_tool_4_explicar_riesgo(ubigeo: str) -> Dict[str, object]:
-        if not repo.get_historical_series(ubigeo=ubigeo, anio_inicio=2014, anio_fin=2025):
+        clean_ubigeo = _validate_ubigeo_or_raise(ubigeo)
+        if not repo.get_historical_series(ubigeo=clean_ubigeo, anio_inicio=2014, anio_fin=2025):
             tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
         try:
-            return tool4.execute(ubigeo=ubigeo)
+            return tool4.execute(ubigeo=clean_ubigeo)
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @api.post("/tools/redactar_informe", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
     def endpoint_tool_5_redactar_informe(req: RedactarInformeRequest) -> Dict[str, Any]:
         try:
+            if "ubigeo" in req.district_context and req.district_context["ubigeo"] is not None:
+                _validate_ubigeo_or_raise(str(req.district_context["ubigeo"]))
             return tool5.execute(district_context=req.district_context, prefer_provider=req.prefer_provider)
         except PrivacyViolationError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except HTTPException:
+            raise
+        except (ValueError, TypeError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @api.post("/tools/notificar", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
     def endpoint_tool_6_notificar(req: NotificarRequest) -> Dict[str, Any]:
-        return tool6.execute_dispatch(report_payload=req.report_payload)
+        try:
+            raw_ubigeo = req.report_payload.get("ubigeo", "090101")
+            _validate_ubigeo_or_raise(str(raw_ubigeo))
+            return tool6.execute_dispatch(report_payload=req.report_payload)
+        except HTTPException:
+            raise
+        except (ValueError, TypeError, sqlite3.IntegrityError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @api.post("/hitl/aprobar/{alert_id}", tags=["Regla Fija 3: Aprobación Humana (HITL)"])
     def endpoint_human_approval(alert_id: int, req: HumanApprovalRequest) -> Dict[str, Any]:
@@ -171,7 +206,8 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
                 approver_name=req.approver_name,
             )
         except ValueError as exc:
-            raise HTTPException(status_code=404, detail=str(exc)) from exc
+            status_code = 422 if "approver_name" in str(exc) else 404
+            raise HTTPException(status_code=status_code, detail=str(exc)) from exc
 
     @api.get("/evaluation/metrics", tags=["Semana 7: Evaluación y Gobernanza (AUC, F1, SHAP)"])
     def endpoint_evaluation_metrics() -> Dict[str, object]:

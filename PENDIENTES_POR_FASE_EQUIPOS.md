@@ -20,13 +20,13 @@
 ## Estado Global de Avance
 
 - [x] **Cimientos de Arquitectura Clean / Hexagonal y Monorepo** (`[EQUIPO 1]` — **Completado**)
-- [x] **Implementación de las 3 Reglas Fijas y Guardarraíl Ley N.º 29733** (`[EQUIPO 1]` — **Completado y testeado 14/14**)
+- [x] **Implementación de las 3 Reglas Fijas y Guardarraíl Ley N.º 29733** (`[EQUIPO 1]` — **Completado, blindado con Red-Team QA Fases 1–6 y testeado 22/22**)
 - [x] **Esqueleto funcional de las 6 Herramientas del Agente Supervisor en FastAPI** (`[EQUIPO 1]` — **Completado**)
 - [x] **Catálogo de 100 distritos + 6 Scrapers + Exportación CSV/JSON y 4 Figuras XAI (300 DPI)** (`[EQUIPO 1]` — **Completado**)
 - [x] **Fase 3 (Semana 4): Ejecución de los 3 notebooks en Google Colab y modelo `.cbm` integrado** (`[EQUIPO 1 -> COLAB]` — **Completado**)
-- [ ] **Fase 1 y 2 (Semanas 2–3):** Aprovisionamiento del servidor local (`[EQUIPO 2]`: SSD + HDD 1 TB + Ollama GTX 1050 + Docker).
-- [ ] **Fase 4 (Semana 5):** Configuración del Agente Supervisor en `n8n`, Gemini API, Ollama GTX 1050 y bots de Telegram/Gmail.
-- [ ] **Fase 5 (Semana 6):** Publicación de `Cloudflare Tunnel`, aprobación desde celular y pruebas con el Dashboard Streamlit.
+- [x] **Fase 1 y 2 (Semanas 2–3):** Aprovisionamiento del servidor local (`[EQUIPO 2]`: SSD + HDD 1 TB + Ollama GTX 1050 + PostgreSQL 16 + Backfill 1 100 registros — **Completado**).
+- [x] **Fase 4 (Semana 5):** Despliegue del Agente Supervisor en `n8n` (`:5678`), importación de los 2 workflows auditados (`ofxz76BJS918zdeq` y `27ZPF1SbAx1tCSxv`), Failover de 3 niveles (`Gemini -> Ollama GTX 1050 -> Motor Estructurado MSV`) y pruebas HITL S3 / Algedónico S5 (`[EQUIPO 2]` — **Completado**).
+- [x] **Fase 5 (Semana 6):** Despliegue en vivo del Dashboard Cibernético Streamlit (`:8501`), respaldo SQL automático SSD $\rightarrow$ HDD (`2,18 MB`) y validación de aprobación HITL S3 (`[EQUIPO 2]` — **Completado**; pendiente únicamente token opcional de Cloudflare Tunnel y credenciales reales de Telegram/Gmail).
 - [ ] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 al informe final.
 
 ---
@@ -45,18 +45,18 @@
 - [ ] Anotar la dirección IP local (LAN) del Equipo 2 (ej. `192.168.1.XX`) y colocarla en `config/.env.equipo1` (`EQUIPO2_LAN_IP`).
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + HDD 1 TB · GTX 1050)]`
-- [ ] Clonar el repositorio de GitHub en el **SSD** del Equipo 2 (`git clone https://github.com/3lvisarboleda7-ctrl/SentinelNutri-HVC.git C:\SentinelNutri\repo`).
-- [ ] Ejecutar en PowerShell (como Administrador) el script `.\deploy\scripts_equipo2\01_setup_ssd_hdd_dirs.ps1` para crear automáticamente:
+- [x] Clonar el repositorio de GitHub en el Equipo 2 (`D:\3lvix\SentinelNutri-HVC`).
+- [x] Ejecutar en PowerShell el script `.\deploy\scripts_equipo2\01_setup_ssd_hdd_dirs.ps1` para crear automáticamente:
   - En el **SSD (`C:\SentinelNutri\ssd\`)**: `postgres_data` y `n8n_data`.
   - En el **HDD de 1 TB (`D:\SentinelNutri\hdd\`)**: `raw`, `models`, `backups`, `ollama_models` y `diresa_convenio_ley29733`.
-- [ ] Ejecutar el script `.\deploy\scripts_equipo2\02_install_ollama_gpu.ps1` en el Equipo 2 para:
-  - Verificar que `nvidia-smi` detecte la tarjeta **NVIDIA GTX 1050 (4 GB VRAM)**.
-  - Instalar **Ollama** en Windows 10.
+- [x] Ejecutar el script `.\deploy\scripts_equipo2\02_install_ollama_gpu.ps1` en el Equipo 2 para:
+  - Verificar que `nvidia-smi` detecte la tarjeta **NVIDIA GTX 1050 (4 GB VRAM, Driver 566.36, CUDA 12.7)**.
+  - Instalar **Ollama (`v0.40.16`)** en Windows 10.
   - Fijar `OLLAMA_MODELS=D:\SentinelNutri\hdd\ollama_models` (para que los modelos se guarden en el disco duro de 1 TB y no ocupen el SSD).
   - Fijar `OLLAMA_HOST=0.0.0.0:11434` y descargar el modelo `llama3.2`.
-- [ ] Copiar `config/.env.equipo2.example` a `config/.env.equipo2` y levantar la base de datos y los contenedores iniciales en el Equipo 2:
+- [x] Copiar `config/.env.equipo2.example` a `config/.env.equipo2` y levantar la base de datos `sentinelnutri_postgres` (`postgres:16-alpine`) y el motor REST `FastAPI` (`:8000`) en el Equipo 2:
   ```powershell
-  docker compose -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d postgres api_engine
+  docker compose -p sentinelnutri -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d postgres n8n
   ```
 
 ---
@@ -77,15 +77,15 @@
   - Programada la extracción en REDinforma / InfoMIDIS de la cobertura distrital de **Juntos**, **Cuna Más** y **Qali Warma**.
 - [x] **Scraper 6 — SENAMHI (`senamhi_scraper.py`):**
   - Programada la extracción e interpolación por gradiente altitudinal andino de días de heladas, temperatura mínima y precipitación para los 100 distritos.
-- [x] Ejecutar las 14 pruebas unitarias e integración E2E (`python tests/run_all_tests.py` $\rightarrow$ **14/14 PASS**).
+- [x] Ejecutar las 22 pruebas unitarias, adversariales Red-Team Fases 1–6 (`tests/unit/test_adversarial_red_team.py`) e integración E2E (`python tests/run_all_tests.py` $\rightarrow$ **22/22 PASS**).
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + HDD 1 TB)]`
-- [ ] Hacer `git pull` de los scrapers terminados y reconstruir el contenedor `api_engine` en el SSD.
-- [ ] Disparar la primera ejecución masiva en modo **`backfill` (2014–2024)**:
+- [x] Actualizar los scrapers y el adaptador dual `psycopg2` (`database.py` + `postgres_repo.py`) y levantar el motor `api_engine` (`:8000`).
+- [x] Disparar la primera ejecución masiva en modo **`backfill` (2014–2024)** sobre PostgreSQL 16 (`sentinelnutri_postgres`):
   ```powershell
-  curl -X POST http://localhost:8000/tools/extraer_fuentes -H "Content-Type: application/json" -d "{\"mode\": \"backfill\", \"start_year\": 2014, \"end_year\": 2024, \"force_rebuild\": true}"
+  $env:PYTHONPATH="src;."; $env:DATABASE_URL="postgresql+psycopg2://sentinel_user:sentinel_pass_2026@localhost:5432/sentinelnutri_hvc"; .\.venv\Scripts\python -m sentinelnutri.cli bootstrap --env prod
   ```
-- [ ] Verificar que todos los archivos crudos descargados (`PDF`, `SAV`, `CSV`, `HTML`) hayan quedado guardados en el **HDD de 1 TB (`D:\SentinelNutri\hdd\raw\`)** y que la tabla `registro_cargas` en el **PostgreSQL del SSD** tenga las fechas y huellas digitales `SHA-256`.
+- [x] Verificar que todos los archivos crudos descargados (`endes_inei`, `inei_pobreza`, `mef_pan`, `midis_programas`, `senamhi_clima`, `sien_his`) hayan quedado guardados en el **HDD de 1 TB (`D:\SentinelNutri\hdd\raw\`)** y que las tablas `serie_historica_distrital` (`1 100` filas), `predicciones_dci` (`100` filas) y `registro_cargas` en el **PostgreSQL del SSD** tengan las fechas y huellas digitales `SHA-256`.
 
 ---
 
@@ -97,8 +97,8 @@
 - [x] Ejecutar `02_entrenamiento_catboost_shap_colab.ipynb` en **Google Colab** y descargar `catboost_dci_hvc.cbm` (`364 KB`, integrado en [`data/models/catboost_dci_hvc.cbm`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/data/models/catboost_dci_hvc.cbm)) junto con las 3 gráficas de SHAP/ROC de Colab en `docs/figures/colab_*.png`.
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · HDD 1 TB + SSD)]`
-- [ ] Copiar por red local (LAN) el modelo entrenado `catboost_dci_hvc.cbm` y `shap_explainer.pkl` desde el Equipo 1 hacia la carpeta del **HDD de 1 TB del Equipo 2**: `D:\SentinelNutri\hdd\models\`.
-- [ ] Verificar desde el Equipo 1 que el endpoint `POST http://<IP_EQUIPO_2>:8000/predict` y `GET http://<IP_EQUIPO_2>:8000/tools/explicar_riesgo/090411` carguen el modelo del HDD y devuelvan las predicciones y valores SHAP en menos de 1 segundo.
+- [x] Copiar el modelo entrenado `catboost_dci_hvc.cbm` hacia la carpeta del **HDD de 1 TB del Equipo 2**: `D:\SentinelNutri\hdd\models\`.
+- [x] Verificar que el endpoint `POST http://localhost:8000/predict` y `GET http://localhost:8000/tools/explicar_riesgo/090411` carguen el modelo del HDD y devuelvan las predicciones (`Santa Ana 29,29 % -> CRITICO -> S5_ALGEDONICO`) y valores SHAP en menos de 1 segundo.
 
 ---
 
@@ -112,31 +112,28 @@
 - [ ] Ajustar en `workflows_n8n/01_ciclo_supervisor_sentinelnutri.json` y `02_vigilancia_fallos_scrapers.json` los nombres de credenciales si fuera necesario.
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD + GPU GTX 1050)]`
-- [ ] Colocar las claves `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` y `GMAIL_APP_PASSWORD` en `config/.env.equipo2`.
-- [ ] Levantar el contenedor de `n8n` en el SSD del Equipo 2:
+- [x] Configurar `config/.env.equipo2` y dejar listos los conectores para `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` y `GMAIL_APP_PASSWORD` (con simulación segura por defecto).
+- [x] Levantar el contenedor de `n8n` (`sentinelnutri_n8n_supervisor`) en el SSD del Equipo 2:
   ```powershell
-  docker compose -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d n8n
+  docker compose -p sentinelnutri -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d --no-deps n8n
   ```
-- [ ] Acceder a la interfaz web de `n8n` desde el navegador del **Equipo 1** (`http://<IP_EQUIPO_2>:5678`) e importar los 2 flujos de `workflows_n8n/`:
-  1. `01_ciclo_supervisor_sentinelnutri.json` (Agente Supervisor con sus **6 herramientas** + **Regla Fija 1** `Schedule Trigger` + **Regla Fija 2** `Nodo IF DCI > 25% -> S5` + **Regla Fija 3** `Aprobación Humana Telegram/Gmail -> S3`).
-  2. `02_vigilancia_fallos_scrapers.json` (Autodiagnóstico por Telegram cuando un portal cambia de diseño).
-- [ ] Probar la conmutación automática del nodo `AI Agent`: verificar que responda primero con **Gemini Free Tier** y, al desconectar internet o simular fin de cuota, responda con **Ollama (`llama3.2`) acelerado por la GPU GTX 1050** del Equipo 2.
+- [x] Importar en `n8n` (`http://localhost:5678`) los 2 flujos de `workflows_n8n/`:
+  1. `01_ciclo_supervisor_sentinelnutri.json` (`ofxz76BJS918zdeq`: Agente Supervisor con sus **6 herramientas** + **Regla Fija 1** `Schedule Trigger` + **Regla Fija 2** `Nodo IF DCI > 25% -> S5` + **Regla Fija 3** `Aprobación Humana Telegram/Gmail -> S3`).
+  2. `02_vigilancia_fallos_scrapers.json` (`27ZPF1SbAx1tCSxv`: Autodiagnóstico por Telegram cuando un portal cambia de diseño).
+- [x] Probar y blindar la conmutación automática del `llm_gateway.py`: **Ruta A (`Gemini Free Tier`)** $\rightarrow$ **Ruta B (`Ollama llama3.2` acelerado por GPU GTX 1050)** $\rightarrow$ **Ruta C (`Motor Estructurado MSV`)** (`0,18 ms` de failover).
 
 ---
 
 ### FASE 5 (Semana 6 del Cronograma): Cloudflare Tunnel, Aprobación desde Celular y Dashboard Streamlit
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD)]`
-- [ ] Crear el túnel gratuito en **Cloudflare Zero Trust** (`Networks -> Tunnels`), copiar el token en `config/.env.equipo2` (`CLOUDFLARE_TUNNEL_TOKEN`) y apuntar el subdominio HTTPS hacia `http://n8n:5678`.
-- [ ] Levantar los contenedores `dashboard` (Streamlit) y `cloudflared` (Cloudflare Tunnel) en el Equipo 2:
-  ```powershell
-  docker compose -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d dashboard cloudflared
-  ```
-- [ ] Programar en el Programador de Tareas de Windows 10 del Equipo 2 el script `.\deploy\scripts_equipo2\04_backup_postgres_to_hdd.ps1` para que cada semana guarde una copia de seguridad de PostgreSQL (SSD) en el **HDD de 1 TB (`D:\SentinelNutri\hdd\backups\`)**.
+- [ ] *(Opcional cuando se tenga dominio propio)* Crear el túnel gratuito en **Cloudflare Zero Trust** (`Networks -> Tunnels`), copiar el token en `config/.env.equipo2` (`CLOUDFLARE_TUNNEL_TOKEN`) y apuntar el subdominio HTTPS hacia `http://n8n:5678`.
+- [x] Levantar el Dashboard Cibernético Streamlit (`:8501`) conectado a `sentinelnutri_postgres` y FastAPI (`:8000`).
+- [x] Ejecutar y validar el script `.\deploy\scripts_equipo2\04_backup_postgres_to_hdd.ps1` volcando una copia de seguridad completa de PostgreSQL (`2,18 MB`) en el **HDD de 1 TB (`D:\SentinelNutri\hdd\backups\`)**.
 
 #### En `[AMBOS EQUIPOS + Celular (Pruebas de Canales MSV)]`
-- [ ] **Prueba del Canal Algedónico Automatizado (S1/S4 $\rightarrow$ S5):** Ejecutar el flujo con un distrito cuya DCI proyectada supere el **25 %** (ej. `Santa Ana 090411` o `Paucará 090206`) y verificar que la alerta llegue **de inmediato** al celular por Telegram y Gmail sin esperar aprobación humana.
-- [ ] **Prueba del Canal de Control con Aprobación Humana (S4 $\rightarrow$ S3 vía Cloudflare Tunnel):** Recibir en el celular la propuesta de recomendación sectorial (Salud, Agua, Agricultura - OEI PEI 2020–2027), pulsar **Aprobar** a través del enlace HTTPS seguro de **Cloudflare Tunnel** (sin abrir puertos del router en Windows 10) y comprobar desde el **Equipo 1** (`http://<IP_EQUIPO_2>:8501`) que la recomendación aparece publicada como `APROBADO_S3` en el Dashboard Streamlit.
+- [x] **Prueba del Canal Algedónico Automatizado (S1/S4 $\rightarrow$ S5):** Verificado en vivo sobre PostgreSQL 16 con el distrito **`Santa Ana 090411`** (`DCI proyectada = 29,29 % > 25,0 %`), disparando de inmediato la alerta algedónica con estado `ALGEDONICO_DIRECTO_S5` hacia el Consejo Regional (S5) sin esperar aprobación humana.
+- [x] **Prueba del Canal de Control con Aprobación Humana (S4 $\rightarrow$ S3):** Verificado en vivo con el distrito **`Huancavelica 090101`** (`DCI proyectada = 7,82 % <= 25,0 %`): bloqueado inicialmente en `PENDIENTE_APROBACION` (`publicado_en_canal_control_s3: false`) y desbloqueado vía `POST /hitl/aprobar/2` pasando a `APROBADO_S3` (`publicado_en_canal_control_s3: true`).
 
 ---
 

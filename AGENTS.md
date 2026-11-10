@@ -138,7 +138,7 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
   ```powershell
   $env:PYTHONPATH="src;."; python -m sentinelnutri.cli export-artifacts
   ```
-- Ejecutar las 14 pruebas unitarias y de integración E2E:
+- Ejecutar las 22 pruebas unitarias, adversariales (Red-Team QA Fases 1–6) y de integración E2E:
   ```powershell
   $env:PYTHONPATH="src;."; python tests/run_all_tests.py
   ```

@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS serie_historica_distrital (
     tasa_dci_pct NUMERIC(5, 2) NOT NULL,
     tasa_anemia_pct NUMERIC(5, 2) NOT NULL,
     tasa_bajo_peso_pct NUMERIC(5, 2) NOT NULL,
-    niños_evaluados INTEGER NOT NULL DEFAULT 300,
+    ninos_evaluados INTEGER NOT NULL DEFAULT 300,
     -- Dimensión 2: Socioeconómica (INEI Censos / Mapa de Pobreza / ENDES)
     pobreza_monetaria_pct NUMERIC(5, 2) NOT NULL,
     educacion_materna_secundaria_pct NUMERIC(5, 2) NOT NULL,
@@ -97,9 +97,9 @@ CREATE TABLE IF NOT EXISTS alertas_y_recomendaciones_msv (
     recomendacion_salud TEXT NOT NULL,
     recomendacion_agua_saneamiento TEXT NOT NULL,
     recomendacion_agricultura_midis TEXT NOT NULL,
-    oei_pei_vinculados VARCHAR(120) NOT NULL,  -- Ej. OEI.01, OEI.04, OEI.08 (PEI 2020-2027)
-    ods_vinculados VARCHAR(60) NOT NULL,       -- ODS 2, ODS 3, ODS 6
-    proveedor_llm VARCHAR(40) NOT NULL,        -- gemini-2.0-flash o ollama/llama3.2
+    oei_pei_vinculados VARCHAR(200) NOT NULL,  -- Ej. OEI.01, OEI.04, OEI.08 (PEI 2020-2027)
+    ods_vinculados VARCHAR(100) NOT NULL,      -- ODS 2, ODS 3, ODS 6
+    proveedor_llm VARCHAR(60) NOT NULL,        -- gemini-2.0-flash o ollama/llama3.2
     estado_aprobacion_humana VARCHAR(30) NOT NULL DEFAULT 'PENDIENTE_APROBACION', -- PENDIENTE_APROBACION, APROBADO_S3, ALGEDONICO_DIRECTO_S5, RECHAZADO
     aprobado_por VARCHAR(80),
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

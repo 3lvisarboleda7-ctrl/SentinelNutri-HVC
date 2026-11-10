@@ -67,9 +67,19 @@ OFFICIAL_SOURCES_CATALOG: List[Dict[str, str]] = [
 class MultiSourceScraperOrchestrator(ScraperPort):
     """Implementación del subsistema de extracción automatizada y armonización por ubigeo."""
 
-    def __init__(self, repository: RepositoryPort, scraper_client: EthicalWebScraperClient | None = None) -> None:
+    def __init__(
+        self,
+        repository: RepositoryPort,
+        scraper_client: EthicalWebScraperClient | None = None,
+        raw_data_dir: str | None = None,
+    ) -> None:
         self._repo = repository
-        self._client = scraper_client or EthicalWebScraperClient()
+        if scraper_client is not None:
+            self._client = scraper_client
+        elif raw_data_dir is not None:
+            self._client = EthicalWebScraperClient(raw_storage_dir=raw_data_dir)
+        else:
+            self._client = EthicalWebScraperClient()
 
     def execute_extraction(
         self,
