@@ -63,6 +63,7 @@ services:
       - ${HDD_DIRESA_SHARED:-D:/SentinelNutri/hdd/diresa_convenio_ley29733}:/data/diresa_ley29733
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "api_engine:host-gateway"
     networks:
       - msv_net
 
@@ -96,6 +97,7 @@ services:
       - ${HDD_DIRESA_SHARED:-D:/SentinelNutri/hdd/diresa_convenio_ley29733}:/data/diresa_ley29733:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "api_engine:host-gateway"
     networks:
       - msv_net
 
