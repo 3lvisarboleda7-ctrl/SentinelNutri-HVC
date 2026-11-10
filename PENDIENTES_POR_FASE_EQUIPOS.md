@@ -27,7 +27,7 @@
 - [x] **Fase 1 y 2 (Semanas 2–3):** Aprovisionamiento del servidor local (`[EQUIPO 2]`: SSD + HDD 1 TB + Ollama GTX 1050 + PostgreSQL 16 + Backfill 1 100 registros — **Completado**).
 - [x] **Fase 4 (Semana 5):** Despliegue del Agente Supervisor en `n8n` (`:5678`), importación de los 2 workflows auditados (`ofxz76BJS918zdeq` y `27ZPF1SbAx1tCSxv`), Failover de 3 niveles (`Gemini -> Ollama GTX 1050 -> Motor Estructurado MSV`) y pruebas HITL S3 / Algedónico S5 (`[EQUIPO 2]` — **Completado**).
 - [x] **Fase 5 (Semana 6):** Despliegue en vivo del Dashboard Cibernético Streamlit (`:8501`), respaldo SQL automático SSD $\rightarrow$ HDD (`2,18 MB`) y validación de aprobación HITL S3 (`[EQUIPO 2]` — **Completado**; pendiente únicamente token opcional de Cloudflare Tunnel y credenciales reales de Telegram/Gmail).
-- [ ] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 al informe final.
+- [x] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 (`docs/figures/equipo2_live_01_*.png` a `06_*.png`) al informe final (`[EQUIPO 2]` — **Completado**).
 
 ---
 
@@ -148,5 +148,5 @@
     2. [`docs/figures/fig2_shap_importancia_global_s3_star.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig2_shap_importancia_global_s3_star.png)
     3. [`docs/figures/fig3_shap_waterfall_distrito_critico.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig3_shap_waterfall_distrito_critico.png)
     4. [`docs/figures/fig4_homeostato_s3_s4_7_provincias.png`](file:///c:/Users/arbol/OneDrive/Univesidad_Nacional_de_Ingenieria/Ciclo_8/MSV/SentinelNutri-HVC/docs/figures/fig4_homeostato_s3_s4_7_provincias.png)
-- [ ] Tomar las capturas de pantalla finales del Dashboard Streamlit, del flujo del Agente Supervisor en `n8n` y de las alertas en Telegram/Gmail una vez levantados los contenedores en el **Equipo 2**.
+- [x] Tomar las 6 capturas de pantalla en alta resolución (`1920x1080`) del Dashboard Streamlit (`:8501`), de la API FastAPI (`:8000/docs`) y del orquestador `n8n` (`:5678`) en vivo en el **Equipo 2** (`docs/figures/equipo2_live_01_*.png` a `06_*.png`) e integrarlas en [`docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md`](file:///d:/3lvix/SentinelNutri-HVC/docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md).
 

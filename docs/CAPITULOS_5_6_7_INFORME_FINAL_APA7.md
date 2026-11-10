@@ -123,3 +123,17 @@ La matriz completa de los 100 distritos exportada en [`data/exports/matriz_gober
 - **ODS 3 (Salud y Bienestar — Meta 3.2) $\leftrightarrow$ OEI.01 y OEI.03 del PEI 2020–2027:** Coordinación interprovincial (**S2**) de las 7 Redes de Salud de la DIRESA Huancavelica y mejora de la calidad de ejecución del Programa Articulado Nutricional (`0001`).
 - **ODS 6 (Agua Limpia y Saneamiento — Meta 6.1) $\leftrightarrow$ OEI.04 del PEI 2020–2027:** Intervención prioritaria sobre los sistemas de cloración rural (donde los valores SHAP demuestran el segundo mayor impacto estructural sobre la DCI regional, $|\text{SHAP}| = 1,1306$ puntos porcentuales).
 
+---
+
+### 7.4. Evidencia Operativa en Vivo del Servidor Local (Equipo 2: PostgreSQL 16 + FastAPI + n8n + Streamlit + Ollama GTX 1050)
+
+Las capturas en alta resolución tomadas directamente de los servicios en ejecución sobre el **Equipo 2 (`DESKTOP-H3C8P9R`, Intel Core i7-7700HQ, GPU NVIDIA GeForce GTX 1050 4 GB VRAM, SSD `C:\SentinelNutri\ssd` + HDD `D:\SentinelNutri\hdd`)** se encuentran integradas en [`docs/figures/`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures):
+
+1. **Sala 1 — Homeostato $\text{S3–S4}$ (`:8501`):** [`docs/figures/equipo2_live_01_dashboard_homeostato_s4_s3.png`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures/equipo2_live_01_dashboard_homeostato_s4_s3.png)
+2. **Sala 2 — Auditoría $\text{S3}^*$ mediante Explicabilidad SHAP (`:8501/S3_Star_Auditoria_SHAP`):** [`docs/figures/equipo2_live_02_dashboard_s3_star_auditoria_shap.png`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures/equipo2_live_02_dashboard_s3_star_auditoria_shap.png)
+3. **Sala 3 — Coordinación Interprovincial $\text{S2}$ de las 7 Redes de Salud (`:8501/S2_Coordinacion_Redes`):** [`docs/figures/equipo2_live_03_dashboard_s2_coordinacion_redes.png`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures/equipo2_live_03_dashboard_s2_coordinacion_redes.png)
+4. **Sala 4 — Canal Algedónico $\text{S5}$, Aprobación Humana HITL y Trazabilidad `SHA-256` (`:8501/S5_Canal_Algedonico_ODS`):** [`docs/figures/equipo2_live_04_dashboard_s5_canal_algedonico_ods.png`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures/equipo2_live_04_dashboard_s5_canal_algedonico_ods.png)
+5. **Microservicio REST FastAPI con las 6 Herramientas del Agente Supervisor (`:8000/docs`):** [`docs/figures/equipo2_live_05_fastapi_swagger_6_tools.png`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures/equipo2_live_05_fastapi_swagger_6_tools.png)
+6. **Orquestador Agéntico `n8n` en SSD (`:5678`):** [`docs/figures/equipo2_live_06_n8n_orchestrator.png`](file:///d:/3lvix/SentinelNutri-HVC/docs/figures/equipo2_live_06_n8n_orchestrator.png)
+
+
