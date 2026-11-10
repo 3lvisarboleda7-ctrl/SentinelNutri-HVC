@@ -131,9 +131,9 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 
 - **Host detectado:** `DESKTOP-H3C8P9R` · i7-7700HQ · GTX 1050 4 GB (Driver 566.36) · Windows 10 Home · Repo en `D:\3lvix\SentinelNutri-HVC` · `.venv` con CPython 3.12 (`uv`).
 - **IP LAN del Equipo 2:** `10.36.113.176` (asignada por DHCP: verificar con `ipconfig` si cambia de red). Desde el Equipo 1: `http://10.36.113.176:5678` (n8n), `:8501` (Streamlit), `:8000/docs` (API).
-- **Proyecto Docker aislado:** `-p sentinelnutri` con `deploy/docker-compose.equipo2.yml` + `config/.env.equipo2` (gitignored). **No tocar** contenedores ajenos (p. ej. `contextapp-fase1-*`).
-- **Ollama:** `v0.40.16` con `OLLAMA_VULKAN=1` y `CUDA_VISIBLE_DEVICES=-1` (el backend CUDA falla con el driver 566.36; Vulkan usa la GTX 1050). Modelos en `D:\SentinelNutri\hdd\ollama_models` (`llama3.2` Q4_K_M).
-- **n8n (`sentinelnutri_n8n_supervisor`, v2.47.3):** propietario `3lvisarboleda7@gmail.com`. Workflows `ofxz76BJS918zdeq` (Ciclo Supervisor, 15 nodos) y `27ZPF1SbAx1tCSxv` (Vigilancia de scrapers). Credenciales: `Ollama Local GPU GTX 1050` (operativa), `Google Gemini Free Tier` y `Telegram Bot` (**con valores de relleno, faltan claves reales**). Variables: `N8N_SECURE_COOKIE=false` (login por LAN) y `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` (los nodos leen `$env.TELEGRAM_CHAT_ID_*`).
+- **Proyecto Docker aislado:** `-p sentinelnutri` con `deploy/docker-compose.equipo2.yml` + `config/.env.equipo2` (gitignored). Los 4 contenedores están activos y encapsulados en Docker: `sentinelnutri_postgres` (`:5432`), `sentinelnutri_api_engine` (`:8000`), `sentinelnutri_streamlit_msv` (`:8501`) y `sentinelnutri_n8n_supervisor` (`:5678`). **No tocar** contenedores ajenos (p. ej. `contextapp-fase1-*`).
+- **Ollama:** `v0.40.16` con `OLLAMA_VULKAN=1` y `CUDA_VISIBLE_DEVICES=-1` (el backend CUDA falla con el driver 566.36; Vulkan usa la GTX 1050). Modelos en `D:\SentinelNutri\hdd\ollama_models` (`llama3.2` Q4_K_M). Arranque automático al iniciar sesión configurado en Windows Startup (`SentinelNutri_Ollama_GPU.vbs`).
+- **n8n (`sentinelnutri_n8n_supervisor`, v2.47.3):** propietario `3lvisarboleda7@gmail.com`. Workflows `ofxz76BJS918zdeq` (Ciclo Supervisor, 15 nodos con Ollama GTX 1050 nativo como chatModel del AI Agent) y `27ZPF1SbAx1tCSxv` (Vigilancia de scrapers). Credenciales: `Ollama Local GPU GTX 1050` (operativa en vivo), `Google Gemini Free Tier` y `Telegram Bot` (con valores de relleno, faltan claves reales). Variables: `N8N_SECURE_COOKIE=false` (login por LAN) y `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` (los nodos leen `$env.TELEGRAM_CHAT_ID_*`).
 - **Regla Fija 3 en n8n (crítica):** el nodo `rule-fixed-3-human-approval` debe usar `sendAndWait`, sin `onError: continue`, seguido de la compuerta `¿Aprobado por Humano S3?` antes de `POST /hitl/aprobar/{id}`. Lo audita `test_red_team_6`.
 
 ### Registro de Cambios del Equipo 2
@@ -145,13 +145,12 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-10 | `be12c0b`, `f158994` | n8n: `api_engine -> host-gateway` y `N8N_SECURE_COOKIE=false`. |
 | 2026-11-10 | `16b1aa4` | n8n: credenciales vinculadas a los nodos. **Introdujo una regresión en la Regla Fija 3** (HITL sin espera). |
 | 2026-11-10 | `2cc1421` | Corrige la regresión: `sendAndWait` + compuerta de aprobación + test que lo audita. |
+| 2026-11-10 | `48bd7f9` | docs(memoria): sincronización de estado operativo y pendientes honestos. |
+| 2026-11-10 | En curso | Encapsulación de FastAPI y Streamlit dentro de Docker (`sentinelnutri_api_engine` y `sentinelnutri_streamlit_msv`), autostart de Ollama GPU en Windows y ejecución en vivo en n8n. |
 
 ### Pendientes Reales del Equipo 2
 - [ ] Credenciales reales: `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` + chat IDs, `GMAIL_APP_PASSWORD` (requieren al usuario).
 - [ ] Cloudflare Tunnel (`CLOUDFLARE_TUNNEL_TOKEN`, requiere cuenta/dominio del usuario).
-- [ ] API (`:8000`) y Dashboard (`:8501`) dentro de Docker para que sobrevivan reinicios (hoy corren como procesos de la sesión).
-- [ ] Ollama con arranque automático al iniciar Windows.
-- [ ] Ejecución de prueba del flujo `ofxz76BJS918zdeq` dentro de n8n (canal S5 > 25 % y espera HITL S3).
 
 ---
 

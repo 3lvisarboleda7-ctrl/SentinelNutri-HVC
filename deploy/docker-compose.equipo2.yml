@@ -1,9 +1,9 @@
-# ============================================================================
-# DOCKER COMPOSE DE PRODUCCIÓN — EQUIPO 2 (Servidor Local Windows 10)
+﻿# ============================================================================
+# DOCKER COMPOSE DE PRODUCCIÃ“N â€” EQUIPO 2 (Servidor Local Windows 10)
 # Hardware: Intel Core i7-7700HQ | 16 GB RAM | GPU GTX 1050 4GB | SSD 447GB + HDD 1TB
-# SSD: C:/SentinelNutri/ssd/* (Servicios rápidos)
+# SSD: C:/SentinelNutri/ssd/* (Servicios rÃ¡pidos)
 # HDD: D:/SentinelNutri/hdd/* (Archivos crudos, modelos entrenados y respaldos)
-# Ollama corre en Windows 10 con aceleración directa GTX 1050 (host.docker.internal:11434)
+# Ollama corre en Windows 10 con aceleraciÃ³n directa GTX 1050 (host.docker.internal:11434)
 # ============================================================================
 
 services:
@@ -40,7 +40,7 @@ services:
         condition: service_healthy
     environment:
       APP_ENV: production
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://sentinel_user:sentinel_pass_2026@postgres:5432/sentinelnutri_hvc}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-sentinel_user}:${POSTGRES_PASSWORD:-sentinel_pass_2026}@postgres:5432/${POSTGRES_DB:-sentinelnutri_hvc}
       RAW_DATA_DIR: /data/raw
       MODELS_DIR: /data/models
       SHARED_DIRESA_DIR: /data/diresa_ley29733
@@ -63,7 +63,6 @@ services:
       - ${HDD_DIRESA_SHARED:-D:/SentinelNutri/hdd/diresa_convenio_ley29733}:/data/diresa_ley29733
     extra_hosts:
       - "host.docker.internal:host-gateway"
-      - "api_engine:host-gateway"
     networks:
       - msv_net
 
@@ -102,7 +101,6 @@ services:
       - ${HDD_DIRESA_SHARED:-D:/SentinelNutri/hdd/diresa_convenio_ley29733}:/data/diresa_ley29733:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
-      - "api_engine:host-gateway"
     networks:
       - msv_net
 
@@ -116,7 +114,7 @@ services:
       api_engine:
         condition: service_started
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://sentinel_user:sentinel_pass_2026@postgres:5432/sentinelnutri_hvc}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-sentinel_user}:${POSTGRES_PASSWORD:-sentinel_pass_2026}@postgres:5432/${POSTGRES_DB:-sentinelnutri_hvc}
       API_ENGINE_URL: http://api_engine:8000
       ALGEDONIC_DCI_THRESHOLD: ${ALGEDONIC_DCI_THRESHOLD:-0.25}
     ports:
