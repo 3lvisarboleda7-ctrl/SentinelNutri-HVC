@@ -149,8 +149,11 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-10 | En curso | Encapsulación de FastAPI y Streamlit dentro de Docker (`sentinelnutri_api_engine` y `sentinelnutri_streamlit_msv`), autostart de Ollama GPU en Windows y ejecución en vivo en n8n. |
 
 ### Pendientes Reales del Equipo 2
-- [ ] Credenciales reales: `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` + chat IDs, `GMAIL_APP_PASSWORD` (requieren al usuario).
-- [ ] Cloudflare Tunnel (`CLOUDFLARE_TUNNEL_TOKEN`, requiere cuenta/dominio del usuario).
+- [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`).
+- [x] Ollama GPU GTX 1050 operativo con autostart en Windows 10.
+- [x] Workflows n8n operativos y conmutación LLM verificada.
+- [x] Credenciales configuradas en vivo (`GEMINI_API_KEY` y `TELEGRAM_BOT_TOKEN`).
+- [ ] Cloudflare Tunnel opcional (`CLOUDFLARE_TUNNEL_TOKEN`, para acceso fuera de la red local).
 
 ---
 

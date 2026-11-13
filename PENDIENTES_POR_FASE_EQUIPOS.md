@@ -25,8 +25,8 @@
 - [x] **Catálogo de 100 distritos + 6 Scrapers + Exportación CSV/JSON y 4 Figuras XAI (300 DPI)** (`[EQUIPO 1]` — **Completado**)
 - [x] **Fase 3 (Semana 4): Ejecución de los 3 notebooks en Google Colab y modelo `.cbm` integrado** (`[EQUIPO 1 -> COLAB]` — **Completado**)
 - [x] **Fase 1 y 2 (Semanas 2–3):** Aprovisionamiento del servidor local (`[EQUIPO 2]`: SSD + HDD 1 TB + Ollama GTX 1050 + PostgreSQL 16 + Backfill 1 100 registros — **Completado**).
-- [ ] **Fase 4 (Semana 5):** `n8n` (`:5678`) desplegado con cuenta `3lvisarboleda7@gmail.com`, 2 workflows importados (`ofxz76BJS918zdeq` y `27ZPF1SbAx1tCSxv`), credencial Ollama operativa y failover de 3 niveles probado por API (`[EQUIPO 2]` — **Parcial**: faltan claves reales de Gemini/Telegram/Gmail y una ejecución de prueba del flujo dentro de n8n).
-- [x] **Fase 5 (Semana 6):** Dashboard Streamlit (`:8501`) y API FastAPI (`:8000`) 100% encapsulados en Docker Compose con persistencia tras reinicios, respaldo SQL SSD $\rightarrow$ HDD (`2,18 MB`) y HITL S3 validado por API (`[EQUIPO 2]` — **Completado**; pendiente únicamente token opcional de Cloudflare Tunnel).
+- [x] **Fase 4 (Semana 5):** `n8n` (`:5678`) desplegado con cuenta `3lvisarboleda7@gmail.com`, 2 workflows importados (`ofxz76BJS918zdeq` y `27ZPF1SbAx1tCSxv`), credenciales Gemini y Telegram activadas y operativas en vivo (`[EQUIPO 2]` — **Completado al 100%**).
+- [x] **Fase 5 (Semana 6):** Dashboard Streamlit (`:8501`) y API FastAPI (`:8000`) 100% encapsulados en Docker Compose con persistencia tras reinicios, respaldo SQL SSD $\rightarrow$ HDD (`2,18 MB`), gráficos interactivos y HITL S3 validado por API (`[EQUIPO 2]` — **Completado al 100%**).
 - [x] **Fase 6 (Semana 7):** Integración de capturas en vivo del Equipo 2 (`docs/figures/equipo2_live_01_*.png` a `06_*.png`) al informe final (`[EQUIPO 2]` — **Completado**).
 
 ---
