@@ -43,7 +43,7 @@ class Tool5RedactarInformeUseCase:
             "baja cobertura de agua con cloro adecuado, incidencia de heladas y brecha de ejecución en el PAN"
         )
 
-        used_provider = "gemini-2.0-flash (Google AI Studio Free Tier)"
+        used_provider = "gemini-flash-lite-latest (Google AI Studio Free Tier)"
         custom_llm_output: Optional[Dict[str, str]] = None
         if self._llm is not None:
             custom_llm_output, used_provider = self._llm.generate_policy_report(

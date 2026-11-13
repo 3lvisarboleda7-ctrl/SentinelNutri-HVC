@@ -36,17 +36,23 @@ class AgnosticLLMGateway:
         gemini_api_key: Optional[str] = None,
         ollama_base_url: Optional[str] = None,
         ollama_model: str = "llama3.2",
-        gemini_timeout_sec: float = 4.0,
-        ollama_timeout_sec: float = 1.5,
+        gemini_timeout_sec: Optional[float] = None,
+        ollama_timeout_sec: Optional[float] = None,
         attempt_ollama_when_unconfigured: bool = False,
+        gemini_model: Optional[str] = None,
     ) -> None:
         self.gemini_api_key = gemini_api_key if gemini_api_key is not None else os.getenv("GEMINI_API_KEY", "")
         raw_ollama_url = ollama_base_url if ollama_base_url is not None else os.getenv("OLLAMA_BASE_URL", "")
         self.ollama_base_url = raw_ollama_url or "http://localhost:11434"
         self._ollama_explicitly_configured = bool(raw_ollama_url) or attempt_ollama_when_unconfigured
-        self.ollama_model = ollama_model
-        self.gemini_timeout_sec = float(gemini_timeout_sec)
-        self.ollama_timeout_sec = float(ollama_timeout_sec)
+        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "llama3.2")
+        self.gemini_model = (gemini_model or os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")).removeprefix("models/")
+        self.gemini_timeout_sec = float(
+            gemini_timeout_sec if gemini_timeout_sec is not None else os.getenv("LLM_GEMINI_TIMEOUT_SEC", "15.0")
+        )
+        self.ollama_timeout_sec = float(
+            ollama_timeout_sec if ollama_timeout_sec is not None else os.getenv("LLM_OLLAMA_TIMEOUT_SEC", "30.0")
+        )
 
     def _has_valid_gemini_key(self) -> bool:
         return bool(self.gemini_api_key and not self.gemini_api_key.startswith("tu_api_key"))
@@ -70,18 +76,18 @@ class AgnosticLLMGateway:
             if self._has_valid_gemini_key():
                 res_a = self._try_gemini(verified_payload)
                 if res_a:
-                    return res_a, "gemini-2.0-flash (Google AI Studio Free Tier - Failover)"
+                    return res_a, f"{self.gemini_model} (Google AI Studio Free Tier - Failover)"
         else:
             if self._has_valid_gemini_key():
                 res_a = self._try_gemini(verified_payload)
                 if res_a:
-                    return res_a, "gemini-2.0-flash (Google AI Studio Free Tier)"
+                    return res_a, f"{self.gemini_model} (Google AI Studio Free Tier)"
             if self._ollama_explicitly_configured or self._has_valid_gemini_key():
                 res_b = self._try_ollama(verified_payload)
                 if res_b:
                     return res_b, f"ollama/{self.ollama_model} (GPU GTX 1050 Local - Failover)"
 
-        return None, "gemini-2.0-flash / ollama-llama3.2 (Síntesis Estructurada Local)"
+        return None, f"{self.gemini_model} / ollama-{self.ollama_model} (Síntesis Estructurada Local)"
 
     def _try_ollama(self, payload: Dict[str, Any]) -> Optional[Dict[str, str]]:
         try:
@@ -92,7 +98,13 @@ class AgnosticLLMGateway:
                 + json.dumps(payload, ensure_ascii=False)
             )
             req_body = json.dumps(
-                {"model": self.ollama_model, "prompt": prompt, "stream": False, "format": "json"}
+                {
+                    "model": self.ollama_model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "format": "json",
+                    "keep_alive": "15m",
+                }
             ).encode("utf-8")
             req = urllib.request.Request(
                 f"{self.ollama_base_url.rstrip('/')}/api/generate",
@@ -114,7 +126,7 @@ class AgnosticLLMGateway:
         try:
             url = (
                 "https://generativelanguage.googleapis.com/v1beta/models/"
-                f"gemini-2.0-flash:generateContent?key={self.gemini_api_key}"
+                f"{self.gemini_model}:generateContent?key={self.gemini_api_key}"
             )
             prompt = (
                 "Actúa como el Sistema 4 (Inteligencia) del MSV del GORE Huancavelica. "

@@ -15,7 +15,7 @@ y por los recuadros de Reglas Fijas (Figura 1):
 
 import sqlite3
 from typing import Any, Dict, Optional
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from sentinelnutri.application import (
@@ -134,7 +134,9 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
         }
 
     @api.post("/tools/extraer_fuentes", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
-    def endpoint_tool_1_extraer_fuentes(req: ExtraerFuentesRequest) -> Dict[str, object]:
+    def endpoint_tool_1_extraer_fuentes(
+        req: ExtraerFuentesRequest = Body(default_factory=ExtraerFuentesRequest),
+    ) -> Dict[str, object]:
         return tool1.execute(
             mode=req.mode,
             start_year=req.start_year,
@@ -153,7 +155,9 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
 
     @api.post("/predict", tags=["Motor Predictivo CatBoost + SHAP y Herramienta 3"])
     @api.post("/tools/predecir_riesgo", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
-    def endpoint_tool_3_predecir_riesgo(req: PredictRequest) -> Dict[str, object]:
+    def endpoint_tool_3_predecir_riesgo(
+        req: PredictRequest = Body(default_factory=PredictRequest),
+    ) -> Dict[str, object]:
         clean_ubigeo = _validate_ubigeo_or_raise(req.ubigeo) if req.ubigeo is not None else None
         # Si la base de datos aún está vacía, ejecuta automáticamente el backfill inicial 2014-2024
         if not repo.get_historical_series(anio_inicio=2014, anio_fin=2025):

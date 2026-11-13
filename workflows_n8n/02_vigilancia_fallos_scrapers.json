@@ -17,7 +17,7 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID_ADMIN_TECH }}",
-        "text": "⚠️ [SentinelNutri-HVC · Autodiagnóstico S4]\nFallo detectado en flujo de extracción automatizada.\nFlujo: {{ $json.workflow.name }}\nNodo: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}",
+        "text": "=⚠️ [SentinelNutri-HVC · Autodiagnóstico S4]\nFallo detectado en flujo de extracción automatizada.\nFlujo: {{ $json.workflow.name }}\nNodo: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}",
         "additionalFields": {}
       },
       "id": "telegram-error-notify",

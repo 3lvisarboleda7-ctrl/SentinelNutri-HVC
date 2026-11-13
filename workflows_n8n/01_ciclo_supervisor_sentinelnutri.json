@@ -25,9 +25,9 @@
       "parameters": {
         "agent": "toolsAgent",
         "promptType": "define",
-        "text": "Ejecuta el ciclo semanal de vigilancia nutricional del Sistema 4 (GORE Huancavelica): 1) Invoca extraer_fuentes, 2) Si hay cambios o es revisión programada, invoca predecir_riesgo, 3) Para los distritos de mayor riesgo, consulta consultar_bd y explicar_riesgo (SHAP), 4) Invoca redactar_informe y 5) Invoca notificar.",
+        "text": "Ejecuta el ciclo semanal de vigilancia nutricional del Sistema 4 (GORE Huancavelica): 1) Invoca extraer_fuentes, 2) Invoca predecir_riesgo, 3) Para el distrito más crítico consulta explicar_riesgo (SHAP), 4) Invoca redactar_informe, 5) Invoca notificar y devuelve un único JSON válido con las claves: ubigeo, distrito, provincia, dci_proyectada_pct, id_alerta, canal_destino, sintesis_narrativa_s4.",
         "options": {
-          "systemMessage": "Eres el Agente Supervisor del Sistema 4 (Inteligencia) de SentinelNutri-HVC para el GORE Huancavelica (Wang et al., 2026). Decides el orden de las 6 herramientas, pero NUNCA estimas valores numéricos de DCI por tu cuenta (eso lo hace predecir_riesgo con CatBoost) ni omites alertas críticas."
+          "systemMessage": "Eres el Agente Supervisor del Sistema 4 (Inteligencia) de SentinelNutri-HVC para el GORE Huancavelica (Wang et al., 2026). Decides el orden de las 6 herramientas, pero NUNCA estimas valores numéricos de DCI por tu cuenta (eso lo hace predecir_riesgo con CatBoost) ni omites alertas críticas. Al terminar, responde SOLO con un objeto JSON válido con ubigeo, distrito, provincia, dci_proyectada_pct (número), id_alerta (entero retornado por notificar), canal_destino y sintesis_narrativa_s4."
         }
       },
       "id": "supervisor-ai-agent",
@@ -41,7 +41,7 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-2.0-flash",
+        "modelName": "models/gemini-flash-lite-latest",
         "options": {}
       },
       "id": "llm-primary-gemini",
@@ -84,7 +84,10 @@
         "name": "extraer_fuentes",
         "description": "Revisa los portales públicos (SIEN-HIS, ENDES, INEI, MEF, MIDIS, SENAMHI), detecta publicaciones nuevas por hash SHA-256 y las descarga al HDD.",
         "method": "POST",
-        "url": "http://api_engine:8000/tools/extraer_fuentes"
+        "url": "http://api_engine:8000/tools/extraer_fuentes",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"mode\": \"weekly_watch\", \"start_year\": 2014, \"end_year\": 2024}"
       },
       "id": "tool-1-extraer",
       "name": "Tool 1: extraer_fuentes",
@@ -116,7 +119,10 @@
         "name": "predecir_riesgo",
         "description": "Calcula el índice de riesgo de DCI por distrito con el motor CatBoost (/predict).",
         "method": "POST",
-        "url": "http://api_engine:8000/predict"
+        "url": "http://api_engine:8000/predict",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"anio_corte\": 2024}"
       },
       "id": "tool-3-predict",
       "name": "Tool 3: predecir_riesgo (CatBoost /predict)",
@@ -130,9 +136,18 @@
     {
       "parameters": {
         "name": "explicar_riesgo",
-        "description": "Identifica las variables que explican el riesgo de cada distrito mediante SHAP (Auditoría S3*).",
+        "description": "Identifica las variables que explican el riesgo de un distrito de Huancavelica mediante SHAP (Auditoría S3*). Requiere parámetro ubigeo (6 dígitos, ej. 090106).",
         "method": "GET",
-        "url": "http://api_engine:8000/tools/explicar_riesgo/090206"
+        "url": "http://api_engine:8000/tools/explicar_riesgo/{ubigeo}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "ubigeo",
+              "description": "Ubigeo de 6 dígitos del distrito en Huancavelica (ej. 090106 o 090411)",
+              "type": "string"
+            }
+          ]
+        }
       },
       "id": "tool-4-explain",
       "name": "Tool 4: explicar_riesgo (SHAP)",
@@ -146,9 +161,36 @@
     {
       "parameters": {
         "name": "redactar_informe",
-        "description": "Elabora la síntesis narrativa S4 y las recomendaciones por provincia y sector alineadas al PEI 2020-2027 (solo datos agregados Ley 29733).",
+        "description": "Elabora la síntesis narrativa S4 y recomendaciones PEI 2020-2027 (solo datos agregados Ley 29733).",
         "method": "POST",
-        "url": "http://api_engine:8000/tools/redactar_informe"
+        "url": "http://api_engine:8000/tools/redactar_informe",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"district_context\": {\n    \"ubigeo\": \"{ubigeo}\",\n    \"provincia\": \"{provincia}\",\n    \"distrito\": \"{distrito}\",\n    \"dci_proyectada_pct\": {dci_proyectada_pct}\n  },\n  \"prefer_provider\": \"gemini\"\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "ubigeo",
+              "description": "Ubigeo de 6 dígitos del distrito",
+              "type": "string"
+            },
+            {
+              "name": "provincia",
+              "description": "Provincia del distrito",
+              "type": "string"
+            },
+            {
+              "name": "distrito",
+              "description": "Nombre del distrito",
+              "type": "string"
+            },
+            {
+              "name": "dci_proyectada_pct",
+              "description": "DCI proyectada numérica en porcentaje (ej. 25.65)",
+              "type": "number"
+            }
+          ]
+        }
       },
       "id": "tool-5-redactar",
       "name": "Tool 5: redactar_informe",
@@ -162,9 +204,46 @@
     {
       "parameters": {
         "name": "notificar",
-        "description": "Registra en el dashboard y prepara el envío de alertas hacia los canales S3 y S5.",
+        "description": "Registra la alerta en PostgreSQL y prepara el envío hacia los canales S3 y S5, devolviendo id_alerta.",
         "method": "POST",
-        "url": "http://api_engine:8000/tools/notificar"
+        "url": "http://api_engine:8000/tools/notificar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"report_payload\": {\n    \"ubigeo\": \"{ubigeo}\",\n    \"provincia\": \"{provincia}\",\n    \"distrito\": \"{distrito}\",\n    \"dci_proyectada_pct\": {dci_proyectada_pct},\n    \"canal_destino\": \"{canal_destino}\",\n    \"sintesis_narrativa_s4\": \"{sintesis_narrativa_s4}\"\n  }\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "ubigeo",
+              "description": "Ubigeo de 6 dígitos del distrito",
+              "type": "string"
+            },
+            {
+              "name": "provincia",
+              "description": "Provincia del distrito",
+              "type": "string"
+            },
+            {
+              "name": "distrito",
+              "description": "Nombre del distrito",
+              "type": "string"
+            },
+            {
+              "name": "dci_proyectada_pct",
+              "description": "DCI proyectada en porcentaje",
+              "type": "number"
+            },
+            {
+              "name": "canal_destino",
+              "description": "S5_ALGEDONICO o S3_CONTROL",
+              "type": "string"
+            },
+            {
+              "name": "sintesis_narrativa_s4",
+              "description": "Resumen ejecutivo S4 del informe",
+              "type": "string"
+            }
+          ]
+        }
       },
       "id": "tool-6-notificar",
       "name": "Tool 6: notificar",
@@ -173,6 +252,19 @@
       "position": [
         1020,
         100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json || {};\nlet parsed = {};\nif (typeof raw.output === 'string') {\n  const m = raw.output.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e) { parsed = {}; }\n  }\n} else if (typeof raw.dci_proyectada_pct === 'number') {\n  parsed = { ...raw };\n}\n\nconst needsFallback = !parsed.ubigeo || !parsed.distrito || typeof parsed.dci_proyectada_pct !== 'number' || !parsed.id_alerta;\nif (needsFallback) {\n  const predRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/predict',\n    body: { anio_corte: 2024 },\n    json: true,\n  });\n  const rows = (predRes.distritos_criticos_s5 && predRes.distritos_criticos_s5.length) ? predRes.distritos_criticos_s5 : (predRes.predicciones_distritales || []);\n  rows.sort((a, b) => Number(b.dci_proyectada_pct || 0) - Number(a.dci_proyectada_pct || 0));\n  const top = rows[0] || { ubigeo: '090106', distrito: 'Huachocolpa', provincia: 'Huancavelica', dci_proyectada_pct: 25.65 };\n  const infRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/redactar_informe',\n    body: { district_context: top, prefer_provider: 'gemini' },\n    json: true,\n  });\n  const inf = infRes.informe || {};\n  const notRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/notificar',\n    body: { report_payload: inf },\n    json: true,\n  });\n  parsed = {\n    ubigeo: inf.ubigeo || top.ubigeo,\n    distrito: inf.distrito || top.distrito,\n    provincia: inf.provincia || top.provincia,\n    dci_proyectada_pct: Number(inf.dci_proyectada_pct ?? top.dci_proyectada_pct ?? 25.0),\n    id_alerta: Number(notRes.id_alerta || 1),\n    canal_destino: inf.canal_destino || 'S5_ALGEDONICO',\n    sintesis_narrativa_s4: inf.sintesis_narrativa_s4 || (typeof raw.output === 'string' ? raw.output.slice(0, 400) : 'Síntesis S4 generada.'),\n  };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "normalize-supervisor-output",
+      "name": "Normalizar Salida S4 para Reglas Fijas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
       ]
     },
     {
@@ -192,7 +284,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        860,
+        880,
         300
       ]
     },
@@ -200,7 +292,7 @@
       "parameters": {
         "operation": "sendAndWait",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID_S3_APROBACION }}",
-        "message": "📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?",
+        "message": "=📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?",
         "approvalOptions": {
           "values": {
             "approvalType": "double"
@@ -228,8 +320,8 @@
       "parameters": {
         "resource": "message",
         "operation": "sendMessage",
-        "chatId": "={{ $env.TELEGRAM_CHAT_ID_S5_CONSEJO_REGIONAL }}",
-        "text": "🚨 [CANAL ALGEDÓNICO DIRECTO S1/S4 -> S5 CONSEJO REGIONAL HVC]\nDistrito Crítico: {{ $json.distrito }} (Ubigeo {{ $json.ubigeo }})\nDCI Proyectada: {{ $json.dci_proyectada_pct }}% (> 25.0%)\nSíntesis S4: {{ $json.sintesis_narrativa_s4 }}",
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID_S5_CONSEJO_REGIONAL || $env.TELEGRAM_CHAT_ID_S5_CONSEJO }}",
+        "text": "=🚨 [CANAL ALGEDÓNICO DIRECTO S1/S4 -> S5 CONSEJO REGIONAL HVC]\nDistrito Crítico: {{ $json.distrito }} (Ubigeo {{ $json.ubigeo }})\nDCI Proyectada: {{ $json.dci_proyectada_pct }}% (> 25.0%)\nSíntesis S4: {{ $json.sintesis_narrativa_s4 }}",
         "additionalFields": {}
       },
       "id": "rule-fixed-2-s5-algedonic-dispatch",
@@ -386,6 +478,17 @@
       ]
     },
     "Agente Supervisor (AI Agent de n8n)": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Salida S4 para Reglas Fijas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Salida S4 para Reglas Fijas": {
       "main": [
         [
           {

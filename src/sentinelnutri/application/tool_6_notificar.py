@@ -82,7 +82,7 @@ class Tool6NotificarUseCase:
             recomendacion_agricultura_midis=str(recs.get("agricultura_midis_mef", "")),
             oei_pei_vinculados=str(alin.get("pei_gore_huancavelica_2020_2027", "OEI.01, OEI.04, OEI.08")),
             ods_vinculados=str(alin.get("agenda_2030_ods", "ODS 2, ODS 3, ODS 6")),
-            proveedor_llm=str(report_payload.get("proveedor_llm_utilizado", "gemini-2.0-flash")),
+            proveedor_llm=str(report_payload.get("proveedor_llm_utilizado", "gemini-flash-lite-latest")),
             estado_aprobacion_humana=initial_status,
         )
 
