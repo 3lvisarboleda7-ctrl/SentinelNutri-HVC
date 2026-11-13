@@ -11,7 +11,8 @@ Materializa en una sola interfaz los canales del Modelo de Sistema Viable del GO
    registro de cargas (hash SHA-256) y alineación con ODS 2, 3 y 6.
 """
 
-from pathlib import Path
+from typing import Any, Dict, Optional
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -31,10 +32,11 @@ from sentinelnutri.infrastructure.persistence import (
 )
 from sentinelnutri.infrastructure.scrapers import MultiSourceScraperOrchestrator
 
+_EVAL_METRICS_CACHE: Dict[str, Dict[str, Any]] = {}
 
-@st.cache_resource
-def init_services():
-    _, session_factory = create_db_engine_and_session()
+
+def init_services(database_url: Optional[str] = None):
+    _, session_factory = create_db_engine_and_session(database_url)
     repo = SqlAlchemyRepository(session_factory)
     scraper = MultiSourceScraperOrchestrator(repository=repo)
     predictor = CatBoostShapPredictor()
@@ -50,6 +52,44 @@ def init_services():
         tool3.execute(anio_corte=2024)
 
     return repo, predictor, tool1, tool3, tool4, tool5, tool6
+
+
+def get_cached_evaluation_metrics(
+    repo: SqlAlchemyRepository,
+    predictor: CatBoostShapPredictor,
+    cache_key: str = "default",
+) -> Dict[str, Any]:
+    """Obtiene y almacena en caché las métricas de validación cruzada para evitar recálculo en cada render."""
+    if cache_key not in _EVAL_METRICS_CACHE:
+        series = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        _EVAL_METRICS_CACHE[cache_key] = predictor.train_and_evaluate(series)
+    return _EVAL_METRICS_CACHE[cache_key]
+
+
+def build_dashboard_rooms_snapshot(database_url: Optional[str] = None) -> Dict[str, Any]:
+    """Construye de forma determinista el estado de las 4 salas MSV para pruebas e inspección rápida."""
+    key = database_url or os.getenv("DATABASE_URL", "default")
+    repo, predictor, _, tool3, tool4, _, _ = init_services(database_url)
+    preds = repo.get_latest_predictions()
+    if not preds:
+        tool3.execute(anio_corte=2024)
+        preds = repo.get_latest_predictions()
+
+    options = {f"{p.ubigeo} - {p.distrito} ({p.provincia})": p.ubigeo for p in preds}
+    first_ubigeo = next(iter(options.values())) if options else "090101"
+    shap_audit = tool4.execute(first_ubigeo)
+    alerts = repo.get_all_alerts()
+    metrics = get_cached_evaluation_metrics(repo, predictor, cache_key=key)
+
+    return {
+        "sala_1_homeostato_count": len(preds),
+        "sala_1_criticos_s5_count": sum(1 for p in preds if p.supera_umbral_algedonico),
+        "sala_2_shap_options_count": len(options),
+        "sala_2_sample_explanation": shap_audit,
+        "sala_3_alerts_count": len(alerts),
+        "sala_4_metrics_globales": metrics["metricas_globales"],
+        "sala_4_loads_count": len(repo.get_recent_loads(limit=20)),
+    }
 
 
 def main() -> None:

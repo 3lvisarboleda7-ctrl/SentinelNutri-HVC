@@ -102,6 +102,23 @@ class GmailNotificationAdapter:
         self.password = password or os.getenv("GMAIL_APP_PASSWORD", "")
         self.sent_emails: List[Dict[str, object]] = []
 
+    def send_algedonic_email_s5(
+        self,
+        ubigeo: str,
+        provincia: str,
+        distrito: str,
+        dci_proyectada_pct: float,
+        sintesis: str,
+    ) -> Dict[str, object]:
+        entry = {
+            "channel": "GMAIL_S5_ALGEDONICO",
+            "to": os.getenv("GMAIL_RECIPIENT_S5", "consejo.regional@regionhuancavelica.gob.pe"),
+            "subject": f"[ALERTA S5] DCI Proyectada Crítica en {distrito}: {dci_proyectada_pct:.2f}%",
+            "body": f"Distrito: {distrito} ({provincia} - {ubigeo})\nProyección: {dci_proyectada_pct:.2f}%\n{sintesis}",
+        }
+        self.sent_emails.append(entry)
+        return entry
+
     def send_email_alert(self, recipient: str, subject: str, body: str) -> Dict[str, object]:
         entry = {
             "channel": "GMAIL_SMTP",
