@@ -81,7 +81,7 @@ class Tool3PredecirRiesgoUseCase:
                         "variable": c.variable,
                         "etiqueta": c.etiqueta_legible,
                         "valor_shap": round(c.valor_shap, 4),
-                        "direccion": c.direccion_impacto,
+                        "efecto": c.direccion_impacto,
                     }
                     for c in pred.top_contribuciones_shap[:4]
                 ],

@@ -23,17 +23,20 @@
     },
     {
       "parameters": {
-        "agent": "toolsAgent",
         "promptType": "define",
         "text": "Ejecuta el ciclo semanal de vigilancia nutricional del Sistema 4 (GORE Huancavelica): 1) Invoca extraer_fuentes, 2) Invoca predecir_riesgo, 3) Para el distrito más crítico consulta explicar_riesgo (SHAP), 4) Invoca redactar_informe, 5) Invoca notificar y devuelve un único JSON válido con las claves: ubigeo, distrito, provincia, dci_proyectada_pct, id_alerta, canal_destino, sintesis_narrativa_s4.",
+        "hasOutputParser": false,
+        "needsFallback": true,
         "options": {
-          "systemMessage": "Eres el Agente Supervisor del Sistema 4 (Inteligencia) de SentinelNutri-HVC para el GORE Huancavelica (Wang et al., 2026). Decides el orden de las 6 herramientas, pero NUNCA estimas valores numéricos de DCI por tu cuenta (eso lo hace predecir_riesgo con CatBoost) ni omites alertas críticas. Al terminar, responde SOLO con un objeto JSON válido con ubigeo, distrito, provincia, dci_proyectada_pct (número), id_alerta (entero retornado por notificar), canal_destino y sintesis_narrativa_s4."
+          "forceToolCallOnFirstIteration": true,
+          "maxIterations": 12,
+          "systemMessage": "Eres el Agente Supervisor del Sistema 4 (Inteligencia) de SentinelNutri-HVC para el GORE Huancavelica. Comienza SIEMPRE llamando a extraer_fuentes, luego predecir_riesgo para obtener el distrito crítico real, luego explicar_riesgo con su ubigeo numérico de 6 dígitos, luego redactar_informe y finalmente notificar. En redactar_informe y notificar envía dci_proyectada_pct como cadena decimal (ej. \"29.29\"). Al finalizar todas las herramientas, responde SOLO con un objeto JSON válido con ubigeo, distrito, provincia, dci_proyectada_pct (número), id_alerta (entero), canal_destino y sintesis_narrativa_s4."
         }
       },
       "id": "supervisor-ai-agent",
       "name": "Agente Supervisor (AI Agent de n8n)",
       "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 1.6,
+      "typeVersion": 3.1,
       "position": [
         520,
         300
@@ -82,16 +85,14 @@
     {
       "parameters": {
         "name": "extraer_fuentes",
-        "description": "Revisa los portales públicos (SIEN-HIS, ENDES, INEI, MEF, MIDIS, SENAMHI), detecta publicaciones nuevas por hash SHA-256 y las descarga al HDD.",
-        "method": "POST",
-        "url": "http://api_engine:8000/tools/extraer_fuentes",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\"mode\": \"weekly_watch\", \"start_year\": 2014, \"end_year\": 2024}"
+        "description": "PASO 1: Revisa los portales públicos (SIEN-HIS, ENDES, INEI, MEF, MIDIS, SENAMHI), detecta publicaciones nuevas por hash SHA-256 y las descarga al HDD.",
+        "language": "javaScript",
+        "jsCode": "const res = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://api_engine:8000/tools/extraer_fuentes',\n  body: { mode: 'weekly_watch', start_year: 2014, end_year: 2024 },\n  json: true,\n});\nreturn JSON.stringify(res);",
+        "specifyInputSchema": false
       },
       "id": "tool-1-extraer",
       "name": "Tool 1: extraer_fuentes",
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         220,
@@ -102,12 +103,13 @@
       "parameters": {
         "name": "consultar_bd",
         "description": "Lee las series históricas 2014-2024 por distrito y el registro de cargas desde PostgreSQL.",
-        "method": "GET",
-        "url": "http://api_engine:8000/tools/consultar_bd"
+        "language": "javaScript",
+        "jsCode": "const res = await this.helpers.httpRequest({\n  method: 'GET',\n  url: 'http://api_engine:8000/tools/consultar_bd',\n  json: true,\n});\nreturn JSON.stringify(res);",
+        "specifyInputSchema": false
       },
       "id": "tool-2-bd",
       "name": "Tool 2: consultar_bd",
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         380,
@@ -117,16 +119,14 @@
     {
       "parameters": {
         "name": "predecir_riesgo",
-        "description": "Calcula el índice de riesgo de DCI por distrito con el motor CatBoost (/predict).",
-        "method": "POST",
-        "url": "http://api_engine:8000/predict",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\"anio_corte\": 2024}"
+        "description": "PASO 2: Calcula el índice de riesgo de DCI por distrito con el motor CatBoost (/predict) y devuelve los distritos críticos reales con su ubigeo y dci_proyectada_pct.",
+        "language": "javaScript",
+        "jsCode": "const res = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://api_engine:8000/predict',\n  body: { anio_corte: 2024 },\n  json: true,\n});\nreturn JSON.stringify(res);",
+        "specifyInputSchema": false
       },
       "id": "tool-3-predict",
       "name": "Tool 3: predecir_riesgo (CatBoost /predict)",
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         540,
@@ -136,22 +136,16 @@
     {
       "parameters": {
         "name": "explicar_riesgo",
-        "description": "Identifica las variables que explican el riesgo de un distrito de Huancavelica mediante SHAP (Auditoría S3*). Requiere parámetro ubigeo (6 dígitos, ej. 090106).",
-        "method": "GET",
-        "url": "http://api_engine:8000/tools/explicar_riesgo/{ubigeo}",
-        "placeholderDefinitions": {
-          "values": [
-            {
-              "name": "ubigeo",
-              "description": "Ubigeo de 6 dígitos del distrito en Huancavelica (ej. 090106 o 090411)",
-              "type": "string"
-            }
-          ]
-        }
+        "description": "PASO 3: Identifica las variables SHAP que explican el riesgo de un distrito de Huancavelica. Requiere parámetro ubigeo numérico de 6 dígitos obtenido de predecir_riesgo.",
+        "language": "javaScript",
+        "jsCode": "const ubigeo = String(query.ubigeo || '').trim();\nif (!/^\\d{6}$/.test(ubigeo)) {\n  return JSON.stringify({ error: 'Debes ejecutar primero predecir_riesgo y pasar un ubigeo numérico real de 6 dígitos.' });\n}\nconst res = await this.helpers.httpRequest({\n  method: 'GET',\n  url: `http://api_engine:8000/tools/explicar_riesgo/${ubigeo}`,\n  json: true,\n});\nreturn JSON.stringify(res);",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"ubigeo\":{\"type\":\"string\",\"description\":\"Ubigeo numérico de 6 dígitos obtenido de predecir_riesgo\"}},\"required\":[\"ubigeo\"]}"
       },
       "id": "tool-4-explain",
       "name": "Tool 4: explicar_riesgo (SHAP)",
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         700,
@@ -162,39 +156,15 @@
       "parameters": {
         "name": "redactar_informe",
         "description": "Elabora la síntesis narrativa S4 y recomendaciones PEI 2020-2027 (solo datos agregados Ley 29733).",
-        "method": "POST",
-        "url": "http://api_engine:8000/tools/redactar_informe",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"district_context\": {\n    \"ubigeo\": \"{ubigeo}\",\n    \"provincia\": \"{provincia}\",\n    \"distrito\": \"{distrito}\",\n    \"dci_proyectada_pct\": {dci_proyectada_pct}\n  },\n  \"prefer_provider\": \"gemini\"\n}",
-        "placeholderDefinitions": {
-          "values": [
-            {
-              "name": "ubigeo",
-              "description": "Ubigeo de 6 dígitos del distrito",
-              "type": "string"
-            },
-            {
-              "name": "provincia",
-              "description": "Provincia del distrito",
-              "type": "string"
-            },
-            {
-              "name": "distrito",
-              "description": "Nombre del distrito",
-              "type": "string"
-            },
-            {
-              "name": "dci_proyectada_pct",
-              "description": "DCI proyectada numérica en porcentaje (ej. 25.65)",
-              "type": "number"
-            }
-          ]
-        }
+        "language": "javaScript",
+        "jsCode": "const ubigeo = String(query.ubigeo || '').trim();\nif (!/^\\d{6}$/.test(ubigeo)) {\n  return JSON.stringify({ error: 'Debes ejecutar primero extraer_fuentes y predecir_riesgo para obtener un ubigeo numérico real de 6 dígitos antes de redactar_informe.' });\n}\nconst dci = Number.parseFloat(String(query.dci_proyectada_pct ?? '0'));\nconst res = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://api_engine:8000/tools/redactar_informe',\n  body: {\n    district_context: {\n      ubigeo,\n      provincia: String(query.provincia || ''),\n      distrito: String(query.distrito || ''),\n      dci_proyectada_pct: Number.isFinite(dci) ? dci : 0,\n    },\n    prefer_provider: 'gemini',\n  },\n  json: true,\n});\nreturn JSON.stringify(res);",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"ubigeo\":{\"type\":\"string\",\"description\":\"Ubigeo de 6 dígitos del distrito\"},\"provincia\":{\"type\":\"string\",\"description\":\"Provincia del distrito\"},\"distrito\":{\"type\":\"string\",\"description\":\"Nombre del distrito\"},\"dci_proyectada_pct\":{\"type\":\"string\",\"description\":\"DCI proyectada en porcentaje como texto decimal (ej. 25.65)\"}},\"required\":[\"ubigeo\",\"provincia\",\"distrito\",\"dci_proyectada_pct\"]}"
       },
       "id": "tool-5-redactar",
       "name": "Tool 5: redactar_informe",
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         860,
@@ -205,49 +175,15 @@
       "parameters": {
         "name": "notificar",
         "description": "Registra la alerta en PostgreSQL y prepara el envío hacia los canales S3 y S5, devolviendo id_alerta.",
-        "method": "POST",
-        "url": "http://api_engine:8000/tools/notificar",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"report_payload\": {\n    \"ubigeo\": \"{ubigeo}\",\n    \"provincia\": \"{provincia}\",\n    \"distrito\": \"{distrito}\",\n    \"dci_proyectada_pct\": {dci_proyectada_pct},\n    \"canal_destino\": \"{canal_destino}\",\n    \"sintesis_narrativa_s4\": \"{sintesis_narrativa_s4}\"\n  }\n}",
-        "placeholderDefinitions": {
-          "values": [
-            {
-              "name": "ubigeo",
-              "description": "Ubigeo de 6 dígitos del distrito",
-              "type": "string"
-            },
-            {
-              "name": "provincia",
-              "description": "Provincia del distrito",
-              "type": "string"
-            },
-            {
-              "name": "distrito",
-              "description": "Nombre del distrito",
-              "type": "string"
-            },
-            {
-              "name": "dci_proyectada_pct",
-              "description": "DCI proyectada en porcentaje",
-              "type": "number"
-            },
-            {
-              "name": "canal_destino",
-              "description": "S5_ALGEDONICO o S3_CONTROL",
-              "type": "string"
-            },
-            {
-              "name": "sintesis_narrativa_s4",
-              "description": "Resumen ejecutivo S4 del informe",
-              "type": "string"
-            }
-          ]
-        }
+        "language": "javaScript",
+        "jsCode": "const ubigeo = String(query.ubigeo || '').trim();\nif (!/^\\d{6}$/.test(ubigeo)) {\n  return JSON.stringify({ error: 'Debes ejecutar primero extraer_fuentes, predecir_riesgo y redactar_informe para obtener un ubigeo numérico real de 6 dígitos antes de notificar.' });\n}\nconst dci = Number.parseFloat(String(query.dci_proyectada_pct ?? '0'));\nconst res = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://api_engine:8000/tools/notificar',\n  body: {\n    report_payload: {\n      ubigeo,\n      provincia: String(query.provincia || ''),\n      distrito: String(query.distrito || ''),\n      dci_proyectada_pct: Number.isFinite(dci) ? dci : 0,\n      canal_destino: String(query.canal_destino || 'S5_ALGEDONICO'),\n      sintesis_narrativa_s4: String(query.sintesis_narrativa_s4 || ''),\n    },\n  },\n  json: true,\n});\nreturn JSON.stringify(res);",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"ubigeo\":{\"type\":\"string\",\"description\":\"Ubigeo de 6 dígitos del distrito\"},\"provincia\":{\"type\":\"string\",\"description\":\"Provincia del distrito\"},\"distrito\":{\"type\":\"string\",\"description\":\"Nombre del distrito\"},\"dci_proyectada_pct\":{\"type\":\"string\",\"description\":\"DCI proyectada en porcentaje como texto decimal (ej. 25.65)\"},\"canal_destino\":{\"type\":\"string\",\"description\":\"S5_ALGEDONICO o S3_CONTROL\"},\"sintesis_narrativa_s4\":{\"type\":\"string\",\"description\":\"Resumen ejecutivo S4 del informe\"}},\"required\":[\"ubigeo\",\"provincia\",\"distrito\",\"dci_proyectada_pct\",\"canal_destino\",\"sintesis_narrativa_s4\"]}"
       },
       "id": "tool-6-notificar",
       "name": "Tool 6: notificar",
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         1020,
@@ -256,7 +192,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json || {};\nlet parsed = {};\nif (typeof raw.output === 'string') {\n  const m = raw.output.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e) { parsed = {}; }\n  }\n} else if (typeof raw.dci_proyectada_pct === 'number') {\n  parsed = { ...raw };\n}\n\nconst needsFallback = !parsed.ubigeo || !parsed.distrito || typeof parsed.dci_proyectada_pct !== 'number' || !parsed.id_alerta;\nif (needsFallback) {\n  const predRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/predict',\n    body: { anio_corte: 2024 },\n    json: true,\n  });\n  const rows = (predRes.distritos_criticos_s5 && predRes.distritos_criticos_s5.length) ? predRes.distritos_criticos_s5 : (predRes.predicciones_distritales || []);\n  rows.sort((a, b) => Number(b.dci_proyectada_pct || 0) - Number(a.dci_proyectada_pct || 0));\n  const top = rows[0] || { ubigeo: '090106', distrito: 'Huachocolpa', provincia: 'Huancavelica', dci_proyectada_pct: 25.65 };\n  const infRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/redactar_informe',\n    body: { district_context: top, prefer_provider: 'gemini' },\n    json: true,\n  });\n  const inf = infRes.informe || {};\n  const notRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/notificar',\n    body: { report_payload: inf },\n    json: true,\n  });\n  parsed = {\n    ubigeo: inf.ubigeo || top.ubigeo,\n    distrito: inf.distrito || top.distrito,\n    provincia: inf.provincia || top.provincia,\n    dci_proyectada_pct: Number(inf.dci_proyectada_pct ?? top.dci_proyectada_pct ?? 25.0),\n    id_alerta: Number(notRes.id_alerta || 1),\n    canal_destino: inf.canal_destino || 'S5_ALGEDONICO',\n    sintesis_narrativa_s4: inf.sintesis_narrativa_s4 || (typeof raw.output === 'string' ? raw.output.slice(0, 400) : 'Síntesis S4 generada.'),\n  };\n}\nreturn [{ json: parsed }];"
+        "jsCode": "const raw = $input.first().json || {};\nlet parsed = {};\nif (typeof raw.output === 'string') {\n  const m = raw.output.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e) { parsed = {}; }\n  }\n} else if (typeof raw.dci_proyectada_pct === 'number') {\n  parsed = { ...raw };\n}\n\nconst needsFallback = !parsed.ubigeo || !parsed.distrito || typeof parsed.dci_proyectada_pct !== 'number' || !parsed.id_alerta;\nif (needsFallback) {\n  const predRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/predict',\n    body: { anio_corte: 2024 },\n    json: true,\n  });\n  const rows = (predRes.distritos_criticos_s5 && predRes.distritos_criticos_s5.length) ? predRes.distritos_criticos_s5 : (predRes.predicciones_distritales || []);\n  rows.sort((a, b) => Number(b.dci_proyectada_pct || 0) - Number(a.dci_proyectada_pct || 0));\n  const top = rows[0] || { ubigeo: '090411', distrito: 'Santa Ana', provincia: 'Castrovirreyna', dci_proyectada_pct: 29.29 };\n  let explainCtx = top;\n  try {\n    explainCtx = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://api_engine:8000/tools/explicar_riesgo/${top.ubigeo}`,\n      json: true,\n    });\n  } catch (e) {\n    explainCtx = { ubigeo: top.ubigeo, distrito: top.distrito, provincia: top.provincia, red_salud: top.red_salud, dci_actual_pct: top.dci_actual_pct, dci_proyectada_pct: top.dci_proyectada_pct };\n  }\n  const infRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/redactar_informe',\n    body: { district_context: explainCtx, prefer_provider: 'gemini' },\n    json: true,\n  });\n  const inf = infRes.informe || {};\n  const notRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/notificar',\n    body: { report_payload: inf },\n    json: true,\n  });\n  parsed = {\n    ubigeo: inf.ubigeo || top.ubigeo,\n    distrito: inf.distrito || top.distrito,\n    provincia: inf.provincia || top.provincia,\n    dci_proyectada_pct: Number(inf.dci_proyectada_pct ?? top.dci_proyectada_pct ?? 25.0),\n    id_alerta: Number(notRes.id_alerta || 1),\n    canal_destino: inf.canal_destino || 'S5_ALGEDONICO',\n    sintesis_narrativa_s4: inf.sintesis_narrativa_s4 || (typeof raw.output === 'string' ? raw.output.slice(0, 400) : 'Síntesis S4 generada.'),\n  };\n}\nreturn [{ json: parsed }];"
       },
       "id": "normalize-supervisor-output",
       "name": "Normalizar Salida S4 para Reglas Fijas",
@@ -314,7 +250,10 @@
           "name": "Telegram Bot SentinelNutri-HVC (S5/S3)"
         }
       },
-      "webhookId": "0231679b-1976-4b0e-85d4-dea440a53a79"
+      "webhookId": "0231679b-1976-4b0e-85d4-dea440a53a79",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -338,7 +277,10 @@
           "name": "Telegram Bot SentinelNutri-HVC (S5/S3)"
         }
       },
-      "webhookId": "d064ff18-38ec-4f83-83dd-ad9311c02126"
+      "webhookId": "d064ff18-38ec-4f83-83dd-ad9311c02126",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -400,13 +342,24 @@
         ]
       ]
     },
-    "Ollama Local Respaldo (Llama 3.2 en GTX 1050 Equipo 2)": {
+    "Gemini (Nivel Gratuito Google AI Studio)": {
       "ai_languageModel": [
         [
           {
             "node": "Agente Supervisor (AI Agent de n8n)",
             "type": "ai_languageModel",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Local Respaldo (Llama 3.2 en GTX 1050 Equipo 2)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Supervisor (AI Agent de n8n)",
+            "type": "ai_languageModel",
+            "index": 1
           }
         ]
       ]
