@@ -149,7 +149,9 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-10 | `48bd7f9` | docs(memoria): sincronización de estado operativo y pendientes honestos. |
 | 2026-11-10 | En curso | Encapsulación de FastAPI y Streamlit dentro de Docker (`sentinelnutri_api_engine` y `sentinelnutri_streamlit_msv`), autostart de Ollama GPU en Windows y ejecución en vivo en n8n. |
 | 2026-11-12 | `40201e1` / `a5f264c` | Telegram HTTP real en Python, gráficas en las 4 salas de Streamlit, sync de avance 100% Equipo 2. |
-| 2026-11-12 | Actual | Ensayo E2E LAN (`192.168.1.6`) y corrección de fallos en flujo n8n + LLM (`gemini-flash-lite-latest`, `sendBody`/`placeholderDefinitions` en Tools, `Normalizar Salida S4`, prefijos `=` en Telegram y `Body(default_factory)` en FastAPI). |
+| 2026-11-12 | `75e0396` | Ensayo E2E LAN (`192.168.1.6`) y corrección de fallos en flujo n8n + LLM (`gemini-flash-lite-latest`, `sendBody`/`placeholderDefinitions` en Tools, `Normalizar Salida S4`, prefijos `=` en Telegram y `Body(default_factory)` en FastAPI). |
+| 2026-11-12 | `cbda0d1` / `165e0ee` | Migración de herramientas n8n a `toolCode` + `AI Agent v3.1` (`needsFallback: true`), `"direccion" -> "efecto"` en Tool 3 SHAP (`privacy_guard`), y compactación de salidas Tool 2–3. |
+| 2026-11-12 | Actual | Ensayo E2E LAN completo exitoso (`53.94 s` con `gemini-flash-lite-latest` en vivo) y actualización de `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md` con sustento estadístico de indicadores actuales y hoja de ruta Parra Luna. |
 
 ### Pendientes Reales del Equipo 2
 - [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`).
