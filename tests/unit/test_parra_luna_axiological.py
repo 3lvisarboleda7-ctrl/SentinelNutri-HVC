@@ -48,3 +48,18 @@ def test_parra_luna_prvu_selection_and_isdh_hvc_bounds() -> None:
 
     fig5 = Path("docs/figures/fig5_perfil_axiologico_parra_luna_hvc.png")
     assert fig5.exists() and fig5.stat().st_size > 20_000
+
+    # Validar también el endpoint REST GET /evaluation/parra_luna sobre SQLite temporal
+    import tempfile
+    from fastapi.testclient import TestClient
+    from sentinelnutri.interfaces.api.main import create_app
+
+    with tempfile.TemporaryDirectory(prefix="sentinelnutri_pl_") as tmp:
+        app = create_app(database_url=f"sqlite:///{Path(tmp) / 'pl.db'}", raw_storage_dir=str(Path(tmp) / "raw"))
+        client = TestClient(app)
+        resp = client.get("/evaluation/parra_luna")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["progreso_longitudinal"]["anio_2024"]["ISDH_HVC_arit"] > body["progreso_longitudinal"]["anio_2014"]["ISDH_HVC_arit"]
+        assert len(body["provincias_2024"]) == 7
+        assert body["correlaciones_isdh_vs_dci"]["corte_2024_spearman_rho"] < -0.90

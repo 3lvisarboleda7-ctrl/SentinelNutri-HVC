@@ -14,6 +14,7 @@ y por los recuadros de Reglas Fijas (Figura 1):
 """
 
 import sqlite3
+from dataclasses import asdict
 from typing import Any, Dict, Optional
 from fastapi import Body, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -26,6 +27,7 @@ from sentinelnutri.application import (
     Tool5RedactarInformeUseCase,
     Tool6NotificarUseCase,
 )
+from sentinelnutri.domain.rules.parra_luna_axiological import summarize_parra_luna_panel
 from sentinelnutri.domain.rules.privacy_guard import PrivacyViolationError
 from sentinelnutri.infrastructure.ml_xai import CatBoostShapPredictor
 from sentinelnutri.infrastructure.notifications import (
@@ -220,6 +222,29 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
             records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
         return predictor.train_and_evaluate(records)
+
+    @api.get("/evaluation/parra_luna", tags=["Semana 7: Evaluación y Gobernanza (AUC, F1, SHAP)"])
+    def endpoint_evaluation_parra_luna(
+        include_all_districts: bool = Query(
+            default=False,
+            description="Si es True, incluye el vector completo de los 100 distritos en corte 2024",
+        ),
+    ) -> Dict[str, Any]:
+        records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        if not records:
+            tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
+            records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        preds = repo.get_latest_predictions()
+        if not preds:
+            tool3.execute(anio_corte=2024)
+            preds = repo.get_latest_predictions()
+        s5_ubigeos = [p.ubigeo for p in preds if p.supera_umbral_algedonico]
+        rows = [asdict(r) if not isinstance(r, dict) else r for r in records]
+        summary = summarize_parra_luna_panel(rows, s5_ubigeos=s5_ubigeos)
+        if not include_all_districts:
+            summary = {k: v for k, v in summary.items() if k != "scores_2024"}
+            summary["total_distritos_2024"] = len(preds)
+        return summary
 
     return api
 

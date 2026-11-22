@@ -66,6 +66,7 @@ Este archivo es leído automáticamente por Antigravity en cada sesión y turno 
     - **Regla Fija 3 (`can_publish_to_s3_control`):** Requiere estado `APROBADO_S3` (aprobación humana por Telegram/Gmail) antes de publicar en el **Canal de Control S3 (GRDS)**.
   - `privacy_guard.py`: Guardarraíl **Ley N.º 29733** (`sanitize_district_payload_for_llm`); bloquea cualquier campo nominal (`dni`, `nombres`, `historia_clinica`, etc.) antes de llamar al LLM.
   - `scraping_ethics.py`: Verificador de `robots.txt`, validación de `User-Agent` académico FIIS-UNI y cálculo de huella digital `SHA-256` (`compute_sha256_hash`, `has_file_changed`).
+  - `parra_luna_axiological.py`: Modelo Axiológico de Francisco Parra Luna (2017, 2018) adaptado a 6 dimensiones del PRVU (`S`, `RM`, `Se`, `CO`, `JD`, `CN`) y denominador transformador $X = 1 + (100 - \text{Ejec. PAN})/100$ ($\text{ISDH}_{\text{HVC}} = Y/X$, aritmético y geométrico + desequilibrio $\sigma_Y$).
 - **Puertos Hexagonales (`domain/ports/`):**
   - `repository_port.py`, `scraper_port.py`, `predictor_port.py`.
 
@@ -97,9 +98,9 @@ Mapeadas 1 a 1 con la **Tabla 5** del documento de perfil:
 
 ### Capa 4: Interfaces, Workflows n8n, Colab y Despliegue
 - **API FastAPI (`src/sentinelnutri/interfaces/api/main.py`):**
-  - Endpoints: `/health`, `/predict`, `/tools/extraer_fuentes`, `/tools/consultar_bd`, `/tools/predecir_riesgo`, `/tools/explicar_riesgo/{ubigeo}`, `/tools/redactar_informe`, `/tools/notificar`, `/hitl/aprobar/{alert_id}`, `/evaluation/metrics`.
+  - Endpoints: `/health`, `/predict`, `/tools/extraer_fuentes`, `/tools/consultar_bd`, `/tools/predecir_riesgo`, `/tools/explicar_riesgo/{ubigeo}`, `/tools/redactar_informe`, `/tools/notificar`, `/hitl/aprobar/{alert_id}`, `/evaluation/metrics`, `/evaluation/parra_luna`.
 - **Dashboard Streamlit (`src/sentinelnutri/interfaces/dashboard/`):**
-  - `app.py` y multipágina en `pages/`: `01_S4_S3_Homeostato.py`, `02_S3_Star_Auditoria_SHAP.py`, `03_S2_Coordinacion_Redes.py`, `04_S5_Canal_Algedonico_ODS.py`.
+  - `app.py` y multipágina en `pages/`: `01_S4_S3_Homeostato.py`, `02_S3_Star_Auditoria_SHAP.py`, `03_S2_Coordinacion_Redes.py`, `04_S5_Canal_Algedonico_ODS.py`, `05_S4_Modelo_Axiologico_Parra_Luna.py`.
 - **Flujos n8n (`workflows_n8n/`):**
   - `01_ciclo_supervisor_sentinelnutri.json` y `02_vigilancia_fallos_scrapers.json` + prompts en `workflows_n8n/prompts/`.
 - **Notebooks para Google Colab (`notebooks_colab/`):**
@@ -117,11 +118,8 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 - `data/exports/panel_distrital_hvc_2014_2024.csv`: Panel histórico consolidado de `1 100` registros (100 distritos × 11 años × 24 columnas), listo para subir a Google Colab.
 - `data/exports/metrics_report.json`: Reporte completo de validación ($\text{AUC-ROC} = 0,9993 \ge 0,90$, $\text{F1} = 0,8917$, matriz de confusión, importancia global SHAP y resumen de las 7 provincias S2).
 - `data/exports/matriz_gobernanza_oei_ods_hvc.csv`: Matriz de los 100 distritos con proyección DCI, canal MSV (`S5_ALGEDONICO` vs `S3_CONTROL`), factor SHAP principal, recomendaciones sectoriales (Salud, Agua, Agricultura) y vinculación con los **OEI del PEI 2020–2027** y **ODS 2, 3 y 6**.
-- `docs/figures/`: 4 figuras académicas en `300 DPI` listas para los Capítulos 5, 6 y 7 del informe:
-  - `fig1_roc_cv5_catboost_hvc.png`
-  - `fig2_shap_importancia_global_s3_star.png`
-  - `fig3_shap_waterfall_distrito_critico.png`
-  - `fig4_homeostato_s3_s4_7_provincias.png`
+- `docs/figures/`: 5 figuras académicas en `300 DPI` (`fig1` a `fig5_perfil_axiologico_parra_luna_hvc.png`) + 8 capturas en vivo del Equipo 2 (`equipo2_live_01_*` a `equipo2_live_08_dashboard_s4_parra_luna.png`) listas para los Capítulos 5, 6 y 7 del informe.
+- `data/exports/indicadores_parra_luna_hvc_2024.csv` y `data/exports/resumen_parra_luna_hvc.json`: Perfil axiológico PRVU e $\text{ISDH}_{\text{HVC}}$ de los 100 distritos (`2014–2024`, generados por `scripts/generar_parra_luna_hvc.py`).
 
 ---
 
@@ -151,7 +149,8 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-12 | `40201e1` / `a5f264c` | Telegram HTTP real en Python, gráficas en las 4 salas de Streamlit, sync de avance 100% Equipo 2. |
 | 2026-11-12 | `75e0396` | Ensayo E2E LAN (`192.168.1.6`) y corrección de fallos en flujo n8n + LLM (`gemini-flash-lite-latest`, `sendBody`/`placeholderDefinitions` en Tools, `Normalizar Salida S4`, prefijos `=` en Telegram y `Body(default_factory)` en FastAPI). |
 | 2026-11-12 | `cbda0d1` / `165e0ee` | Migración de herramientas n8n a `toolCode` + `AI Agent v3.1` (`needsFallback: true`), `"direccion" -> "efecto"` en Tool 3 SHAP (`privacy_guard`), y compactación de salidas Tool 2–3. |
-| 2026-11-12 | Actual | Ensayo E2E LAN completo exitoso (`53.94 s` con `gemini-flash-lite-latest` en vivo) y actualización de `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md` con sustento estadístico de indicadores actuales y hoja de ruta Parra Luna. |
+| 2026-11-12 | `bb9bb0e` | Ensayo E2E LAN completo exitoso (`53.94 s` con `gemini-flash-lite-latest` en vivo) y actualización de `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md` con sustento estadístico de indicadores actuales y hoja de ruta Parra Luna. |
+| 2026-11-22 | `4d2f72a` / `cac1cb3` | Integración completa del Modelo Axiológico de Parra Luna (`parra_luna_axiological.py`, `GET /evaluation/parra_luna`, Sala 5 en Streamlit `:8501`, `fig5` 300 DPI, captura en vivo `equipo2_live_08`, Sección 7.5 del informe y suite `23/23 PASS`). |
 
 ### Pendientes Reales del Equipo 2
 - [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`).
