@@ -4,7 +4,7 @@
 **Curso:** Modelo de Sistema Viable (MSV) — FIIS UNI  
 **Autor:** Elvis Arboleda  
 **Docente:** Ing. Ricardo Rodríguez-Ulloa  
-**Corte de avance técnico:** 12 de noviembre de 2026 (commits sincronizados hasta `165e0ee`)  
+**Corte de avance técnico:** 22 de noviembre de 2026 (integración del Modelo Axiológico de Parra Luna sobre `panel_distrital_hvc_2014_2024.csv`)  
 
 ---
 
@@ -189,9 +189,70 @@ Las capturas en vivo tomadas directamente sobre los servicios encapsulados en Do
 
 Adicionalmente, el **ensayo de demostración End-to-End en vivo sobre red local** ejecutado desde el Equipo 1 contra el Equipo 2 (`python scripts/ensayo_flujo_e2e.py --host 192.168.1.6`) completó las **7 etapas en $53,94\text{ s}$**: validación de los 4 servicios de infraestructura, ingesta `weekly_watch` de 6 portales (`Tool 1`), consulta de $1\,100$ registros (`Tool 2`), inferencia `CatBoost` en $10,89\text{ s}$ (`Tool 3`), explicación SHAP para `Huachocolpa` y `Nuevo Occoro` (`Tool 4`), bloqueo de datos nominales `HTTP 422` y redacción en vivo con **`gemini-flash-lite-latest`** incluyendo conmutación automática por failover cuando `Ollama` excedió el umbral (`Tool 5`), despacho directo `S5_ALGEDONICO` (`Alerta ID=26`) y compuerta humana HITL completa `PENDIENTE_APROBACION -> APROBADO_S3` (`Alerta ID=27`).
 
-### 7.5. Proyección de la Siguiente Iteración: Evaluación de Indicadores de Parra Luna (Próxima Semana)
+### 7.5. Evaluación Sistémica Mediante el Modelo Axiológico de Parra Luna (PRVU e $\text{ISDH}_{\text{HVC}}$)
 
-Con el panel histórico consolidado (`1 100` registros), el motor XAI validado ($\text{AUC-ROC} = 0,9993$) y la infraestructura operativa verificada end-to-end, la **próxima semana** se evaluará la pertinencia y formulación formal de los **indicadores sistémicos de Francisco Parra Luna** aplicados al caso SentinelNutri-HVC:
+Con el fin de complementar el monitoreo predictivo de la DCI con una medida holística de desarrollo humano territorial y eficiencia institucional, se integró el marco axiológico de **Francisco Parra Luna** (Parra Luna, 2017, 2018) en el módulo [`parra_luna_axiological.py`](../src/sentinelnutri/domain/rules/parra_luna_axiological.py) y se ejecutó sobre los $N = 1\,100$ registros (`2014–2024`, $100$ distritos) del panel consolidado.
 
-- Se analizará cómo mapear las variables reales ya recolectadas en PostgreSQL (por ejemplo, `dci_actual_pct`, `dci_proyectada_pct`, `ejecucion_pan_mef_pct`, `agua_cloro_adecuado_pct`, coberturas MIDIS y latencias de respuesta $\text{S3–S4–S5}$) dentro de la taxonomía de Parra Luna (*actualidad*, *capacidad/potencialidad*, *eficacia*, *eficiencia* y *efectividad* institucional frente a los OEI del PEI 2020–2027).
-- Los resultados de dicha evaluación se incorporarán como módulo analítico adicional en el Dashboard y como sección complementaria del informe final una vez validados con los criterios de la cátedra.
+#### 7.5.1. Selección Pertinente del Patrón Referencial de Valores Universales (PRVU)
+
+De acuerdo con los tres principios sistémicos de Parra Luna —*Finalidad*, *Totalidad Epistemológica* y *Maximización Transformadora* ($T = Y/X$)— se seleccionaron **únicamente las 6 dimensiones del PRVU** operativamente pertinentes al propósito nutricional distrital en Huancavelica (sin doble conteo de variables) y se descartaron explícitamente las dimensiones macro-país inaplicables al ámbito distrital:
+
+**Tabla 7**  
+*Adecuación y Filtrado del Patrón Referencial de Valores Universales (PRVU, Parra Luna, 2017, 2018) al Propósito de SentinelNutri-HVC*
+
+| Valor Universal del PRVU (Parra Luna) | Estado | Indicadores Empíricos del Panel (`2014–2024`) | Transformación a Forma Positiva y Justificación |
+| :--- | :---: | :--- | :--- |
+| **1. Salud (`S`, $y_1$)** | **Incluido** | `tasa_dci_pct`, `tasa_anemia_pct`, `tasa_bajo_peso_pct`, `controles_cred_completo_pct`, `lactancia_materna_exclusiva_pct` | Inversión de tasas de morbilidad (`-v`) + Min–Max $[0,1]$. Núcleo sanitario del Sistema 4 (`SIEN-HIS` / `ENDES`). |
+| **2. Riqueza Material (`RM`, $y_2$)** | **Incluido** | `pobreza_monetaria_pct`, `presupuesto_pan_per_capita_soles` | Inversión de pobreza monetaria (`-v`) + dotación PAN per cápita (`INEI` / `MEF`). |
+| **3. Seguridad ante Contingencias (`Se`, $y_3$)** | **Incluido** | `cobertura_juntos_pct`, `cobertura_cuna_mas_pct`, `cobertura_qali_warma_pct` | Red de protección social infantil frente a contingencias del hogar (`MIDIS`). |
+| **4. Conocimiento (`CO`, $y_4$)** | **Incluido** | `educacion_materna_secundaria_pct` | Capital educativo materno protector ($r = -0,814$ con DCI, `ENDES`). |
+| **5. Libertad (`L`, $y_5$)** | *Descartado* | *Libertad de prensa, presión fiscal, población penitenciaria* | Carece de variación distrital oficial y vínculo operativo con la alerta temprana de DCI. |
+| **6. Justicia Distributiva (`JD`, $y_6$)** | **Incluido** | `agua_cloro_adecuado_pct`, `saneamiento_basico_pct` | Equidad en acceso a servicios básicos vitales (`ENDES`; agua clorada es 2.º predictor SHAP). |
+| **7. Conservación / Adaptación Natural (`CN`, $y_7$)** | **Incluido** | `dias_heladas_anual`, `temp_minima_promedio_c`, `precipitacion_anual_mm` | Inversión de días de heladas (`-v`) + benignidad térmica e hídrica altoandina (`SENAMHI`). |
+| **8. Calidad de Actividades / Gestión (`CA`, $y_8$) $\rightarrow$ Denominador $X$** | **Adaptado a $X$** | `ejecucion_pan_mef_pct` (como brecha de inejecución $100 - \text{Ejec. PAN}$) | Materializa el denominador penalizador $X = 1 + (100 - \text{Ejec. PAN})/100$ en $T = Y/X$ (`MEF PAN 0001`). |
+| **9. Prestigio Moral (`PM`, $y_9$) y Poder (`P`)** | *Descartado* | *Ayuda oficial al desarrollo (% PNB), migración internacional, PIB, arsenal* | Indicadores geopolíticos macro-país inaplicables a gobiernos distritales. |
+| **Denominador original $X$ (Exportación de armas)** | *Sustituido* | Reemplazado por la **brecha de inejecución presupuestal del PAN `0001`** | Preserva la forma exacta $X = 1 + x/100 \in [1, 2]$ (Parra Luna, 2018, p. 8) penalizando presupuesto nutricional no ejecutado. |
+
+#### 7.5.2. Formulación del Índice Sistémico Nutricional ($\text{ISDH}_{\text{HVC}}$) y Perfil Axiológico
+
+Siguiendo la estandarización Min–Max $[0, 1]$ sobre la serie completa `2014–2024` (escala común para evaluar el progreso intertemporal) y la recomendación de **media geométrica** discutida en *Avances Sistémicos* (Caselles, 2018; PNUD, 2010) para impedir la sustitutibilidad perfecta entre dimensiones:
+
+$$Y_{\text{arit}} = \frac{1}{6}\sum_{i \in \{S, RM, Se, CO, JD, CN\}} y_i, \qquad Y_{\text{geom}} = \left(\prod_{i} \max(y_i, 0{,}01)\right)^{1/6}, \qquad \sigma_Y = \sqrt{\frac{1}{6}\sum_i (y_i - Y_{\text{arit}})^2}$$
+
+$$X = 1 + \frac{100 - \text{Ejecución PAN}_{0001}}{100}, \qquad \text{ISDH}_{\text{HVC}} = \frac{Y}{X}$$
+
+#### 7.5.3. Resultados Empíricos (`2014–2024`), Brecha $\text{S5}$ vs $\text{S3}$ y Validación Estadística
+
+Los artefactos completos se exportaron en [`data/exports/indicadores_parra_luna_hvc_2024.csv`](../data/exports/indicadores_parra_luna_hvc_2024.csv), [`data/exports/resumen_parra_luna_hvc.json`](../data/exports/resumen_parra_luna_hvc.json) y la figura de 300 DPI [`docs/figures/fig5_perfil_axiologico_parra_luna_hvc.png`](figures/fig5_perfil_axiologico_parra_luna_hvc.png), además de integrarse como vista interactiva en la **Sala 5 del Dashboard Streamlit** ([`05_S4_Modelo_Axiologico_Parra_Luna.py`](../src/sentinelnutri/interfaces/dashboard/pages/05_S4_Modelo_Axiologico_Parra_Luna.py), puerto `:8501`).
+
+**Tabla 8**  
+*Perfil Axiológico PRVU, Desequilibrio ($\sigma_Y$), Denominador de Inejecución PAN ($X$) e $\text{ISDH}_{\text{HVC}}$ ($T=Y/X$) — Progreso `2014–2024`, Brecha $\text{S5}$ vs $\text{S3}$ y Desagregación Provincial (`2024`)*
+
+| Ámbito / Grupo Territorial (`n`) | `S` ($y_1$) | `RM` ($y_2$) | `Se` ($y_3$) | `CO` ($y_4$) | `JD` ($y_6$) | `CN` ($y_7$) | $\sigma_Y$ (Desequil.) | $X$ (Inejec. PAN) | $\text{ISDH}_{\text{HVC}}$ Arit. | $\text{ISDH}_{\text{HVC}}$ Geom. |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Línea Base Regional `2014` (`100`)** | $32,36\,\%$ | $27,70\,\%$ | $35,04\,\%$ | $10,37\,\%$ | $7,37\,\%$ | $65,52\,\%$ | $0,2058$ | $1,3602$ | **$21,93\,\%$** | **$15,14\,\%$** |
+| **Promedio Regional `2024` (`100`)** | $75,01\,\%$ | $75,12\,\%$ | $92,12\,\%$ | $53,80\,\%$ | $48,54\,\%$ | $65,54\,\%$ | **$0,1681$** | **$1,2179$** | **$56,27\,\%$** | **$54,40\,\%$** |
+| **Distritos Algedónicos $\text{S5}$ (`5`)** | $58,97\,\%$ | $64,06\,\%$ | **$97,30\,\%$** | $46,97\,\%$ | **$35,95\,\%$** | **$25,54\,\%$** | **$0,2322$** | $1,2093$ | **$45,31\,\%$** | **$40,98\,\%$** |
+| **Distritos de Control $\text{S3}$ (`95`)** | $75,86\,\%$ | $75,70\,\%$ | $91,85\,\%$ | $54,16\,\%$ | $49,21\,\%$ | $67,65\,\%$ | $0,1647$ | $1,2183$ | **$56,85\,\%$** | **$55,11\,\%$** |
+| Provincia **Castrovirreyna** (`13`) | $76,94\,\%$ | $76,95\,\%$ | $91,70\,\%$ | $54,35\,\%$ | $49,57\,\%$ | $68,85\,\%$ | $0,1644$ | $1,2139$ | $57,47\,\%$ | $55,48\,\%$ |
+| Provincia **Tayacaja** (`21`) | $76,84\,\%$ | $75,52\,\%$ | $93,55\,\%$ | $51,92\,\%$ | $47,29\,\%$ | $73,40\,\%$ | $0,1718$ | $1,2229$ | $57,14\,\%$ | $55,23\,\%$ |
+| Provincia **Huancavelica** (`19`) | $74,56\,\%$ | $76,73\,\%$ | $87,17\,\%$ | $60,33\,\%$ | $55,02\,\%$ | $56,26\,\%$ | $0,1585$ | $1,2022$ | $57,10\,\%$ | $55,46\,\%$ |
+| Provincia **Churcampa** (`11`) | $76,23\,\%$ | $76,05\,\%$ | $93,24\,\%$ | $52,32\,\%$ | $47,30\,\%$ | $69,58\,\%$ | $0,1667$ | $1,2146$ | $57,05\,\%$ | $55,29\,\%$ |
+| Provincia **Huaytará** (`16`) | $74,05\,\%$ | $73,37\,\%$ | $94,88\,\%$ | $50,17\,\%$ | $44,76\,\%$ | $69,08\,\%$ | $0,1814$ | $1,2292$ | $55,19\,\%$ | $53,03\,\%$ |
+| Provincia **Acobamba** (`8`) | $72,32\,\%$ | $74,02\,\%$ | $92,24\,\%$ | $53,64\,\%$ | $47,32\,\%$ | $56,68\,\%$ | $0,1670$ | $1,2121$ | $54,75\,\%$ | $53,00\,\%$ |
+| Provincia **Angaraes** (`12`) | $72,40\,\%$ | $72,08\,\%$ | $93,16\,\%$ | $52,43\,\%$ | $46,37\,\%$ | $60,38\,\%$ | $0,1649$ | $1,2298$ | $53,85\,\%$ | $52,05\,\%$ |
+
+*Nota.* Fuente: cálculo propio sobre `panel_distrital_hvc_2014_2024.csv` ($N=1\,100$) mediante `scripts/generar_parra_luna_hvc.py`. Representación gráfica en [`docs/figures/fig5_perfil_axiologico_parra_luna_hvc.png`](figures/fig5_perfil_axiologico_parra_luna_hvc.png).
+
+Cuatro conclusiones cibernéticas y axiológicas se desprenden directamente de la **Tabla 8**:
+
+1. **Doble mandato de progreso axiológico verificado (`2014 → 2024`):** En una década, Huancavelica elevó su $\text{ISDH}_{\text{HVC}}$ aritmético de $21,93\,\%$ a $56,27\,\%$ ($+34,34\text{ pp}$) y su $\text{ISDH}_{\text{HVC}}$ geométrico de $15,14\,\%$ a $54,40\,\%$ ($+39,26\text{ pp}$), reduciendo simultáneamente su desequilibrio axiológico $\sigma_Y$ de $0,2058$ a $0,1681$ (*horizontalización del perfil*, Parra Luna, 2017, p. 36) y disminuyendo la penalización por inejecución del PAN ($X: 1,3602 \rightarrow 1,2179$).
+2. **Desequilibrio axiológico extremo en el Canal Algedónico $\text{S5}$:** Los 5 distritos críticos $\text{S5}$ presentan una desviación $\sigma_Y = 0,2322$ (un $+41,0\,\%$ mayor que los distritos $\text{S3}$, $\sigma_Y = 0,1647$). El caso extremo es **Santa Ana (`090411`, puesto #100/100)**, que pese a registrar una cobertura casi total de programas sociales (**`Se` = $99,20\,\%$**), colapsa en **Adaptación Natural (`CN` = $10,62\,\%$)** y **Justicia Distributiva en agua/saneamiento (`JD` = $31,29\,\%$)**, arrojando un $\text{ISDH}_{\text{HVC}}$ geométrico de apenas **$35,15\,\%$** (frente al líder regional **Izcuchaca `090109`**, con $\text{ISDH}_{\text{HVC}}$ geométrico de **$72,69\,\%$** y $\sigma_Y = 0,0753$).
+3. **Superioridad diagnóstica de la media geométrica para $\text{S3}$:** Mientras el índice aritmético muestra una brecha $\text{S5}$ vs $\text{S3}$ de $-11,54\text{ pp}$ ($45,31\,\%$ vs $56,85\,\%$), el índice geométrico amplía la señal a **$-14,13\text{ pp}$** ($40,98\,\%$ vs $55,11\,\%$), demostrando que la asistencia social (`Se`) no compensa la ausencia de agua segura (`JD`, OEI.04) ni la exposición a heladas (`CN`, OEI.10).
+4. **Alta validez convergente empírica:** El $\text{ISDH}_{\text{HVC}}$ exhibe una correlación inversa muy fuerte con la tasa observada de DCI tanto en la serie completa `2014–2024` (**Pearson $r = -0,8997$, Spearman $\rho = -0,9007$**) como en el corte transversal `2024` (**Pearson $r = -0,9669$, Spearman $\rho = -0,9529$**), superando en magnitud el coeficiente de referencia reportado por Parra Luna ($\rho = 0,86$; Parra Luna, 2018, p. 9).
+
+#### Referencias Adicionales del Marco Axiológico (APA 7)
+
+- Caselles, A. (2018). Hacia un nuevo Índice de Desarrollo Humano. En F. Parra Luna (Ed.), *¿Qué es el desarrollo? Hacia un Índice Sistémico de Desarrollo Humano (ISDH)*, *Avances Sistémicos* (SESGE), Año 1(3), 10–14.
+- Parra Luna, F. (2017). Un Modelo Axiológico para la gobernanza mundial. *Revista Internacional de Sistemas* (SESGE), 21(1), 26–37. https://doi.org/10.7203/RIS.21.1.11597
+- Parra Luna, F. (Ed.). (2018). En búsqueda de la paz mundial: Hacia un nuevo Índice Sistémico de Desarrollo Humano (ISDH). *Avances Sistémicos* (SESGE), Año 1(3), 4–9 y 35–46.

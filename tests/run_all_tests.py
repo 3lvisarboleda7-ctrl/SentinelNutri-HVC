@@ -39,6 +39,9 @@ from tests.unit.test_adversarial_red_team import (
     test_red_team_7_dashboard_4_rooms_and_hitl_approver_guard,
     test_red_team_8_exported_artifacts_and_figures_integrity,
 )
+from tests.unit.test_parra_luna_axiological import (
+    test_parra_luna_prvu_selection_and_isdh_hvc_bounds,
+)
 from sentinelnutri.domain.rules.privacy_guard import (
     PrivacyViolationError,
     sanitize_district_payload_for_llm,
@@ -80,6 +83,7 @@ def main() -> None:
         ("Red-Team QA 6: Auditoría estructural de grafos y reglas en Workflows n8n", test_red_team_6_n8n_workflows_structural_and_rules_audit),
         ("Red-Team QA 7: Resiliencia de las 4 Salas del Dashboard Streamlit y guardia HITL S3", test_red_team_7_dashboard_4_rooms_and_hitl_approver_guard),
         ("Red-Team QA 8: Integridad de artefactos exportados (1 100 filas, OEI/ODS, AUC>=0.90 y 300 DPI)", test_red_team_8_exported_artifacts_and_figures_integrity),
+        ("Modelo Axiológico Parra Luna: Selección PRVU (6 dim.), ISDH-HVC (T=Y/X) y Figura 5", test_parra_luna_prvu_selection_and_isdh_hvc_bounds),
     ]
 
     for name, fn in tests:
