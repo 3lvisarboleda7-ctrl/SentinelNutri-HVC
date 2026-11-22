@@ -83,7 +83,14 @@ La validación del motor predictivo sobre el panel histórico integrado de los *
 | **Precisión (*Precision*)** | **$0,8046$** | $\ge 0,8000$ | **Cumple:** Tasa controlada de falsas alarmas ($\text{FP} = 93$) auditable en $\text{S3}^*$ |
 | **Exactitud Global (*Accuracy*)** | **$91,55\,\%$** | $\ge 85,00\,\%$ | **Cumple:** Consistente entre evaluación local y servidor PostgreSQL |
 
-*Nota.* Matriz de confusión sobre $N = 1\,100$: Verdaderos Positivos ($\text{TP} = 383$), Verdaderos Negativos ($\text{TN} = 624$), Falsos Positivos ($\text{FP} = 93$), Falsos Negativos ($\text{FN} = 0$). Desde la perspectiva del MSV, la asimetría entre $\text{FN} = 0$ y $\text{FP} = 93$ es intencional y deseable: el costo social de omitir un distrito en crisis nutricional supera ampliamente el costo administrativo de someter un caso limítrofe a revisión de Auditoría ($\text{S3}^*$). La curva ROC y la matriz de confusión de entrenamiento se documentan en [`docs/figures/fig1_roc_cv5_catboost_hvc.png`](figures/fig1_roc_cv5_catboost_hvc.png) y [`docs/figures/colab_roc_confusion_sentinelnutri.png`](figures/colab_roc_confusion_sentinelnutri.png).
+*Nota.* Matriz de confusión sobre $N = 1\,100$: Verdaderos Positivos ($\text{TP} = 383$), Verdaderos Negativos ($\text{TN} = 624$), Falsos Positivos ($\text{FP} = 93$), Falsos Negativos ($\text{FN} = 0$). Desde la perspectiva del MSV, la asimetría entre $\text{FN} = 0$ y $\text{FP} = 93$ es intencional y deseable: el costo social de omitir un distrito en crisis nutricional supera ampliamente el costo administrativo de someter un caso limítrofe a revisión de Auditoría ($\text{S3}^*$). La curva ROC y la matriz de confusión de entrenamiento se documentan en las Figuras 1 y 2.
+
+**Figura 1**  
+*Curva ROC de Validación Cruzada Estratificada ($k = 5$) del Motor CatBoost + SHAP frente a la Meta Académica ($\text{AUC} \ge 0,90$)*
+
+![Figura 1: Curva ROC CatBoost + SHAP Huancavelica 2014-2024](figures/fig1_roc_cv5_catboost_hvc.png)
+
+*Nota.* Elaboración propia a partir del panel histórico `2014–2024` ($N = 1\,100$). Archivo de alta resolución (`300 DPI`): [`fig1_roc_cv5_catboost_hvc.png`](figures/fig1_roc_cv5_catboost_hvc.png) (complementado en Google Colab por [`colab_roc_confusion_sentinelnutri.png`](figures/colab_roc_confusion_sentinelnutri.png)).
 
 ### 6.2. Homeostato $\text{S3–S4}$ por Provincia y Red de Salud ($\text{S2}$)
 
@@ -101,7 +108,14 @@ La validación del motor predictivo sobre el panel histórico integrado de los *
 | **Tayacaja** | 21 | $93,51\,\%$ | $16,54\,\%$ | $15,63\,\%$ | 0 |
 | **Total / Promedio Regional** | **100** | **$91,55\,\%$** | **$17,26\,\%$** | **$16,53\,\%$** | **5** |
 
-*Nota.* Visualización comparativa en [`docs/figures/fig4_homeostato_s3_s4_7_provincias.png`](figures/fig4_homeostato_s3_s4_7_provincias.png).
+*Nota.* Visualización comparativa del balance homeostático provincial en la Figura 2.
+
+**Figura 2**  
+*Balance Homeostático $\text{S3–S4}$ en las 7 Provincias de Huancavelica (DCI Actual vs. Proyectada y Umbral Algedónico $25\,\%$)*
+
+![Figura 2: Homeostato S3-S4 7 Provincias Huancavelica](figures/fig4_homeostato_s3_s4_7_provincias.png)
+
+*Nota.* Archivo de alta resolución (`300 DPI`): [`fig4_homeostato_s3_s4_7_provincias.png`](figures/fig4_homeostato_s3_s4_7_provincias.png).
 
 ### 6.3. Auditoría de Explicabilidad XAI mediante Valores SHAP (Soporte a S3*)
 
@@ -123,7 +137,17 @@ Para impedir que el atenuador opere como una «caja negra», la herramienta `exp
 | 9 | `educacion_materna_secundaria_pct` | 2. Socioeconómica (ENDES INEI) | $0,2896$ | **OEI.02** (Educación básica de calidad) |
 | 10 | `cobertura_juntos_pct` | 4. Programas Sociales (MIDIS) | $0,2691$ | **OEI.01 / OEI.03** (Protección social) |
 
-*Nota.* Los gráficos globales y locales se encuentran en [`docs/figures/fig2_shap_importancia_global_s3_star.png`](figures/fig2_shap_importancia_global_s3_star.png), [`docs/figures/fig3_shap_waterfall_distrito_critico.png`](figures/fig3_shap_waterfall_distrito_critico.png), [`docs/figures/colab_shap_beeswarm_global.png`](figures/colab_shap_beeswarm_global.png) y [`docs/figures/colab_shap_waterfall_distrital.png`](figures/colab_shap_waterfall_distrital.png). Obsérvese la convergencia entre la Tabla 1 y la Tabla 4: aunque la anemia posee alta colinealidad lineal con la DCI ($r = +0,994$), `CatBoost + SHAP` asigna el segundo y tercer mayor peso causal directo al **agua clorada (`1,1306` pp)** y a las **heladas (`1,0904` pp)**, identificando palancas accionables para DRVCS (OEI.04) y SENAMHI/Agricultura (OEI.10).
+*Nota.* Obsérvese la convergencia entre la Tabla 1 y la Tabla 4: aunque la anemia posee alta colinealidad lineal con la DCI ($r = +0,994$), `CatBoost + SHAP` asigna el segundo y tercer mayor peso causal directo al **agua clorada (`1,1306` pp)** y a las **heladas (`1,0904` pp)**, identificando palancas accionables para DRVCS (OEI.04) y SENAMHI/Agricultura (OEI.10). Los resultados globales y locales se visualizan en las Figuras 3 y 4 (complementadas por [`colab_shap_beeswarm_global.png`](figures/colab_shap_beeswarm_global.png) y [`colab_shap_waterfall_distrital.png`](figures/colab_shap_waterfall_distrital.png)).
+
+**Figura 3**  
+*Importancia Global de Determinantes Estructurales de la DCI mediante Valores $|\text{SHAP}|$ (Soporte a Auditoría $\text{S3}^*$)*
+
+![Figura 3: Importancia Global SHAP S3*](figures/fig2_shap_importancia_global_s3_star.png)
+
+**Figura 4**  
+*Descomposición Local SHAP (Waterfall) del Distrito Crítico Prioritario para Auditoría $\text{S3}^*$*
+
+![Figura 4: SHAP Waterfall Distrito Critico](figures/fig3_shap_waterfall_distrito_critico.png)
 
 ### 6.4. Indicadores Operativos y de Gobernanza Cibernética Verificados hasta la Fecha
 
@@ -178,15 +202,47 @@ La matriz completa de los 100 distritos exportada en [`data/exports/matriz_gober
 
 ### 7.4. Evidencia Operativa en Vivo y Ensayo End-to-End (Equipo 1 $\leftrightarrow$ Equipo 2 LAN)
 
-Las capturas en vivo tomadas directamente sobre los servicios encapsulados en Docker en el **Equipo 2 (`DESKTOP-H3C8P9R`, PostgreSQL 16 + FastAPI `:8000` + n8n `:5678` + Streamlit `:8501` + Ollama Vulkan GTX 1050 `:11434`)** se documentan en [`docs/figures/`](figures/):
+Las capturas en vivo (`1920×1080`) tomadas directamente sobre los servicios encapsulados en Docker en el **Equipo 2 (`DESKTOP-H3C8P9R`, PostgreSQL 16 + FastAPI `:8000` + n8n `:5678` + Streamlit `:8501` + Ollama Vulkan GTX 1050 `:11434`)** evidencian el funcionamiento real del sistema (Figuras 5 a 12):
 
-1. **Sala 1 — Homeostato $\text{S3–S4}$ (`:8501`):** [`equipo2_live_01_dashboard_homeostato_s4_s3.png`](figures/equipo2_live_01_dashboard_homeostato_s4_s3.png)
-2. **Sala 2 — Auditoría $\text{S3}^*$ mediante Explicabilidad SHAP:** [`equipo2_live_02_dashboard_s3_star_auditoria_shap.png`](figures/equipo2_live_02_dashboard_s3_star_auditoria_shap.png)
-3. **Sala 3 — Coordinación Interprovincial $\text{S2}$ de las 7 Redes de Salud:** [`equipo2_live_03_dashboard_s2_coordinacion_redes.png`](figures/equipo2_live_03_dashboard_s2_coordinacion_redes.png)
-4. **Sala 4 — Canal Algedónico $\text{S5}$, Aprobación Humana HITL y `SHA-256`:** [`equipo2_live_04_dashboard_s5_canal_algedonico_ods.png`](figures/equipo2_live_04_dashboard_s5_canal_algedonico_ods.png)
-5. **Sala 5 — Modelo Axiológico de Parra Luna (PRVU e $\text{ISDH}_{\text{HVC}}$ en vivo sobre PostgreSQL 16):** [`equipo2_live_08_dashboard_s4_parra_luna.png`](figures/equipo2_live_08_dashboard_s4_parra_luna.png)
-6. **Microservicio REST FastAPI con las 6 Herramientas (`:8000/docs`):** [`equipo2_live_05_fastapi_swagger_6_tools.png`](figures/equipo2_live_05_fastapi_swagger_6_tools.png)
-7. **Orquestador Agéntico `n8n` en SSD (`:5678`):** [`equipo2_live_06_n8n_orchestrator.png`](figures/equipo2_live_06_n8n_orchestrator.png) y [`equipo2_live_07_n8n_trial_run.png`](figures/equipo2_live_07_n8n_trial_run.png)
+**Figura 5**  
+*Sala 1 en Vivo — Homeostato $\text{S3–S4}$: Balance Provincial, Mapa Territorial de los 100 Distritos y Tabla de Riesgo (`:8501`)*
+
+![Figura 5: Sala 1 Dashboard Homeostato S3-S4](figures/equipo2_live_01_dashboard_homeostato_s4_s3.png)
+
+**Figura 6**  
+*Sala 2 en Vivo — Auditoría $\text{S3}^*$ mediante Explicabilidad XAI SHAP Local y Global (`090411 - Santa Ana`, `:8501`)*
+
+![Figura 6: Sala 2 Dashboard Auditoria SHAP S3*](figures/equipo2_live_02_dashboard_s3_star_auditoria_shap.png)
+
+**Figura 7**  
+*Sala 3 en Vivo — Coordinación Interprovincial $\text{S2}$: Evolución 2014–2024, Ejecución PAN vs. DCI y Alertas Sectoriales (`:8501`)*
+
+![Figura 7: Sala 3 Dashboard Coordinacion Redes S2](figures/equipo2_live_03_dashboard_s2_coordinacion_redes.png)
+
+**Figura 8**  
+*Sala 4 en Vivo — Canal Algedónico $\text{S5}$, Curva ROC (`AUC = 0,9993`), Exactitud Provincial y Registro de Cargas `SHA-256` (`:8501`)*
+
+![Figura 8: Sala 4 Dashboard Canal Algedonico S5 y ODS](figures/equipo2_live_04_dashboard_s5_canal_algedonico_ods.png)
+
+**Figura 9**  
+*Sala 5 en Vivo — Modelo Axiológico de Parra Luna (PRVU e $\text{ISDH}_{\text{HVC}}$ sobre PostgreSQL 16, `:8501`)*
+
+![Figura 9: Sala 5 Dashboard Modelo Axiologico Parra Luna](figures/equipo2_live_08_dashboard_s4_parra_luna.png)
+
+**Figura 10**  
+*Microservicio REST FastAPI en Vivo (`:8000/docs`) con las 6 Herramientas del Agente Supervisor y Endpoints de Evaluación*
+
+![Figura 10: FastAPI Swagger 6 Herramientas](figures/equipo2_live_05_fastapi_swagger_6_tools.png)
+
+**Figura 11**  
+*Orquestador Agéntico `n8n` en Vivo (`:5678`) — Ciclo del Agente Supervisor $\text{S4}$, Ollama/Gemini y las 3 Reglas Fijas MSV*
+
+![Figura 11: Orquestador n8n SentinelNutri-HVC](figures/equipo2_live_06_n8n_orchestrator.png)
+
+**Figura 12**  
+*Ejecución Verificada en Vivo del Flujo en `n8n` (`:5678`) hacia Canal Algedónico $\text{S5}$ y Compuerta Humana HITL $\text{S3}$*
+
+![Figura 12: Ejecucion en Vivo Flujo n8n](figures/equipo2_live_07_n8n_trial_run.png)
 
 Adicionalmente, el **ensayo de demostración End-to-End en vivo sobre red local** ejecutado desde el Equipo 1 contra el Equipo 2 (`python scripts/ensayo_flujo_e2e.py --host 192.168.1.6`) completó las **7 etapas en $53,94\text{ s}$**: validación de los 4 servicios de infraestructura, ingesta `weekly_watch` de 6 portales (`Tool 1`), consulta de $1\,100$ registros (`Tool 2`), inferencia `CatBoost` en $10,89\text{ s}$ (`Tool 3`), explicación SHAP para `Huachocolpa` y `Nuevo Occoro` (`Tool 4`), bloqueo de datos nominales `HTTP 422` y redacción en vivo con **`gemini-flash-lite-latest`** incluyendo conmutación automática por failover cuando `Ollama` excedió el umbral (`Tool 5`), despacho directo `S5_ALGEDONICO` (`Alerta ID=26`) y compuerta humana HITL completa `PENDIENTE_APROBACION -> APROBADO_S3` (`Alerta ID=27`).
 
@@ -243,7 +299,14 @@ Los artefactos completos se exportaron en [`data/exports/indicadores_parra_luna_
 | Provincia **Acobamba** (`8`) | $72,32\,\%$ | $74,02\,\%$ | $92,24\,\%$ | $53,64\,\%$ | $47,32\,\%$ | $56,68\,\%$ | $0,1670$ | $1,2121$ | $54,75\,\%$ | $53,00\,\%$ |
 | Provincia **Angaraes** (`12`) | $72,40\,\%$ | $72,08\,\%$ | $93,16\,\%$ | $52,43\,\%$ | $46,37\,\%$ | $60,38\,\%$ | $0,1649$ | $1,2298$ | $53,85\,\%$ | $52,05\,\%$ |
 
-*Nota.* Fuente: cálculo propio sobre `panel_distrital_hvc_2014_2024.csv` ($N=1\,100$) mediante `scripts/generar_parra_luna_hvc.py`. Representación gráfica en [`docs/figures/fig5_perfil_axiologico_parra_luna_hvc.png`](figures/fig5_perfil_axiologico_parra_luna_hvc.png).
+*Nota.* Fuente: cálculo propio sobre `panel_distrital_hvc_2014_2024.csv` ($N=1\,100$) mediante `scripts/generar_parra_luna_hvc.py`. Representación gráfica en alta resolución en la Figura 13.
+
+**Figura 13**  
+*Perfil Axiológico PRVU Comparado (`2014–2024` y Brecha $\text{S5}$) y Grado de Desarrollo Sistémico Nutricional ($\text{ISDH}_{\text{HVC}} = Y/X$) por Provincia*
+
+![Figura 13: Perfil Axiologico PRVU e ISDH-HVC Parra Luna](figures/fig5_perfil_axiologico_parra_luna_hvc.png)
+
+*Nota.* Elaboración propia a partir de Parra Luna (2017, 2018) sobre el panel histórico `2014–2024` ($N=1\,100$). Archivo de alta resolución (`300 DPI`): [`fig5_perfil_axiologico_parra_luna_hvc.png`](figures/fig5_perfil_axiologico_parra_luna_hvc.png).
 
 Cuatro conclusiones cibernéticas y axiológicas se desprenden directamente de la **Tabla 8**:
 
