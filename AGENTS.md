@@ -27,6 +27,8 @@ Este archivo es leído automáticamente por Antigravity en cada sesión y turno 
 - `PENDIENTES_POR_FASE_EQUIPOS.md`: Checklist detallado por fases (Semanas 2 a 7) separado por `[EQUIPO 1]`, `[EQUIPO 1 -> COLAB]` y `[EQUIPO 2]`.
 - `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md`: Redacción académica completa en formato APA 7 de los Capítulos 5, 6 y 7 con tablas de métricas, valores SHAP, distritos críticos S5 y alineación PEI/ODS.
 - `docs/GUIA_PASO_A_PASO_EQUIPO1_Y_EQUIPO2.md`: Guía operativa con enlaces directos a Google Colab y comandos para Equipo 2.
+- `docs/arquitectura_sentinelnutri_hvc.html` y `docs/figures/arquitectura_sentinelnutri_hvc*.png`: Diagrama dual de arquitectura generado con `stack-diagram` (claro/oscuro).
+- `entregables/articulo/SentinelNutri_HVC_Articulo_APA_7.{docx,pdf}` y `entregables/fuentes/`: Artículo técnico actualizado en APA 7 (28 pp.) con arquitectura, avances reales, modelo axiológico de Parra Luna y capturas en vivo de Telegram.
 
 ---
 
@@ -151,6 +153,7 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-12 | `cbda0d1` / `165e0ee` | Migración de herramientas n8n a `toolCode` + `AI Agent v3.1` (`needsFallback: true`), `"direccion" -> "efecto"` en Tool 3 SHAP (`privacy_guard`), y compactación de salidas Tool 2–3. |
 | 2026-11-12 | `bb9bb0e` | Ensayo E2E LAN completo exitoso (`53.94 s` con `gemini-flash-lite-latest` en vivo) y actualización de `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md` con sustento estadístico de indicadores actuales y hoja de ruta Parra Luna. |
 | 2026-11-22 | `4d2f72a` / `cac1cb3` | Integración completa del Modelo Axiológico de Parra Luna (`parra_luna_axiological.py`, `GET /evaluation/parra_luna`, Sala 5 en Streamlit `:8501`, `fig5` 300 DPI, captura en vivo `equipo2_live_08`, Sección 7.5 del informe y suite `23/23 PASS`). |
+| 2026-11-23 | `Equipo 1` | Pull de Equipo 2 (`ad3f348`: Telegram `equipo2_live_09..11`), diagrama de arquitectura `stack-diagram` (`docs/arquitectura_sentinelnutri_hvc.html` + PNGs) y actualización completa del artículo APA 7 (`entregables/articulo/SentinelNutri_HVC_Articulo_APA_7.{docx,pdf}`, 28 pp.). |
 
 ### Pendientes Reales del Equipo 2
 - [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`).

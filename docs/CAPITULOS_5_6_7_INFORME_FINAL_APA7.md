@@ -2,7 +2,7 @@
 
 **Proyecto:** SentinelNutri-HVC: Sistema Inteligente de Alerta Temprana para el Sistema 4 del MSV, Región Huancavelica  
 **Curso:** Modelo de Sistema Viable (MSV) — FIIS UNI  
-**Autor:** Elvis Arboleda  
+**Autor:** Elvis Arboleda, Steven Cadillo, Cheddi Gastiaburu, Gary Fernandez  
 **Docente:** Ing. Ricardo Rodríguez-Ulloa  
 **Corte de avance técnico:** 22 de noviembre de 2026 (integración del Modelo Axiológico de Parra Luna sobre `panel_distrital_hvc_2014_2024.csv`)  
 
