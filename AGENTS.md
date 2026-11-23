@@ -118,7 +118,7 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 - `data/exports/panel_distrital_hvc_2014_2024.csv`: Panel histórico consolidado de `1 100` registros (100 distritos × 11 años × 24 columnas), listo para subir a Google Colab.
 - `data/exports/metrics_report.json`: Reporte completo de validación ($\text{AUC-ROC} = 0,9993 \ge 0,90$, $\text{F1} = 0,8917$, matriz de confusión, importancia global SHAP y resumen de las 7 provincias S2).
 - `data/exports/matriz_gobernanza_oei_ods_hvc.csv`: Matriz de los 100 distritos con proyección DCI, canal MSV (`S5_ALGEDONICO` vs `S3_CONTROL`), factor SHAP principal, recomendaciones sectoriales (Salud, Agua, Agricultura) y vinculación con los **OEI del PEI 2020–2027** y **ODS 2, 3 y 6**.
-- `docs/figures/`: 5 figuras académicas en `300 DPI` (`fig1` a `fig5_perfil_axiologico_parra_luna_hvc.png`) + 8 capturas en vivo del Equipo 2 (`equipo2_live_01_*` a `equipo2_live_08_dashboard_s4_parra_luna.png`) listas para los Capítulos 5, 6 y 7 del informe.
+- `docs/figures/`: 5 figuras académicas en `300 DPI` (`fig1` a `fig5_perfil_axiologico_parra_luna_hvc.png`) + 11 capturas en vivo del Equipo 2 (`equipo2_live_01_*` a `equipo2_live_11_telegram_*`, incluyendo las 5 Salas Streamlit, FastAPI, n8n y Telegram S5/HITL S3) listas para los Capítulos 5, 6 y 7 del informe.
 - `data/exports/indicadores_parra_luna_hvc_2024.csv` y `data/exports/resumen_parra_luna_hvc.json`: Perfil axiológico PRVU e $\text{ISDH}_{\text{HVC}}$ de los 100 distritos (`2014–2024`, generados por `scripts/generar_parra_luna_hvc.py`).
 
 ---

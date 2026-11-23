@@ -27,7 +27,8 @@ def embed_images_as_data_uri(md_text: str, base_dir: Path) -> str:
             return match.group(0)
         b64 = base64.b64encode(img_file.read_bytes()).decode("ascii")
         ext = img_file.suffix.lstrip(".").lower() or "png"
-        return f"![{alt}](data:image/{ext};base64,{b64})"
+        mime = "jpeg" if ext in ("jpg", "jpeg") else ext
+        return f"![{alt}](data:image/{mime};base64,{b64})"
 
     return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", _repl, md_text)
 

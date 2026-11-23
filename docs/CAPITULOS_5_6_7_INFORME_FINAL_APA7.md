@@ -202,7 +202,7 @@ La matriz completa de los 100 distritos exportada en [`data/exports/matriz_gober
 
 ### 7.4. Evidencia Operativa en Vivo y Ensayo End-to-End (Equipo 1 $\leftrightarrow$ Equipo 2 LAN)
 
-Las capturas en vivo (`1920×1080`) tomadas directamente sobre los servicios encapsulados en Docker en el **Equipo 2 (`DESKTOP-H3C8P9R`, PostgreSQL 16 + FastAPI `:8000` + n8n `:5678` + Streamlit `:8501` + Ollama Vulkan GTX 1050 `:11434`)** evidencian el funcionamiento real del sistema (Figuras 5 a 12):
+Las capturas en vivo (`1920×1080` y evidencia directa del bot `@SentinelNutriHVC_Bot` en Telegram) tomadas sobre los servicios encapsulados en Docker en el **Equipo 2 (`DESKTOP-H3C8P9R`, PostgreSQL 16 + FastAPI `:8000` + n8n `:5678` + Streamlit `:8501` + Ollama Vulkan GTX 1050 `:11434`)** evidencian el funcionamiento real del sistema (Figuras 5 a 15):
 
 **Figura 5**  
 *Sala 1 en Vivo — Homeostato $\text{S3–S4}$: Balance Provincial, Mapa Territorial de los 100 Distritos y Tabla de Riesgo (`:8501`)*
@@ -243,6 +243,21 @@ Las capturas en vivo (`1920×1080`) tomadas directamente sobre los servicios enc
 *Ejecución Verificada en Vivo del Flujo en `n8n` (`:5678`) hacia Canal Algedónico $\text{S5}$ y Compuerta Humana HITL $\text{S3}$*
 
 ![Figura 12: Ejecucion en Vivo Flujo n8n](figures/equipo2_live_07_n8n_trial_run.png)
+
+**Figura 13**  
+*Evidencia en Vivo en Telegram (`SentinelNutri HVC Alertas`) — Señal Algedónica Directa $\text{S1/S4} \rightarrow \text{S5}$ para Santa Ana (`090411`, DCI Proyectada $29,29\,\%$)*
+
+![Figura 13: Telegram Senal Algedonica S5 Santa Ana](figures/equipo2_live_09_telegram_s5_santa_ana.jpg)
+
+**Figura 14**  
+*Evidencia en Vivo en Telegram — Despacho Automático desde `n8n` hacia $\text{S5}$ y Compuerta de Aprobación Humana HITL $\text{S4} \rightarrow \text{S3}$ con Botones `Approve` / `Decline`*
+
+![Figura 14: Telegram Despacho n8n S5 y Compuerta HITL S3](figures/equipo2_live_10_telegram_n8n_s5_y_hitl_s3.jpg)
+
+**Figura 15**  
+*Evidencia en Vivo en Telegram — Botones HITL $\text{S3}$ y Señal Algedónica $\text{S5}$ con Explicabilidad SHAP Cuantitativa para Huachocolpa (`090106`, DCI Proyectada $25,65\,\%$)*
+
+![Figura 15: Telegram HITL S3 y Senal Algedonica S5 Huachocolpa](figures/equipo2_live_11_telegram_s5_huachocolpa_hitl.jpg)
 
 Adicionalmente, el **ensayo de demostración End-to-End en vivo sobre red local** ejecutado desde el Equipo 1 contra el Equipo 2 (`python scripts/ensayo_flujo_e2e.py --host 192.168.1.6`) completó las **7 etapas en $53,94\text{ s}$**: validación de los 4 servicios de infraestructura, ingesta `weekly_watch` de 6 portales (`Tool 1`), consulta de $1\,100$ registros (`Tool 2`), inferencia `CatBoost` en $10,89\text{ s}$ (`Tool 3`), explicación SHAP para `Huachocolpa` y `Nuevo Occoro` (`Tool 4`), bloqueo de datos nominales `HTTP 422` y redacción en vivo con **`gemini-flash-lite-latest`** incluyendo conmutación automática por failover cuando `Ollama` excedió el umbral (`Tool 5`), despacho directo `S5_ALGEDONICO` (`Alerta ID=26`) y compuerta humana HITL completa `PENDIENTE_APROBACION -> APROBADO_S3` (`Alerta ID=27`).
 
@@ -299,12 +314,12 @@ Los artefactos completos se exportaron en [`data/exports/indicadores_parra_luna_
 | Provincia **Acobamba** (`8`) | $72,32\,\%$ | $74,02\,\%$ | $92,24\,\%$ | $53,64\,\%$ | $47,32\,\%$ | $56,68\,\%$ | $0,1670$ | $1,2121$ | $54,75\,\%$ | $53,00\,\%$ |
 | Provincia **Angaraes** (`12`) | $72,40\,\%$ | $72,08\,\%$ | $93,16\,\%$ | $52,43\,\%$ | $46,37\,\%$ | $60,38\,\%$ | $0,1649$ | $1,2298$ | $53,85\,\%$ | $52,05\,\%$ |
 
-*Nota.* Fuente: cálculo propio sobre `panel_distrital_hvc_2014_2024.csv` ($N=1\,100$) mediante `scripts/generar_parra_luna_hvc.py`. Representación gráfica en alta resolución en la Figura 13.
+*Nota.* Fuente: cálculo propio sobre `panel_distrital_hvc_2014_2024.csv` ($N=1\,100$) mediante `scripts/generar_parra_luna_hvc.py`. Representación gráfica en alta resolución en la Figura 16.
 
-**Figura 13**  
+**Figura 16**  
 *Perfil Axiológico PRVU Comparado (`2014–2024` y Brecha $\text{S5}$) y Grado de Desarrollo Sistémico Nutricional ($\text{ISDH}_{\text{HVC}} = Y/X$) por Provincia*
 
-![Figura 13: Perfil Axiologico PRVU e ISDH-HVC Parra Luna](figures/fig5_perfil_axiologico_parra_luna_hvc.png)
+![Figura 16: Perfil Axiologico PRVU e ISDH-HVC Parra Luna](figures/fig5_perfil_axiologico_parra_luna_hvc.png)
 
 *Nota.* Elaboración propia a partir de Parra Luna (2017, 2018) sobre el panel histórico `2014–2024` ($N=1\,100$). Archivo de alta resolución (`300 DPI`): [`fig5_perfil_axiologico_parra_luna_hvc.png`](figures/fig5_perfil_axiologico_parra_luna_hvc.png).
 
