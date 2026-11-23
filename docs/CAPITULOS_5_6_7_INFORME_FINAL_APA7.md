@@ -52,7 +52,7 @@ Antes de evaluar en la siguiente etapa el marco de indicadores sistémicos de Pa
 | **4. Protección (`MIDIS`)** | `cobertura_cuna_mas_pct` (%) | $56,90 \pm 5,06$ | $38,50 - 66,46$ | $-0,272$ | $65,58\,\%$ vs $63,81\,\%$ ($+1,77\text{ pp}$) |
 | **4. Escolar (`MIDIS`)** | `cobertura_qali_warma_pct` (%) | $89,00 \pm 3,16$ | $84,00 - 94,00$ | $-0,611$ | $94,00\,\%$ vs $94,00\,\%$ ($0,00\text{ pp}$) |
 | **5. Climática (`SENAMHI`)** | `dias_heladas_anual` (días/año) | $69,17 \pm 26,66$ | $23,00 - 160,00$ | $+0,560$ | **$121,60$ vs $66,15$** ($+55,45\text{ d}$) |
-| **5. Climática (`SENAMHI`)** | `temp_minima_promedio_c` (°C) | $2,02 \pm 1,87$ | $-4,31 - 5,20$ | $-0,559$ | **$-1,81\,^\circ\text{C}$ vs $+2,23\,^\circ\text{C}$** ($-4,04\,^\circ\text{C}$) |
+| **5. Climática (`SENAMHI`)** | `temp_minima_promedio_c` (°C) | $2,02 \pm 1,87$ | $-4,31 - 5,20$ | $-0,559$ | **$-1,81^{\circ}\text{C}$ vs $+2,23^{\circ}\text{C}$** ($-4,04^{\circ}\text{C}$) |
 | **5. Climática (`SENAMHI`)** | `precipitacion_anual_mm` (mm) | $800,42 \pm 58,92$ | $599,10 - 915,00$ | $-0,340$ | $669,48$ vs $806,39$ ($-136,91\text{ mm}$) |
 | **5. Geográfica (`INEI`)** | `altitud_msnm` (m s. n. m.) | $3\,273,39 \pm 439,24$ | $1\,916 - 4\,473$ | $+0,504$ | **$4\,152,6$ vs $3\,227,1$** ($+925,5\text{ m}$) |
 

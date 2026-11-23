@@ -47,66 +47,78 @@ def main() -> None:
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <style>
     @page {{
-      size: A4;
-      margin: 20mm 18mm 20mm 18mm;
+      size: letter;
+      margin: 25.4mm 25.4mm 25.4mm 25.4mm;
     }}
     body {{
-      font-family: "Times New Roman", Georgia, "Liberation Serif", serif;
-      font-size: 10.5pt;
-      line-height: 1.48;
-      color: #1a1a1a;
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 12pt;
+      line-height: 2.0;
+      color: #000000;
+      background: #ffffff;
       max-width: 100%;
       margin: 0;
     }}
     h1 {{
-      font-size: 16pt;
-      color: #0f2c59;
-      border-bottom: 2px solid #0f2c59;
-      padding-bottom: 6px;
-      margin-top: 0;
+      font-size: 12pt;
+      font-weight: bold;
+      text-align: center;
+      color: #000000;
+      margin: 0 0 12pt 0;
     }}
     h2 {{
-      font-size: 13.5pt;
-      color: #0f4c81;
-      margin-top: 22px;
+      font-size: 12pt;
+      font-weight: bold;
+      text-align: center;
+      color: #000000;
+      margin-top: 18pt;
+      margin-bottom: 6pt;
       page-break-after: avoid;
     }}
     h3 {{
-      font-size: 11.5pt;
-      color: #1b3a57;
-      margin-top: 16px;
+      font-size: 12pt;
+      font-weight: bold;
+      text-align: left;
+      color: #000000;
+      margin-top: 14pt;
+      margin-bottom: 4pt;
       page-break-after: avoid;
     }}
     h4 {{
-      font-size: 10.5pt;
-      color: #2c3e50;
-      margin-top: 12px;
+      font-size: 12pt;
+      font-weight: bold;
+      font-style: italic;
+      text-align: left;
+      color: #000000;
+      margin-top: 12pt;
+      margin-bottom: 4pt;
       page-break-after: avoid;
     }}
     p {{
-      text-align: justify;
-      margin: 6px 0 9px 0;
+      text-align: left;
+      margin: 0 0 8pt 0;
     }}
     ul, ol {{
-      margin: 6px 0 10px 0;
-      padding-left: 22px;
+      margin: 4pt 0 10pt 0;
+      padding-left: 24pt;
     }}
     li {{
-      margin-bottom: 4px;
+      margin-bottom: 3pt;
     }}
     code {{
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 9pt;
-      background: #f4f6f8;
-      padding: 1px 4px;
-      border-radius: 3px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+      background: transparent;
+      color: #000000;
+      padding: 0;
     }}
     table {{
       width: 100%;
       border-collapse: collapse;
-      margin: 10px 0 14px 0;
-      font-size: 8.6pt;
-      line-height: 1.3;
+      margin: 10pt 0 14pt 0;
+      font-size: 9.5pt;
+      line-height: 1.35;
+      color: #000000;
       page-break-inside: auto;
     }}
     thead {{
@@ -116,43 +128,44 @@ def main() -> None:
       page-break-inside: avoid;
     }}
     th {{
-      border-top: 1.5px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-      background: #f3f6fa;
-      padding: 5px 6px;
+      border-top: 1.2pt solid #000000;
+      border-bottom: 0.8pt solid #000000;
+      background: #ffffff;
+      color: #000000;
+      padding: 5pt 5pt;
       text-align: left;
       font-weight: bold;
     }}
     td {{
-      border-bottom: 0.5px solid #d5dbe3;
-      padding: 4px 6px;
+      border: none;
+      padding: 4pt 5pt;
       vertical-align: top;
+      color: #000000;
     }}
     tbody tr:last-child td {{
-      border-bottom: 1.5px solid #1a1a1a;
+      border-bottom: 1.2pt solid #000000;
     }}
     img {{
       display: block;
       max-width: 100%;
-      max-height: 130mm;
+      max-height: 125mm;
       width: auto;
       height: auto;
-      margin: 8px auto 6px auto;
-      border: 0.6px solid #cfd8dc;
-      border-radius: 3px;
+      margin: 8pt auto 6pt auto;
+      border: 0.5pt solid #000000;
       page-break-inside: avoid;
     }}
     hr {{
       border: none;
-      border-top: 1px solid #cfd8dc;
-      margin: 14px 0;
+      border-top: 0.8pt solid #000000;
+      margin: 12pt 0;
     }}
     a {{
-      color: #0f4c81;
+      color: #000000;
       text-decoration: none;
     }}
     .katex-display {{
-      margin: 10px 0;
+      margin: 10pt 0;
       overflow-x: auto;
     }}
   </style>
@@ -208,6 +221,10 @@ def main() -> None:
             page.wait_for_function("window.__RENDER_DONE__ === true", timeout=30000)
             page.wait_for_timeout(1500)
             img_count = page.locator("img").count()
+            katex_errors = page.locator(".katex-error").count()
+            if katex_errors:
+                bad = [page.locator(".katex-error").nth(i).inner_text() for i in range(katex_errors)]
+                raise RuntimeError(f"KaTeX render errors ({katex_errors}): {bad}")
             page.pdf(
                 path=str(PDF_PATH),
                 format="A4",
