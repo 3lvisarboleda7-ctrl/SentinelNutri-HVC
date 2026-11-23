@@ -68,7 +68,7 @@ Este archivo es leído automáticamente por Antigravity en cada sesión y turno 
     - **Regla Fija 3 (`can_publish_to_s3_control`):** Requiere estado `APROBADO_S3` (aprobación humana por Telegram/Gmail) antes de publicar en el **Canal de Control S3 (GRDS)**.
   - `privacy_guard.py`: Guardarraíl **Ley N.º 29733** (`sanitize_district_payload_for_llm`); bloquea cualquier campo nominal (`dni`, `nombres`, `historia_clinica`, etc.) antes de llamar al LLM.
   - `scraping_ethics.py`: Verificador de `robots.txt`, validación de `User-Agent` académico FIIS-UNI y cálculo de huella digital `SHA-256` (`compute_sha256_hash`, `has_file_changed`).
-  - `parra_luna_axiological.py`: Modelo Axiológico de Francisco Parra Luna (2017, 2018) adaptado a 6 dimensiones del PRVU (`S`, `RM`, `Se`, `CO`, `JD`, `CN`) y denominador transformador $X = 1 + (100 - \text{Ejec. PAN})/100$ ($\text{ISDH}_{\text{HVC}} = Y/X$, aritmético y geométrico + desequilibrio $\sigma_Y$).
+  - `parra_luna_axiological.py`: Modelo Axiológico de Francisco Parra Luna (2017, 2018) adaptado a 6 dimensiones del PRVU (`S`, `RM`, `Se`, `CO`, `JD`, `CN`), denominador transformador $X = 1 + (100 - \text{Ejec. PAN})/100$ ($\text{ISDH}_{\text{HVC}} = Y/X$, aritmético y geométrico + desequilibrio $\sigma_Y$) y **Regla Fija 4 determinista** (`evaluate_axiological_governance_rule`: clasificación de equilibrio axiológico, detección de espejismo asistencial, alerta temprana pre-algedónica, brecha de horizontalización y mapeo de cuello de botella PRVU a OEI/ODS).
 - **Puertos Hexagonales (`domain/ports/`):**
   - `repository_port.py`, `scraper_port.py`, `predictor_port.py`.
 
@@ -100,7 +100,7 @@ Mapeadas 1 a 1 con la **Tabla 5** del documento de perfil:
 
 ### Capa 4: Interfaces, Workflows n8n, Colab y Despliegue
 - **API FastAPI (`src/sentinelnutri/interfaces/api/main.py`):**
-  - Endpoints: `/health`, `/predict`, `/tools/extraer_fuentes`, `/tools/consultar_bd`, `/tools/predecir_riesgo`, `/tools/explicar_riesgo/{ubigeo}`, `/tools/redactar_informe`, `/tools/notificar`, `/hitl/aprobar/{alert_id}`, `/evaluation/metrics`, `/evaluation/parra_luna`.
+  - Endpoints (`13` rutas OpenAPI): `/health`, `/predict`, `/tools/extraer_fuentes`, `/tools/consultar_bd`, `/tools/predecir_riesgo`, `/tools/explicar_riesgo/{ubigeo}`, `/tools/redactar_informe`, `/tools/notificar`, `/hitl/aprobar/{alert_id}`, `/evaluation/metrics`, `/evaluation/parra_luna`, `/evaluation/parra_luna/{ubigeo}`, `/governance/audit`.
 - **Dashboard Streamlit (`src/sentinelnutri/interfaces/dashboard/`):**
   - `app.py` y multipágina en `pages/`: `01_S4_S3_Homeostato.py`, `02_S3_Star_Auditoria_SHAP.py`, `03_S2_Coordinacion_Redes.py`, `04_S5_Canal_Algedonico_ODS.py`, `05_S4_Modelo_Axiologico_Parra_Luna.py`.
 - **Flujos n8n (`workflows_n8n/`):**
@@ -154,13 +154,14 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-12 | `bb9bb0e` | Ensayo E2E LAN completo exitoso (`53.94 s` con `gemini-flash-lite-latest` en vivo) y actualización de `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md` con sustento estadístico de indicadores actuales y hoja de ruta Parra Luna. |
 | 2026-11-22 | `4d2f72a` / `cac1cb3` | Integración completa del Modelo Axiológico de Parra Luna (`parra_luna_axiological.py`, `GET /evaluation/parra_luna`, Sala 5 en Streamlit `:8501`, `fig5` 300 DPI, captura en vivo `equipo2_live_08`, Sección 7.5 del informe y suite `23/23 PASS`). |
 | 2026-11-23 | `Equipo 1` | Pull de Equipo 2 (`ad3f348`: Telegram `equipo2_live_09..11`), diagrama de arquitectura `stack-diagram` (`docs/arquitectura_sentinelnutri_hvc.html` + PNGs) y actualización completa del artículo APA 7 (`entregables/articulo/SentinelNutri_HVC_Articulo_APA_7.{docx,pdf}`, 28 pp.). |
+| 2026-11-23 | `Equipo 2` | Mejoras de Reglas Axiológicas (**Regla Fija 4**: equilibrio axiológico, espejismo asistencial, alerta pre-algedónica, cuellos de botella PRVU -> OEI/ODS), Gobernanza (`SHA-256` en alertas/HITL, sanitización salida LLM Ley 29733, `GET /evaluation/parra_luna/{ubigeo}`, `GET /governance/audit`), Arquitectura (`export_parra_luna_artifacts` DRY, caché en Salas 2/4, Sala 5 enriquecida, `03_setup_cloudflare_tunnel.ps1 -QuickTunnel`), suite `24/24 PASS` e informe APA 7 PDF regenerado. |
 
 ### Pendientes Reales del Equipo 2
 - [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`).
 - [x] Ollama GPU GTX 1050 operativo con autostart en Windows 10.
 - [x] Workflows n8n operativos y conmutación LLM verificada.
 - [x] Credenciales configuradas en vivo (`GEMINI_API_KEY` y `TELEGRAM_BOT_TOKEN`).
-- [ ] Cloudflare Tunnel opcional (`CLOUDFLARE_TUNNEL_TOKEN`, para acceso fuera de la red local).
+- [ ] Cloudflare Named Tunnel permanente (`CLOUDFLARE_TUNNEL_TOKEN` + dominio propio en Zero Trust; Quick Tunnel automatizado vía `03_setup_cloudflare_tunnel.ps1 -QuickTunnel`).
 
 ---
 

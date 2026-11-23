@@ -31,6 +31,11 @@ class Tool5RedactarInformeUseCase:
         dci_proyectada = float(safe_context.get("dci_proyectada_pct", 20.3))
         dci_actual = float(safe_context.get("dci_actual_pct", 20.0))
         top_shap = safe_context.get("contribuciones_shap_ordenadas") or safe_context.get("top_factores_shap") or []
+        axiological_ctx = (
+            safe_context.get("perfil_axiologico")
+            or safe_context.get("axiological_decision")
+            or safe_context.get("diagnostico_axiologico_parra_luna")
+        )
 
         route_decision = evaluate_fixed_algedonic_rule(ubigeo=ubigeo, dci_proyectada_pct=dci_proyectada)
 
@@ -63,18 +68,34 @@ class Tool5RedactarInformeUseCase:
                 )
             )
         ):
-            sintesis = custom_llm_output["sintesis_narrativa_s4"]
-            rec_salud = custom_llm_output["recomendacion_salud"]
-            rec_agua = custom_llm_output["recomendacion_agua_saneamiento"]
-            rec_agro = custom_llm_output["recomendacion_agricultura_midis"]
+            # Defensa en profundidad Ley N.° 29733: sanitizar también la salida textual del LLM
+            clean_llm = sanitize_district_payload_for_llm(custom_llm_output, strict=False)
+            sintesis = str(clean_llm["sintesis_narrativa_s4"])
+            rec_salud = str(clean_llm["recomendacion_salud"])
+            rec_agua = str(clean_llm["recomendacion_agua_saneamiento"])
+            rec_agro = str(clean_llm["recomendacion_agricultura_midis"])
         else:
             if custom_llm_output is not None:
                 used_provider = "fallback-determinista-msv (JSON LLM incompleto recuperado)"
+            axiological_note = ""
+            if isinstance(axiological_ctx, dict) and axiological_ctx.get("estado_equilibrio_axiologico"):
+                cuello = axiological_ctx.get("cuello_de_botella_prvu", "N/A")
+                estado_ax = axiological_ctx.get("estado_equilibrio_axiologico")
+                espejismo_txt = (
+                    " con alerta de espejismo asistencial"
+                    if axiological_ctx.get("espejismo_asistencial_detectado") or axiological_ctx.get("espejismo_asistencial")
+                    else ""
+                )
+                axiological_note = (
+                    f" Bajo la Regla Fija 4 (Parra Luna), el distrito exhibe {estado_ax}{espejismo_txt} "
+                    f"(cuello de botella PRVU: {cuello})."
+                )
             sintesis = (
                 f"[S4 · Inteligencia Prospectiva] El distrito de {distrito} (Provincia de {provincia}, "
                 f"Ubigeo {ubigeo}) registra una DCI actual de {dci_actual:.1f} % y una proyección de "
                 f"{dci_proyectada:.1f} % ({route_decision.canal_obligatorio.value}). "
                 f"La auditoría XAI (SHAP - S3*) identifica como determinantes principales: {factores_texto}."
+                f"{axiological_note}"
             )
             rec_salud = (
                 f"[Sector Salud · DIRESA / Red de Salud {provincia} - OEI.01 y OEI.03] "
@@ -111,27 +132,31 @@ class Tool5RedactarInformeUseCase:
             estado_aprobacion_humana=ApprovalStatus.PENDIENTE_APROBACION,
         )
 
+        informe_dict: Dict[str, Any] = {
+            "ubigeo": report.ubigeo,
+            "provincia": report.provincia,
+            "distrito": report.distrito,
+            "dci_proyectada_pct": report.dci_proyectada_pct,
+            "canal_destino": report.canal_destino.value,
+            "sintesis_narrativa_s4": report.sintesis_narrativa_s4,
+            "recomendaciones_sectoriales": {
+                "salud_diresa": report.recomendacion_salud,
+                "agua_saneamiento_drvcs": report.recomendacion_agua_saneamiento,
+                "agricultura_midis_mef": report.recomendacion_agricultura_midis,
+            },
+            "alineacion_estrategica": {
+                "pei_gore_huancavelica_2020_2027": report.oei_pei_vinculados,
+                "agenda_2030_ods": report.ods_vinculados,
+            },
+            "estado_aprobacion_humana": report.estado_aprobacion_humana.value,
+        }
+        if isinstance(axiological_ctx, dict) and axiological_ctx:
+            informe_dict["diagnostico_axiologico_parra_luna"] = axiological_ctx
+
         return {
             "tool": "redactar_informe",
             "cumplimiento_ley_29733": "VERIFICADO_SOLO_INDICADORES_AGREGADOS",
             "proveedor_llm_utilizado": report.proveedor_llm,
-            "informe": {
-                "ubigeo": report.ubigeo,
-                "provincia": report.provincia,
-                "distrito": report.distrito,
-                "dci_proyectada_pct": report.dci_proyectada_pct,
-                "canal_destino": report.canal_destino.value,
-                "sintesis_narrativa_s4": report.sintesis_narrativa_s4,
-                "recomendaciones_sectoriales": {
-                    "salud_diresa": report.recomendacion_salud,
-                    "agua_saneamiento_drvcs": report.recomendacion_agua_saneamiento,
-                    "agricultura_midis_mef": report.recomendacion_agricultura_midis,
-                },
-                "alineacion_estrategica": {
-                    "pei_gore_huancavelica_2020_2027": report.oei_pei_vinculados,
-                    "agenda_2030_ods": report.ods_vinculados,
-                },
-                "estado_aprobacion_humana": report.estado_aprobacion_humana.value,
-            },
+            "informe": informe_dict,
         }
 

@@ -1,4 +1,4 @@
-"""Reglas Fijas Cibernéticas, Privacidad Ley N.° 29733 y Ética de Extracción."""
+"""Reglas Fijas Cibernéticas, Regla Axiológica Parra Luna, Privacidad Ley N.° 29733 y Ética de Extracción."""
 
 from .fixed_thresholds import (
     ALGEDONIC_DCI_THRESHOLD_PCT,
@@ -6,6 +6,15 @@ from .fixed_thresholds import (
     classify_risk_level,
     can_publish_to_s3_control,
     evaluate_fixed_algedonic_rule,
+)
+from .parra_luna_axiological import (
+    AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD,
+    ISDH_GEOM_CRITICAL_THRESHOLD,
+    AxiologicalEquilibriumDecision,
+    DistrictAxiologicalScore,
+    compute_parra_luna_scores,
+    evaluate_axiological_governance_rule,
+    summarize_parra_luna_panel,
 )
 from .privacy_guard import PrivacyViolationError, sanitize_district_payload_for_llm
 from .scraping_ethics import (
@@ -22,6 +31,13 @@ __all__ = [
     "classify_risk_level",
     "evaluate_fixed_algedonic_rule",
     "can_publish_to_s3_control",
+    "AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD",
+    "ISDH_GEOM_CRITICAL_THRESHOLD",
+    "AxiologicalEquilibriumDecision",
+    "DistrictAxiologicalScore",
+    "compute_parra_luna_scores",
+    "evaluate_axiological_governance_rule",
+    "summarize_parra_luna_panel",
     "PrivacyViolationError",
     "sanitize_district_payload_for_llm",
     "DEFAULT_ACADEMIC_USER_AGENT",

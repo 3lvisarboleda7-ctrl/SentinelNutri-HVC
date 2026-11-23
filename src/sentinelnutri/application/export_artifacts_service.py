@@ -23,6 +23,10 @@ from sentinelnutri.application import (
     Tool4ExplicarRiesgoUseCase,
     Tool5RedactarInformeUseCase,
 )
+from sentinelnutri.domain.rules.parra_luna_axiological import (
+    PRVU_DIMENSIONS,
+    summarize_parra_luna_panel,
+)
 from sentinelnutri.infrastructure.ml_xai.catboost_shap_predictor import (
     FEATURE_METADATA,
     CatBoostShapPredictor,
@@ -227,6 +231,125 @@ def generate_academic_figures(
     return generated_files
 
 
+def export_parra_luna_artifacts(
+    panel_rows: List[Dict[str, Any]],
+    s5_ubigeos: List[str],
+    exports_dir: Path = Path("data/exports"),
+    figures_dir: Path = Path("docs/figures"),
+) -> Dict[str, Any]:
+    """
+    Fuente única de verdad (DRY) para exportar los artefactos del Modelo Axiológico de Parra Luna:
+    1. `indicadores_parra_luna_hvc_2024.csv` (100 distritos + Regla Fija 4)
+    2. `resumen_parra_luna_hvc.json` (progreso 2014->2024, S5 vs S3, correlaciones y gobernanza axiológica)
+    3. `fig5_perfil_axiologico_parra_luna_hvc.png` (300 DPI)
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    exports_dir.mkdir(parents=True, exist_ok=True)
+    figures_dir.mkdir(parents=True, exist_ok=True)
+
+    summary = summarize_parra_luna_panel(panel_rows, s5_ubigeos=s5_ubigeos)
+    scores_2024 = summary["scores_2024"]
+    s5_set = set(s5_ubigeos)
+    for row in scores_2024:
+        row["canal_msv"] = "S5_ALGEDONICO" if row["ubigeo"] in s5_set else "S3_CONTROL"
+
+    csv_out = exports_dir / "indicadores_parra_luna_hvc_2024.csv"
+    fieldnames = list(scores_2024[0].keys())
+    with csv_out.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(scores_2024)
+
+    json_out = exports_dir / "resumen_parra_luna_hvc.json"
+    summary_light = {k: v for k, v in summary.items() if k != "scores_2024"}
+    summary_light["total_distritos_2024"] = len(scores_2024)
+    json_out.write_text(json.dumps(summary_light, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    fig_out = figures_dir / "fig5_perfil_axiologico_parra_luna_hvc.png"
+    dim_labels = [
+        "Salud\n(S · y1)",
+        "Riqueza Mat.\n(RM · y2)",
+        "Seguridad Soc.\n(Se · y3)",
+        "Conocimiento\n(CO · y4)",
+        "Justicia Dist.\n(JD · y6)",
+        "Adapt. Natural\n(CN · y7)",
+    ]
+    x = np.arange(len(PRVU_DIMENSIONS))
+
+    g2014 = summary["progreso_longitudinal"]["anio_2014"]
+    g2024 = summary["progreso_longitudinal"]["anio_2024"]
+    gs5 = summary["comparativo_2024_s5_vs_s3"]["distritos_s5_algedonicos"]
+    top1 = summary["top_5_isdh_2024"][0]
+
+    v2014 = [g2014[d] * 100.0 for d in PRVU_DIMENSIONS]
+    v2024 = [g2024[d] * 100.0 for d in PRVU_DIMENSIONS]
+    vs5 = [gs5[d] * 100.0 for d in PRVU_DIMENSIONS]
+    vtop = [
+        top1["y1_salud_S"] * 100.0,
+        top1["y2_riqueza_RM"] * 100.0,
+        top1["y3_seguridad_Se"] * 100.0,
+        top1["y4_conocimiento_CO"] * 100.0,
+        top1["y6_justicia_distributiva_JD"] * 100.0,
+        top1["y7_adaptacion_natural_CN"] * 100.0,
+    ]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13.5, 5.4), dpi=300)
+
+    ax1.plot(x, vtop, marker="^", lw=2.0, linestyle="--", color="#2e7d32", label=f"Líder 2024: {top1['distrito']} (ISDH={top1['isdh_hvc_arit_pct']:.1f}%)")
+    ax1.plot(x, v2024, marker="o", lw=2.6, color="#0f4c81", label=f"Promedio HVC 2024 (ISDH={g2024['ISDH_HVC_arit']*100:.1f}%)")
+    ax1.plot(x, vs5, marker="s", lw=2.3, color="#c62828", label=f"Distritos Algedónicos S5 2024 (n={gs5['n']}, ISDH={gs5['ISDH_HVC_arit']*100:.1f}%)")
+    ax1.plot(x, v2014, marker="d", lw=1.8, linestyle=":", color="#757575", label=f"Línea Base HVC 2014 (ISDH={g2014['ISDH_HVC_arit']*100:.1f}%)")
+
+    for xi, yi in zip(x, v2024):
+        ax1.annotate(f"{yi:.1f}%", (xi, yi), textcoords="offset points", xytext=(0, 7), ha="center", fontsize=7.5, color="#0f4c81", fontweight="bold")
+    for xi, yi in zip(x, vs5):
+        ax1.annotate(f"{yi:.1f}%", (xi, yi), textcoords="offset points", xytext=(0, -12), ha="center", fontsize=7.5, color="#c62828")
+
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(dim_labels, fontsize=8.5)
+    ax1.set_ylim(0, 105)
+    ax1.set_ylabel("Nivel de Realización Axiológica Estándar (%)", fontsize=9)
+    ax1.set_title("A. Perfil Axiológico PRVU (Parra Luna, 2017–2018)\nHuancavelica: Progreso 2014–2024 y Brecha S5", fontsize=10, fontweight="bold")
+    ax1.grid(axis="y", linestyle="--", alpha=0.4)
+    ax1.legend(loc="lower right", fontsize=7.5, frameon=True)
+
+    provs = list(summary["provincias_2024"].keys())
+    isdh_a = [summary["provincias_2024"][p]["ISDH_HVC_arit"] * 100.0 for p in provs]
+    isdh_g = [summary["provincias_2024"][p]["ISDH_HVC_geom"] * 100.0 for p in provs]
+    xp = np.arange(len(provs))
+    w = 0.36
+
+    b1 = ax2.bar(xp - w / 2, isdh_a, width=w, color="#1565c0", label="ISDH-HVC Aritmético (Y_arit / X)")
+    b2 = ax2.bar(xp + w / 2, isdh_g, width=w, color="#00897b", label="ISDH-HVC Geométrico (Y_geom / X)")
+    for bars in (b1, b2):
+        for bar in bars:
+            h = bar.get_height()
+            ax2.annotate(f"{h:.1f}%", (bar.get_x() + bar.get_width() / 2, h), textcoords="offset points", xytext=(0, 3), ha="center", fontsize=7)
+
+    ax2.set_xticks(xp)
+    ax2.set_xticklabels(provs, rotation=22, ha="right", fontsize=8.5)
+    ax2.set_ylim(0, 80)
+    ax2.set_ylabel("Índice Sistémico ISDH-HVC = Y / X (%)", fontsize=9)
+    ax2.set_title("B. Grado de Desarrollo Sistémico Nutricional (T = Y/X)\npor Provincia — Corte 2024 (X = Brecha PAN 0001)", fontsize=10, fontweight="bold")
+    ax2.grid(axis="y", linestyle="--", alpha=0.4)
+    ax2.legend(loc="upper right", fontsize=8)
+
+    fig.tight_layout()
+    fig.savefig(fig_out, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+    return {
+        "indicadores_parra_luna_csv": str(csv_out),
+        "resumen_parra_luna_json": str(json_out),
+        "figura_5_parra_luna": str(fig_out),
+        "summary": summary_light,
+    }
+
+
 def export_all_equipo1_artifacts() -> Dict[str, Any]:
     """Ejecuta la exportación integral de datos, métricas, matriz de gobernanza y figuras XAI en Equipo 1."""
     sync_info = sync_100_districts_sql_and_geojson()
@@ -325,7 +448,7 @@ def export_all_equipo1_artifacts() -> Dict[str, Any]:
                 }
             )
 
-    # 4. Generar las 4 figuras académicas en 300 DPI
+    # 4. Generar las 4 figuras académicas XAI/MSV + Figura 5 Axiológica Parra Luna (300 DPI)
     top_ubigeo = preds_2024[0]["ubigeo"]
     critical_exp = tool4.execute(top_ubigeo)
     figures = generate_academic_figures(
@@ -335,6 +458,14 @@ def export_all_equipo1_artifacts() -> Dict[str, Any]:
         eval_metrics=eval_metrics,
         figures_dir=Path("docs/figures"),
     )
+    s5_ubigeos = [p["ubigeo"] for p in preds_2024 if p["supera_umbral_algedonico_25pct"]]
+    pl_export = export_parra_luna_artifacts(
+        panel_rows=[asdict(rec) for rec in all_series],
+        s5_ubigeos=s5_ubigeos,
+        exports_dir=exports_dir,
+        figures_dir=Path("docs/figures"),
+    )
+    figures.append(pl_export["figura_5_parra_luna"])
 
     return {
         **sync_info,
@@ -342,5 +473,7 @@ def export_all_equipo1_artifacts() -> Dict[str, Any]:
         "total_filas_csv": len(all_series),
         "metrics_json": str(metrics_path),
         "matriz_gobernanza_csv": str(gov_csv_path),
+        "indicadores_parra_luna_csv": pl_export["indicadores_parra_luna_csv"],
+        "resumen_parra_luna_json": pl_export["resumen_parra_luna_json"],
         "figuras_300dpi_generadas": figures,
     }

@@ -1,10 +1,13 @@
 """
 Reglas Fijas del Módulo Agéntico (Figura 1 del Perfil de Proyecto - Recuadros Punteados).
 
-Tres decisiones quedan estrictamente fuera del alcance del modelo de lenguaje (LLM):
+Cuatro decisiones deterministas quedan estrictamente fuera del alcance del modelo de lenguaje (LLM):
 1. La predicción numérica: la calcula CatBoost (/predict) y nunca el LLM.
 2. El disparo del canal algedónico: regla fija determinista (DCI proyectada > 25% -> S5 siempre).
 3. La decisión final hacia S3: requiere aprobación explícita de un responsable humano (HITL).
+4. El equilibrio axiológico PRVU (Parra Luna, 2017, 2018): evaluado de forma determinista en
+   `parra_luna_axiological.evaluate_axiological_governance_rule` (detección de desequilibrio crítico,
+   espejismo asistencial y alertas pre-algedónicas).
 """
 
 from dataclasses import dataclass

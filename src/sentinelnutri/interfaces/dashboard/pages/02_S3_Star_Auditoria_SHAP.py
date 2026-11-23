@@ -5,7 +5,10 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from sentinelnutri.interfaces.dashboard.app import init_services
+from sentinelnutri.interfaces.dashboard.app import (
+    get_cached_evaluation_metrics,
+    init_services,
+)
 
 st.set_page_config(page_title="Auditoría S3* SHAP | SentinelNutri-HVC", page_icon="🔍", layout="wide")
 repo, predictor, _, _, tool4, _, _ = init_services()
@@ -32,6 +35,10 @@ with col_local:
             ha = "left" if val >= 0 else "right"
             offset = 0.04 if val >= 0 else -0.04
             ax_local.text(val + offset, bar.get_y() + bar.get_height() / 2, f"{val:+.2f}", va="center", ha=ha, fontsize=8)
+        min_v = float(df_shap["aporte_shap_puntos_pct"].min())
+        max_v = float(df_shap["aporte_shap_puntos_pct"].max())
+        span = max(1.0, max_v - min_v)
+        ax_local.set_xlim(min(0.0, min_v) - span * 0.22, max(0.0, max_v) + span * 0.22)
         ax_local.set_title(
             f"SHAP Local: {exp['distrito']} (DCI Proyectada: {exp['dci_proyectada_pct']}%)",
             fontsize=9.5,
@@ -44,7 +51,7 @@ with col_local:
         plt.close(fig_local)
 
 with col_global:
-    metrics = predictor.train_and_evaluate(repo.get_historical_series(anio_inicio=2014, anio_fin=2024))
+    metrics = get_cached_evaluation_metrics(repo, predictor)
     global_shap = sorted(metrics["importancia_global_shap"], key=lambda x: x["mean_abs_shap"])
     fig_glob, ax_glob = plt.subplots(figsize=(6.8, 4.3), dpi=130)
     labels = [g["etiqueta"] for g in global_shap]

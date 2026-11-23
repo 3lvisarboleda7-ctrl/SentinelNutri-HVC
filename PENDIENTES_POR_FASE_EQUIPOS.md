@@ -20,7 +20,7 @@
 ## Estado Global de Avance
 
 - [x] **Cimientos de Arquitectura Clean / Hexagonal y Monorepo** (`[EQUIPO 1]` — **Completado**)
-- [x] **Implementación de las 3 Reglas Fijas y Guardarraíl Ley N.º 29733** (`[EQUIPO 1]` — **Completado, blindado con Red-Team QA Fases 1–6 y testeado 22/22**)
+- [x] **Implementación de las 4 Reglas Fijas (incluyendo Regla Fija 4 de Equilibrio Axiológico Parra Luna) y Guardarraíl Ley N.º 29733** (`[EQUIPO 1 / EQUIPO 2]` — **Completado, blindado con Red-Team QA Fases 1–6 y testeado 24/24**)
 - [x] **Esqueleto funcional de las 6 Herramientas del Agente Supervisor en FastAPI** (`[EQUIPO 1]` — **Completado**)
 - [x] **Catálogo de 100 distritos + 6 Scrapers + Exportación CSV/JSON y 4 Figuras XAI (300 DPI)** (`[EQUIPO 1]` — **Completado**)
 - [x] **Fase 3 (Semana 4): Ejecución de los 3 notebooks en Google Colab y modelo `.cbm` integrado** (`[EQUIPO 1 -> COLAB]` — **Completado**)
@@ -127,7 +127,7 @@
 ### FASE 5 (Semana 6 del Cronograma): Cloudflare Tunnel, Aprobación desde Celular y Dashboard Streamlit
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD)]`
-- [ ] *(Opcional cuando se tenga dominio propio)* Crear el túnel gratuito en **Cloudflare Zero Trust** (`Networks -> Tunnels`), copiar el token en `config/.env.equipo2` (`CLOUDFLARE_TUNNEL_TOKEN`) y apuntar el subdominio HTTPS hacia `http://n8n:5678`.
+- [ ] *(Pendiente de dominio propio / Zero Trust)* Crear el túnel nombrado permanente en **Cloudflare Zero Trust** (`Networks -> Tunnels`), copiar el token en `config/.env.equipo2` (`CLOUDFLARE_TUNNEL_TOKEN`) y ejecutar `.\deploy\scripts_equipo2\03_setup_cloudflare_tunnel.ps1` (mientras tanto está automatizado el modo gratuito `.\deploy\scripts_equipo2\03_setup_cloudflare_tunnel.ps1 -QuickTunnel`).
 - [x] Levantar el Dashboard Cibernético Streamlit (`:8501`) conectado a `sentinelnutri_postgres` y FastAPI (`:8000`).
 - [x] Ejecutar y validar el script `.\deploy\scripts_equipo2\04_backup_postgres_to_hdd.ps1` volcando una copia de seguridad completa de PostgreSQL (`2,18 MB`) en el **HDD de 1 TB (`D:\SentinelNutri\hdd\backups\`)**.
 
@@ -152,4 +152,5 @@
 - [x] Ejecutar el ensayo End-to-End en vivo sobre LAN (`Equipo 1 -> Equipo 2 192.168.1.6`, `53,94 s`) con `gemini-flash-lite-latest` real y actualizar [`docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md`](docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md) con el sustento empírico y estadístico de los indicadores actuales (`2014–2024`, $N=1\,100$).
 - [x] Evaluar e integrar la aplicación de los **indicadores sistémicos de Parra Luna** (`parra_luna_axiological.py`, `indicadores_parra_luna_hvc_2024.csv`, `resumen_parra_luna_hvc.json` y `fig5_perfil_axiologico_parra_luna_hvc.png` 300 DPI) sobre el panel consolidado de Huancavelica (`2014–2024`, $\rho = -0,9529$ en corte 2024) y documentar la Sección `7.5` en [`docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md`](docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.md).
 - [x] Generar diagrama técnico de arquitectura dual (`docs/arquitectura_sentinelnutri_hvc.html` + PNGs) y actualizar el artículo técnico en Word y PDF (`entregables/articulo/SentinelNutri_HVC_Articulo_APA_7.pdf`, 28 pp.) incorporando avances reales, Parra Luna y las capturas en vivo de Telegram (`Equipo 1`, commit sincronizado para `Equipo 2`).
+- [x] Implementar mejoras de Arquitectura, Gobernanza y Reglas Axiológicas (`Equipo 2`, 2026-11-23): **Regla Fija 4** (`evaluate_axiological_governance_rule`: 9 distritos críticos, 7 con espejismo asistencial, 6 alertas pre-algedónicas, 97/100 cuellos de botella en `JD`/`CN`), huellas `SHA-256` en alertas y resoluciones HITL (`Tool 6`), sanitización defensiva de salida LLM (`Tool 5`), nuevos endpoints `GET /evaluation/parra_luna/{ubigeo}` y `GET /governance/audit`, servicio DRY `export_parra_luna_artifacts`, mejoras de rendimiento/UX en Salas 2, 4 y 5, automatización `-QuickTunnel` en `03_setup_cloudflare_tunnel.ps1`, suite `24/24 PASS` e informe final APA 7 PDF regenerado.
 

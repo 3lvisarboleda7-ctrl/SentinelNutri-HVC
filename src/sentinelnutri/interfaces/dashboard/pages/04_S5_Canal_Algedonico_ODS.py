@@ -5,13 +5,16 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from sentinelnutri.interfaces.dashboard.app import init_services
+from sentinelnutri.interfaces.dashboard.app import (
+    get_cached_evaluation_metrics,
+    init_services,
+)
 
 st.set_page_config(page_title="Canal Algedónico S5 y Gobernanza | SentinelNutri-HVC", page_icon="🚨", layout="wide")
 repo, predictor, _, _, _, _, _ = init_services()
 
 st.header("🚨 Canal Algedónico Automatizado (S1/S4 → S5) y Marco de Gobernanza (ODS 2, 3 y 6)")
-metrics = predictor.train_and_evaluate(repo.get_historical_series(anio_inicio=2014, anio_fin=2024))
+metrics = get_cached_evaluation_metrics(repo, predictor)
 m_glob = metrics["metricas_globales"]
 
 c1, c2, c3, c4 = st.columns(4)
@@ -57,6 +60,23 @@ with col_prov:
     plt.tight_layout()
     st.pyplot(fig_ep)
     plt.close(fig_ep)
+
+st.subheader("Gobernanza Cibernética HITL (Reglas Fijas 2 y 3 · Ley N.° 29733)")
+alerts_all = repo.get_all_alerts()
+g1, g2, g3, g4 = st.columns(4)
+g1.metric("Alertas Auditadas (Total)", len(alerts_all))
+g2.metric(
+    "Canal Algedónico S5 Directo",
+    sum(1 for a in alerts_all if a.get("estado_aprobacion_humana") == "ALGEDONICO_DIRECTO_S5"),
+)
+g3.metric(
+    "Aprobadas S3 (HITL)",
+    sum(1 for a in alerts_all if a.get("estado_aprobacion_humana") == "APROBADO_S3"),
+)
+g4.metric(
+    "Pendientes de Aprobación S3",
+    sum(1 for a in alerts_all if a.get("estado_aprobacion_humana") == "PENDIENTE_APROBACION"),
+)
 
 st.subheader("Registro de Cargas (Control de Fecha + Huella Digital SHA-256)")
 st.dataframe(repo.get_recent_loads(limit=20), use_container_width=True)

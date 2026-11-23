@@ -202,6 +202,245 @@
     "corte_2024_pearson_r": -0.9669,
     "corte_2024_spearman_rho": -0.9529
   },
+  "reglas_axiologicas_gobernanza_2024": {
+    "regla": "Regla Fija 4 (Equilibrio Axiológico PRVU y Abanico Equilibrador — Parra Luna)",
+    "umbrales_fijos": {
+      "isdh_geom_critico": 0.45,
+      "isdh_geom_alerta": 0.52,
+      "sigma_Y_critico": 0.22,
+      "sigma_Y_moderado": 0.18,
+      "espejismo_Se_min": 0.85,
+      "espejismo_JD_max": 0.4,
+      "espejismo_CN_max": 0.35,
+      "ejecucion_pan_alerta_pct": 75.0
+    },
+    "resumen_estados_2024": {
+      "equilibrados": 39,
+      "desequilibrio_moderado": 52,
+      "desequilibrio_critico": 9,
+      "espejismo_asistencial_count": 7,
+      "alerta_pre_algedonica_count": 6,
+      "alerta_inejecucion_pan_count": 30
+    },
+    "frecuencia_cuello_botella_prvu": {
+      "S": 0,
+      "RM": 0,
+      "Se": 1,
+      "CO": 2,
+      "JD": 78,
+      "CN": 19
+    },
+    "distritos_alerta_pre_algedonica": [
+      {
+        "ubigeo": "090203",
+        "distrito": "Anta",
+        "provincia": "Acobamba",
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "alerta_temprana_pre_algedonica": true,
+        "espejismo_asistencial_detectado": true,
+        "alerta_inejecucion_pan": false,
+        "brecha_horizontalizacion": 0.5995,
+        "cuello_de_botella_prvu": "JD",
+        "cuello_de_botella_label": "Justicia Distributiva (y6)",
+        "cuello_de_botella_valor": 0.3802,
+        "dimension_dominante_prvu": "Se",
+        "oei_prioritario": "OEI.04 (Acceso a Agua Segura y Saneamiento Rural)",
+        "ods_prioritario": "ODS 6 (Meta 6.1: Agua Potable y Cloración Rural)",
+        "sector_prioritario": "DRVCS / Área Técnica Municipal (ATM) / JASS",
+        "accion_equilibradora_s3": "Intervenir sistemas rurales de cloración (cloro residual >= 0,5 mg/L) y mantenimiento preventivo de JASS.",
+        "motivos_regla": [
+          "ISDH-HVC geométrico en alerta (46.27% < 52.0%)",
+          "Desequilibrio axiológico moderado (σ_Y=0.1929 >= 0.18)",
+          "Espejismo asistencial (Se=98.0% frente a JD=38.0% y CN=51.8%)",
+          "Alerta temprana pre-algedónica (DCI=21.96% <= 25.0% con colapso axiológico estructural)"
+        ]
+      },
+      {
+        "ubigeo": "090107",
+        "distrito": "Huayllahuara",
+        "provincia": "Huancavelica",
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "alerta_temprana_pre_algedonica": true,
+        "espejismo_asistencial_detectado": false,
+        "alerta_inejecucion_pan": true,
+        "brecha_horizontalizacion": 0.5492,
+        "cuello_de_botella_prvu": "CN",
+        "cuello_de_botella_label": "Adaptación Natural (y7)",
+        "cuello_de_botella_valor": 0.369,
+        "dimension_dominante_prvu": "Se",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)",
+        "ods_prioritario": "ODS 13 (Acción por el Clima) y ODS 2 (Resiliencia Agroalimentaria)",
+        "sector_prioritario": "GRRNGMA / DRA / SENAMHI (Plan Multisectorial ante Heladas)",
+        "accion_equilibradora_s3": "Desplegar viviendas térmicas Sumaq Wasi, fitotoldos familiares y cobertizos previos al pico de heladas.",
+        "motivos_regla": [
+          "ISDH-HVC geométrico crítico (44.78% < 45.0%)",
+          "Penalización presupuestal PAN 0001 (Ejecución=72.2% < 75.0%, X=1.278)",
+          "Alerta temprana pre-algedónica (DCI=23.31% <= 25.0% con colapso axiológico estructural)"
+        ]
+      },
+      {
+        "ubigeo": "090304",
+        "distrito": "Ccochaccasa",
+        "provincia": "Angaraes",
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "alerta_temprana_pre_algedonica": true,
+        "espejismo_asistencial_detectado": true,
+        "alerta_inejecucion_pan": false,
+        "brecha_horizontalizacion": 0.6659,
+        "cuello_de_botella_prvu": "CN",
+        "cuello_de_botella_label": "Adaptación Natural (y7)",
+        "cuello_de_botella_valor": 0.2523,
+        "dimension_dominante_prvu": "Se",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)",
+        "ods_prioritario": "ODS 13 (Acción por el Clima) y ODS 2 (Resiliencia Agroalimentaria)",
+        "sector_prioritario": "GRRNGMA / DRA / SENAMHI (Plan Multisectorial ante Heladas)",
+        "accion_equilibradora_s3": "Desplegar viviendas térmicas Sumaq Wasi, fitotoldos familiares y cobertizos previos al pico de heladas.",
+        "motivos_regla": [
+          "ISDH-HVC geométrico crítico (43.20% < 45.0%)",
+          "Desequilibrio axiológico moderado (σ_Y=0.2046 >= 0.18)",
+          "Espejismo asistencial (Se=91.8% frente a JD=44.3% y CN=25.2%)",
+          "Alerta temprana pre-algedónica (DCI=24.21% <= 25.0% con colapso axiológico estructural)"
+        ]
+      },
+      {
+        "ubigeo": "090602",
+        "distrito": "Ayaví",
+        "provincia": "Huaytará",
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "alerta_temprana_pre_algedonica": true,
+        "espejismo_asistencial_detectado": false,
+        "alerta_inejecucion_pan": true,
+        "brecha_horizontalizacion": 0.5305,
+        "cuello_de_botella_prvu": "JD",
+        "cuello_de_botella_label": "Justicia Distributiva (y6)",
+        "cuello_de_botella_valor": 0.4184,
+        "dimension_dominante_prvu": "Se",
+        "oei_prioritario": "OEI.04 (Acceso a Agua Segura y Saneamiento Rural)",
+        "ods_prioritario": "ODS 6 (Meta 6.1: Agua Potable y Cloración Rural)",
+        "sector_prioritario": "DRVCS / Área Técnica Municipal (ATM) / JASS",
+        "accion_equilibradora_s3": "Intervenir sistemas rurales de cloración (cloro residual >= 0,5 mg/L) y mantenimiento preventivo de JASS.",
+        "motivos_regla": [
+          "ISDH-HVC geométrico crítico (44.38% < 45.0%)",
+          "Penalización presupuestal PAN 0001 (Ejecución=72.6% < 75.0%, X=1.274)",
+          "Alerta temprana pre-algedónica (DCI=23.19% <= 25.0% con colapso axiológico estructural)"
+        ]
+      },
+      {
+        "ubigeo": "090114",
+        "distrito": "Nuevo Occoro",
+        "provincia": "Huancavelica",
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "alerta_temprana_pre_algedonica": true,
+        "espejismo_asistencial_detectado": false,
+        "alerta_inejecucion_pan": true,
+        "brecha_horizontalizacion": 0.5468,
+        "cuello_de_botella_prvu": "CN",
+        "cuello_de_botella_label": "Adaptación Natural (y7)",
+        "cuello_de_botella_valor": 0.4033,
+        "dimension_dominante_prvu": "Se",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)",
+        "ods_prioritario": "ODS 13 (Acción por el Clima) y ODS 2 (Resiliencia Agroalimentaria)",
+        "sector_prioritario": "GRRNGMA / DRA / SENAMHI (Plan Multisectorial ante Heladas)",
+        "accion_equilibradora_s3": "Desplegar viviendas térmicas Sumaq Wasi, fitotoldos familiares y cobertizos previos al pico de heladas.",
+        "motivos_regla": [
+          "ISDH-HVC geométrico crítico (43.68% < 45.0%)",
+          "Desequilibrio axiológico moderado (σ_Y=0.1861 >= 0.18)",
+          "Penalización presupuestal PAN 0001 (Ejecución=71.4% < 75.0%, X=1.286)",
+          "Alerta temprana pre-algedónica (DCI=24.09% <= 25.0% con colapso axiológico estructural)"
+        ]
+      },
+      {
+        "ubigeo": "090106",
+        "distrito": "Huachocolpa",
+        "provincia": "Huancavelica",
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "alerta_temprana_pre_algedonica": true,
+        "espejismo_asistencial_detectado": true,
+        "alerta_inejecucion_pan": true,
+        "brecha_horizontalizacion": 0.6121,
+        "cuello_de_botella_prvu": "CN",
+        "cuello_de_botella_label": "Adaptación Natural (y7)",
+        "cuello_de_botella_valor": 0.343,
+        "dimension_dominante_prvu": "Se",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)",
+        "ods_prioritario": "ODS 13 (Acción por el Clima) y ODS 2 (Resiliencia Agroalimentaria)",
+        "sector_prioritario": "GRRNGMA / DRA / SENAMHI (Plan Multisectorial ante Heladas)",
+        "accion_equilibradora_s3": "Desplegar viviendas térmicas Sumaq Wasi, fitotoldos familiares y cobertizos previos al pico de heladas.",
+        "motivos_regla": [
+          "ISDH-HVC geométrico crítico (42.28% < 45.0%)",
+          "Desequilibrio axiológico moderado (σ_Y=0.1988 >= 0.18)",
+          "Espejismo asistencial (Se=95.5% frente a JD=39.8% y CN=34.3%)",
+          "Penalización presupuestal PAN 0001 (Ejecución=73.7% < 75.0%, X=1.263)",
+          "Alerta temprana pre-algedónica (DCI=24.75% <= 25.0% con colapso axiológico estructural)"
+        ]
+      }
+    ],
+    "distritos_espejismo_asistencial": [
+      {
+        "ubigeo": "090202",
+        "distrito": "Andabamba",
+        "provincia": "Acobamba",
+        "cuello_de_botella_prvu": "JD",
+        "brecha_horizontalizacion": 0.5839,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_MODERADO",
+        "oei_prioritario": "OEI.04 (Acceso a Agua Segura y Saneamiento Rural)"
+      },
+      {
+        "ubigeo": "090203",
+        "distrito": "Anta",
+        "provincia": "Acobamba",
+        "cuello_de_botella_prvu": "JD",
+        "brecha_horizontalizacion": 0.5995,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "oei_prioritario": "OEI.04 (Acceso a Agua Segura y Saneamiento Rural)"
+      },
+      {
+        "ubigeo": "090304",
+        "distrito": "Ccochaccasa",
+        "provincia": "Angaraes",
+        "cuello_de_botella_prvu": "CN",
+        "brecha_horizontalizacion": 0.6659,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
+      },
+      {
+        "ubigeo": "090606",
+        "distrito": "Pilpichaca",
+        "provincia": "Huaytará",
+        "cuello_de_botella_prvu": "CN",
+        "brecha_horizontalizacion": 0.7112,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
+      },
+      {
+        "ubigeo": "090607",
+        "distrito": "Pilpichaca",
+        "provincia": "Huaytará",
+        "cuello_de_botella_prvu": "CN",
+        "brecha_horizontalizacion": 0.7133,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
+      },
+      {
+        "ubigeo": "090106",
+        "distrito": "Huachocolpa",
+        "provincia": "Huancavelica",
+        "cuello_de_botella_prvu": "CN",
+        "brecha_horizontalizacion": 0.6121,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
+      },
+      {
+        "ubigeo": "090411",
+        "distrito": "Santa Ana",
+        "provincia": "Castrovirreyna",
+        "cuello_de_botella_prvu": "CN",
+        "brecha_horizontalizacion": 0.8858,
+        "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+        "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
+      }
+    ]
+  },
   "top_5_isdh_2024": [
     {
       "ubigeo": "090109",
@@ -220,11 +459,18 @@
       "indice_bruto_Y_arit": 0.8409,
       "indice_bruto_Y_geom": 0.8373,
       "desequilibrio_axiologico_sigma": 0.0753,
+      "brecha_horizontalizacion": 0.2468,
       "denominador_X_inejecucion_pan": 1.1519,
       "isdh_hvc_arit": 0.73,
       "isdh_hvc_geom": 0.7269,
       "isdh_hvc_arit_pct": 73.0,
-      "isdh_hvc_geom_pct": 72.69
+      "isdh_hvc_geom_pct": 72.69,
+      "cuello_de_botella_prvu": "Se",
+      "estado_equilibrio_axiologico": "EQUILIBRADO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.03 (Protección Social e Inclusión) y OEI.01 (DCI)"
     },
     {
       "ubigeo": "090601",
@@ -243,11 +489,18 @@
       "indice_bruto_Y_arit": 0.8427,
       "indice_bruto_Y_geom": 0.8375,
       "desequilibrio_axiologico_sigma": 0.0952,
+      "brecha_horizontalizacion": 0.2554,
       "denominador_X_inejecucion_pan": 1.1823,
       "isdh_hvc_arit": 0.7128,
       "isdh_hvc_geom": 0.7084,
       "isdh_hvc_arit_pct": 71.28,
-      "isdh_hvc_geom_pct": 70.84
+      "isdh_hvc_geom_pct": 70.84,
+      "cuello_de_botella_prvu": "CO",
+      "estado_equilibrio_axiologico": "EQUILIBRADO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.02 (Logros de Aprendizaje y Educación Materna) y OEI.01"
     },
     {
       "ubigeo": "090201",
@@ -266,11 +519,18 @@
       "indice_bruto_Y_arit": 0.7933,
       "indice_bruto_Y_geom": 0.7849,
       "desequilibrio_axiologico_sigma": 0.1144,
+      "brecha_horizontalizacion": 0.3604,
       "denominador_X_inejecucion_pan": 1.1141,
       "isdh_hvc_arit": 0.7121,
       "isdh_hvc_geom": 0.7045,
       "isdh_hvc_arit_pct": 71.21,
-      "isdh_hvc_geom_pct": 70.45
+      "isdh_hvc_geom_pct": 70.45,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "EQUILIBRADO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     },
     {
       "ubigeo": "090501",
@@ -289,11 +549,18 @@
       "indice_bruto_Y_arit": 0.7783,
       "indice_bruto_Y_geom": 0.7731,
       "desequilibrio_axiologico_sigma": 0.0909,
+      "brecha_horizontalizacion": 0.2268,
       "denominador_X_inejecucion_pan": 1.1328,
       "isdh_hvc_arit": 0.687,
       "isdh_hvc_geom": 0.6825,
       "isdh_hvc_arit_pct": 68.7,
-      "isdh_hvc_geom_pct": 68.25
+      "isdh_hvc_geom_pct": 68.25,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "EQUILIBRADO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     },
     {
       "ubigeo": "090119",
@@ -312,11 +579,18 @@
       "indice_bruto_Y_arit": 0.7754,
       "indice_bruto_Y_geom": 0.7562,
       "desequilibrio_axiologico_sigma": 0.1618,
+      "brecha_horizontalizacion": 0.4355,
       "denominador_X_inejecucion_pan": 1.1324,
       "isdh_hvc_arit": 0.6847,
       "isdh_hvc_geom": 0.6678,
       "isdh_hvc_arit_pct": 68.47,
-      "isdh_hvc_geom_pct": 66.78
+      "isdh_hvc_geom_pct": 66.78,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "EQUILIBRADO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     }
   ],
   "bottom_5_isdh_2024": [
@@ -337,11 +611,18 @@
       "indice_bruto_Y_arit": 0.5885,
       "indice_bruto_Y_geom": 0.5652,
       "desequilibrio_axiologico_sigma": 0.1787,
+      "brecha_horizontalizacion": 0.5305,
       "denominador_X_inejecucion_pan": 1.2738,
       "isdh_hvc_arit": 0.462,
       "isdh_hvc_geom": 0.4438,
       "isdh_hvc_arit_pct": 46.2,
-      "isdh_hvc_geom_pct": 44.38
+      "isdh_hvc_geom_pct": 44.38,
+      "cuello_de_botella_prvu": "JD",
+      "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": true,
+      "alerta_inejecucion_pan": true,
+      "oei_prioritario": "OEI.04 (Acceso a Agua Segura y Saneamiento Rural)"
     },
     {
       "ubigeo": "090607",
@@ -360,11 +641,18 @@
       "indice_bruto_Y_arit": 0.5501,
       "indice_bruto_Y_geom": 0.5009,
       "desequilibrio_axiologico_sigma": 0.2424,
+      "brecha_horizontalizacion": 0.7133,
       "denominador_X_inejecucion_pan": 1.1929,
       "isdh_hvc_arit": 0.4611,
       "isdh_hvc_geom": 0.4199,
       "isdh_hvc_arit_pct": 46.11,
-      "isdh_hvc_geom_pct": 41.99
+      "isdh_hvc_geom_pct": 41.99,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+      "espejismo_asistencial": true,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     },
     {
       "ubigeo": "090114",
@@ -383,11 +671,18 @@
       "indice_bruto_Y_arit": 0.588,
       "indice_bruto_Y_geom": 0.5619,
       "desequilibrio_axiologico_sigma": 0.1861,
+      "brecha_horizontalizacion": 0.5468,
       "denominador_X_inejecucion_pan": 1.2863,
       "isdh_hvc_arit": 0.4572,
       "isdh_hvc_geom": 0.4368,
       "isdh_hvc_arit_pct": 45.72,
-      "isdh_hvc_geom_pct": 43.68
+      "isdh_hvc_geom_pct": 43.68,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+      "espejismo_asistencial": false,
+      "alerta_pre_algedonica": true,
+      "alerta_inejecucion_pan": true,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     },
     {
       "ubigeo": "090106",
@@ -406,11 +701,18 @@
       "indice_bruto_Y_arit": 0.565,
       "indice_bruto_Y_geom": 0.5339,
       "desequilibrio_axiologico_sigma": 0.1988,
+      "brecha_horizontalizacion": 0.6121,
       "denominador_X_inejecucion_pan": 1.2628,
       "isdh_hvc_arit": 0.4474,
       "isdh_hvc_geom": 0.4228,
       "isdh_hvc_arit_pct": 44.74,
-      "isdh_hvc_geom_pct": 42.28
+      "isdh_hvc_geom_pct": 42.28,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+      "espejismo_asistencial": true,
+      "alerta_pre_algedonica": true,
+      "alerta_inejecucion_pan": true,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     },
     {
       "ubigeo": "090411",
@@ -429,11 +731,18 @@
       "indice_bruto_Y_arit": 0.5054,
       "indice_bruto_Y_geom": 0.4141,
       "desequilibrio_axiologico_sigma": 0.2754,
+      "brecha_horizontalizacion": 0.8858,
       "denominador_X_inejecucion_pan": 1.1782,
       "isdh_hvc_arit": 0.429,
       "isdh_hvc_geom": 0.3515,
       "isdh_hvc_arit_pct": 42.9,
-      "isdh_hvc_geom_pct": 35.15
+      "isdh_hvc_geom_pct": 35.15,
+      "cuello_de_botella_prvu": "CN",
+      "estado_equilibrio_axiologico": "DESEQUILIBRIO_CRITICO_AXIOLOGICO",
+      "espejismo_asistencial": true,
+      "alerta_pre_algedonica": false,
+      "alerta_inejecucion_pan": false,
+      "oei_prioritario": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)"
     }
   ],
   "total_distritos_2024": 100

@@ -92,6 +92,103 @@ EXCLUDED_PRVU_DIMENSIONS: Dict[str, str] = {
     ),
 }
 
+# Umbrales deterministas de la Regla Fija 4 (Equilibrio Axiológico PRVU — fuera del alcance del LLM)
+ISDH_GEOM_CRITICAL_THRESHOLD: float = 0.45
+ISDH_GEOM_ALERT_THRESHOLD: float = 0.52
+AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD: float = 0.22
+AXIOLOGICAL_SIGMA_MODERATE_THRESHOLD: float = 0.18
+ESPEJISMO_SE_MIN: float = 0.85
+ESPEJISMO_STRUCTURAL_MAX_JD: float = 0.40
+ESPEJISMO_STRUCTURAL_MAX_CN: float = 0.35
+PAN_EXECUTION_PENALTY_WARNING_PCT: float = 75.0
+
+PRVU_OEI_GOVERNANCE_MAP: Dict[str, Dict[str, str]] = {
+    "S": {
+        "oei": "OEI.01 (Reducir DCI y Anemia) y OEI.03 (Salud Materno-Infantil)",
+        "ods": "ODS 2 (Meta 2.2) y ODS 3 (Meta 3.2)",
+        "sector": "DIRESA / Red de Salud Provincial",
+        "accion": "Reforzar brigadas CRED, suplementación preventiva de hierro y consejería de lactancia materna exclusiva.",
+    },
+    "RM": {
+        "oei": "OEI.08 (Competitividad Agraria) y OEI.01 (Articulación PAN 0001)",
+        "ods": "ODS 1 (Fin de la Pobreza) y ODS 2 (Seguridad Alimentaria)",
+        "sector": "DRA / GRDE / MEF (PAN 0001)",
+        "accion": "Acelerar inversión productiva familiar y asignación per cápita del Programa Articulado Nutricional.",
+    },
+    "Se": {
+        "oei": "OEI.03 (Protección Social e Inclusión) y OEI.01 (DCI)",
+        "ods": "ODS 1 (Protección Social) y ODS 2 (Meta 2.2)",
+        "sector": "MIDIS (Juntos, Cuna Más, Qali Warma) / GRDS",
+        "accion": "Cerrar brechas de afiliación nominal del padrón infantil en Juntos, Cuna Más y Qali Warma.",
+    },
+    "CO": {
+        "oei": "OEI.02 (Logros de Aprendizaje y Educación Materna) y OEI.01",
+        "ods": "ODS 4 (Educación de Calidad) y ODS 5 (Igualdad de Género)",
+        "sector": "DRE / UGEL / GRDS Huancavelica",
+        "accion": "Activar alfabetización nutricional, educación secundaria rural femenina y sesiones demostrativas comunitarias.",
+    },
+    "JD": {
+        "oei": "OEI.04 (Acceso a Agua Segura y Saneamiento Rural)",
+        "ods": "ODS 6 (Meta 6.1: Agua Potable y Cloración Rural)",
+        "sector": "DRVCS / Área Técnica Municipal (ATM) / JASS",
+        "accion": "Intervenir sistemas rurales de cloración (cloro residual >= 0,5 mg/L) y mantenimiento preventivo de JASS.",
+    },
+    "CN": {
+        "oei": "OEI.10 (Gestión del Riesgo de Desastres y Adaptación ante Heladas)",
+        "ods": "ODS 13 (Acción por el Clima) y ODS 2 (Resiliencia Agroalimentaria)",
+        "sector": "GRRNGMA / DRA / SENAMHI (Plan Multisectorial ante Heladas)",
+        "accion": "Desplegar viviendas térmicas Sumaq Wasi, fitotoldos familiares y cobertizos previos al pico de heladas.",
+    },
+}
+
+
+@dataclass(frozen=True)
+class AxiologicalEquilibriumDecision:
+    """
+    Decisión determinista inmutable emitida por la Regla Fija 4 (Equilibrio Axiológico PRVU).
+    Complementa la Regla Fija 2 (DCI > 25% -> S5) permitiendo detectar colapsos estructurales
+    pre-algedónicos, espejismos asistenciales (Se alto con JD/CN colapsados) y cuellos de botella.
+    """
+
+    ubigeo: str
+    distrito: str
+    provincia: str
+    estado_equilibrio_axiologico: str
+    alerta_temprana_pre_algedonica: bool
+    espejismo_asistencial_detectado: bool
+    alerta_inejecucion_pan: bool
+    brecha_horizontalizacion: float
+    cuello_de_botella_prvu: str
+    cuello_de_botella_label: str
+    cuello_de_botella_valor: float
+    dimension_dominante_prvu: str
+    oei_prioritario: str
+    ods_prioritario: str
+    sector_prioritario: str
+    accion_equilibradora_s3: str
+    motivos_regla: Tuple[str, ...]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "ubigeo": self.ubigeo,
+            "distrito": self.distrito,
+            "provincia": self.provincia,
+            "estado_equilibrio_axiologico": self.estado_equilibrio_axiologico,
+            "alerta_temprana_pre_algedonica": self.alerta_temprana_pre_algedonica,
+            "espejismo_asistencial_detectado": self.espejismo_asistencial_detectado,
+            "alerta_inejecucion_pan": self.alerta_inejecucion_pan,
+            "brecha_horizontalizacion": round(self.brecha_horizontalizacion, 4),
+            "cuello_de_botella_prvu": self.cuello_de_botella_prvu,
+            "cuello_de_botella_label": self.cuello_de_botella_label,
+            "cuello_de_botella_valor": round(self.cuello_de_botella_valor, 4),
+            "dimension_dominante_prvu": self.dimension_dominante_prvu,
+            "oei_prioritario": self.oei_prioritario,
+            "ods_prioritario": self.ods_prioritario,
+            "sector_prioritario": self.sector_prioritario,
+            "accion_equilibradora_s3": self.accion_equilibradora_s3,
+            "motivos_regla": list(self.motivos_regla),
+        }
+
 
 @dataclass(frozen=True)
 class DistrictAxiologicalScore:
@@ -116,6 +213,7 @@ class DistrictAxiologicalScore:
     isdh_hvc_geom: float
 
     def to_dict(self) -> Dict[str, Any]:
+        gov = evaluate_axiological_governance_rule(self)
         return {
             "ubigeo": self.ubigeo,
             "anio": self.anio,
@@ -133,12 +231,130 @@ class DistrictAxiologicalScore:
             "indice_bruto_Y_arit": round(self.indice_bruto_Y_arit, 4),
             "indice_bruto_Y_geom": round(self.indice_bruto_Y_geom, 4),
             "desequilibrio_axiologico_sigma": round(self.desequilibrio_sigma_Y, 4),
+            "brecha_horizontalizacion": round(gov.brecha_horizontalizacion, 4),
             "denominador_X_inejecucion_pan": round(self.denominador_X_inejecucion, 4),
             "isdh_hvc_arit": round(self.isdh_hvc_arit, 4),
             "isdh_hvc_geom": round(self.isdh_hvc_geom, 4),
             "isdh_hvc_arit_pct": round(self.isdh_hvc_arit * 100.0, 2),
             "isdh_hvc_geom_pct": round(self.isdh_hvc_geom * 100.0, 2),
+            "cuello_de_botella_prvu": gov.cuello_de_botella_prvu,
+            "estado_equilibrio_axiologico": gov.estado_equilibrio_axiologico,
+            "espejismo_asistencial": gov.espejismo_asistencial_detectado,
+            "alerta_pre_algedonica": gov.alerta_temprana_pre_algedonica,
+            "alerta_inejecucion_pan": gov.alerta_inejecucion_pan,
+            "oei_prioritario": gov.oei_prioritario,
         }
+
+
+def evaluate_axiological_governance_rule(
+    score: DistrictAxiologicalScore,
+) -> AxiologicalEquilibriumDecision:
+    """
+    REGLA FIJA 4 (Equilibrio Axiológico y Abanico Equilibrador — Parra Luna, 2017, 2018):
+    Evalúa de forma estrictamente determinista (fuera del LLM) si un distrito presenta:
+    - Desequilibrio axiológico crítico (`isdh_hvc_geom < 0.45`, `sigma_Y >= 0.22` o espejismo severo).
+    - Espejismo asistencial (`Se >= 0.85` coexistiendo con `JD < 0.40` o `CN < 0.35`).
+    - Alerta temprana pre-algedónica (colapso axiológico crítico antes de superar DCI > 25%).
+    - Brecha de horizontalización (`max(y_i) - min(y_i)`) y cuello de botella PRVU mapeado a OEI/ODS.
+    """
+    dim_map: Dict[str, float] = {
+        "S": score.dim_S,
+        "RM": score.dim_RM,
+        "Se": score.dim_Se,
+        "CO": score.dim_CO,
+        "JD": score.dim_JD,
+        "CN": score.dim_CN,
+    }
+    numeric_checks = [
+        *dim_map.values(),
+        score.isdh_hvc_geom,
+        score.desequilibrio_sigma_Y,
+        score.ejecucion_pan_mef_pct,
+        score.tasa_dci_pct,
+    ]
+    if not all(math.isfinite(float(v)) for v in numeric_checks):
+        raise ValueError(f"Valores axiológicos no finitos (NaN/Inf) para el ubigeo '{score.ubigeo}'.")
+
+    min_dim = min(PRVU_DIMENSIONS, key=lambda d: dim_map[d])
+    max_dim = max(PRVU_DIMENSIONS, key=lambda d: dim_map[d])
+    brecha_horiz = dim_map[max_dim] - dim_map[min_dim]
+
+    espejismo = (score.dim_Se >= ESPEJISMO_SE_MIN) and (
+        score.dim_JD < ESPEJISMO_STRUCTURAL_MAX_JD or score.dim_CN < ESPEJISMO_STRUCTURAL_MAX_CN
+    )
+    inejecucion_pan = score.ejecucion_pan_mef_pct < PAN_EXECUTION_PENALTY_WARNING_PCT
+
+    motivos: List[str] = []
+    if score.isdh_hvc_geom < ISDH_GEOM_CRITICAL_THRESHOLD:
+        motivos.append(
+            f"ISDH-HVC geométrico crítico ({score.isdh_hvc_geom * 100:.2f}% < {ISDH_GEOM_CRITICAL_THRESHOLD * 100:.1f}%)"
+        )
+    elif score.isdh_hvc_geom < ISDH_GEOM_ALERT_THRESHOLD:
+        motivos.append(
+            f"ISDH-HVC geométrico en alerta ({score.isdh_hvc_geom * 100:.2f}% < {ISDH_GEOM_ALERT_THRESHOLD * 100:.1f}%)"
+        )
+
+    if score.desequilibrio_sigma_Y >= AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD:
+        motivos.append(
+            f"Desequilibrio axiológico severo (σ_Y={score.desequilibrio_sigma_Y:.4f} >= {AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD:.2f})"
+        )
+    elif score.desequilibrio_sigma_Y >= AXIOLOGICAL_SIGMA_MODERATE_THRESHOLD:
+        motivos.append(
+            f"Desequilibrio axiológico moderado (σ_Y={score.desequilibrio_sigma_Y:.4f} >= {AXIOLOGICAL_SIGMA_MODERATE_THRESHOLD:.2f})"
+        )
+
+    if espejismo:
+        motivos.append(
+            f"Espejismo asistencial (Se={score.dim_Se * 100:.1f}% frente a JD={score.dim_JD * 100:.1f}% y CN={score.dim_CN * 100:.1f}%)"
+        )
+    if inejecucion_pan:
+        motivos.append(
+            f"Penalización presupuestal PAN 0001 (Ejecución={score.ejecucion_pan_mef_pct:.1f}% < {PAN_EXECUTION_PENALTY_WARNING_PCT:.1f}%, X={score.denominador_X_inejecucion:.3f})"
+        )
+
+    if (
+        score.isdh_hvc_geom < ISDH_GEOM_CRITICAL_THRESHOLD
+        or score.desequilibrio_sigma_Y >= AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD
+        or (espejismo and score.isdh_hvc_geom < 0.50)
+    ):
+        estado = "DESEQUILIBRIO_CRITICO_AXIOLOGICO"
+    elif (
+        score.isdh_hvc_geom < ISDH_GEOM_ALERT_THRESHOLD
+        or score.desequilibrio_sigma_Y >= AXIOLOGICAL_SIGMA_MODERATE_THRESHOLD
+        or espejismo
+        or inejecucion_pan
+    ):
+        estado = "DESEQUILIBRIO_MODERADO"
+    else:
+        estado = "EQUILIBRADO"
+        motivos.append("Perfil axiológico dentro de los umbrales de equilibrio sistémico regional")
+
+    alerta_pre_algedonica = estado == "DESEQUILIBRIO_CRITICO_AXIOLOGICO" and score.tasa_dci_pct <= 25.0
+    if alerta_pre_algedonica:
+        motivos.append(
+            f"Alerta temprana pre-algedónica (DCI={score.tasa_dci_pct:.2f}% <= 25.0% con colapso axiológico estructural)"
+        )
+
+    gov_info = PRVU_OEI_GOVERNANCE_MAP[min_dim]
+    return AxiologicalEquilibriumDecision(
+        ubigeo=score.ubigeo,
+        distrito=score.distrito,
+        provincia=score.provincia,
+        estado_equilibrio_axiologico=estado,
+        alerta_temprana_pre_algedonica=alerta_pre_algedonica,
+        espejismo_asistencial_detectado=espejismo,
+        alerta_inejecucion_pan=inejecucion_pan,
+        brecha_horizontalizacion=brecha_horiz,
+        cuello_de_botella_prvu=min_dim,
+        cuello_de_botella_label=PRVU_DIMENSION_LABELS[min_dim],
+        cuello_de_botella_valor=dim_map[min_dim],
+        dimension_dominante_prvu=max_dim,
+        oei_prioritario=gov_info["oei"],
+        ods_prioritario=gov_info["ods"],
+        sector_prioritario=gov_info["sector"],
+        accion_equilibradora_s3=gov_info["accion"],
+        motivos_regla=tuple(motivos),
+    )
 
 
 def _to_positive(val: float, is_positive: bool) -> float:
@@ -311,6 +527,29 @@ def summarize_parra_luna_panel(
     prov_summary = {prov: _agg_group(items) for prov, items in sorted(by_prov.items())}
 
     ranked_2024 = sorted(scores_2024, key=lambda s: s.isdh_hvc_arit, reverse=True)
+    decisions_2024 = [evaluate_axiological_governance_rule(s) for s in ranked_2024]
+
+    bottleneck_freq: Dict[str, int] = {d: 0 for d in PRVU_DIMENSIONS}
+    for dec in decisions_2024:
+        bottleneck_freq[dec.cuello_de_botella_prvu] += 1
+
+    pre_algedonic_list = [
+        dec.to_dict() for dec in decisions_2024 if dec.alerta_temprana_pre_algedonica
+    ]
+    espejismo_list = [
+        {
+            "ubigeo": dec.ubigeo,
+            "distrito": dec.distrito,
+            "provincia": dec.provincia,
+            "cuello_de_botella_prvu": dec.cuello_de_botella_prvu,
+            "brecha_horizontalizacion": round(dec.brecha_horizontalizacion, 4),
+            "estado_equilibrio_axiologico": dec.estado_equilibrio_axiologico,
+            "oei_prioritario": dec.oei_prioritario,
+        }
+        for dec in decisions_2024
+        if dec.espejismo_asistencial_detectado
+    ]
+
     r_all = _pearson([s.isdh_hvc_arit for s in scores_all], [s.tasa_dci_pct for s in scores_all])
     rho_all = spearman_correlation([s.isdh_hvc_arit for s in scores_all], [s.tasa_dci_pct for s in scores_all])
     r_2024 = _pearson([s.isdh_hvc_arit for s in scores_2024], [s.tasa_dci_pct for s in scores_2024])
@@ -334,6 +573,30 @@ def summarize_parra_luna_panel(
             "serie_2014_2024_spearman_rho": round(rho_all, 4),
             "corte_2024_pearson_r": round(r_2024, 4),
             "corte_2024_spearman_rho": round(rho_2024, 4),
+        },
+        "reglas_axiologicas_gobernanza_2024": {
+            "regla": "Regla Fija 4 (Equilibrio Axiológico PRVU y Abanico Equilibrador — Parra Luna)",
+            "umbrales_fijos": {
+                "isdh_geom_critico": ISDH_GEOM_CRITICAL_THRESHOLD,
+                "isdh_geom_alerta": ISDH_GEOM_ALERT_THRESHOLD,
+                "sigma_Y_critico": AXIOLOGICAL_SIGMA_CRITICAL_THRESHOLD,
+                "sigma_Y_moderado": AXIOLOGICAL_SIGMA_MODERATE_THRESHOLD,
+                "espejismo_Se_min": ESPEJISMO_SE_MIN,
+                "espejismo_JD_max": ESPEJISMO_STRUCTURAL_MAX_JD,
+                "espejismo_CN_max": ESPEJISMO_STRUCTURAL_MAX_CN,
+                "ejecucion_pan_alerta_pct": PAN_EXECUTION_PENALTY_WARNING_PCT,
+            },
+            "resumen_estados_2024": {
+                "equilibrados": sum(1 for d in decisions_2024 if d.estado_equilibrio_axiologico == "EQUILIBRADO"),
+                "desequilibrio_moderado": sum(1 for d in decisions_2024 if d.estado_equilibrio_axiologico == "DESEQUILIBRIO_MODERADO"),
+                "desequilibrio_critico": sum(1 for d in decisions_2024 if d.estado_equilibrio_axiologico == "DESEQUILIBRIO_CRITICO_AXIOLOGICO"),
+                "espejismo_asistencial_count": len(espejismo_list),
+                "alerta_pre_algedonica_count": len(pre_algedonic_list),
+                "alerta_inejecucion_pan_count": sum(1 for d in decisions_2024 if d.alerta_inejecucion_pan),
+            },
+            "frecuencia_cuello_botella_prvu": bottleneck_freq,
+            "distritos_alerta_pre_algedonica": pre_algedonic_list,
+            "distritos_espejismo_asistencial": espejismo_list,
         },
         "top_5_isdh_2024": [s.to_dict() for s in ranked_2024[:5]],
         "bottom_5_isdh_2024": [s.to_dict() for s in ranked_2024[-5:]],

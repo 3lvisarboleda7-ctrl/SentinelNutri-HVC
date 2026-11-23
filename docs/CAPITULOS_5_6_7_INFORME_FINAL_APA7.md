@@ -4,7 +4,7 @@
 **Curso:** Modelo de Sistema Viable (MSV) — FIIS UNI  
 **Autor:** Elvis Arboleda, Steven Cadillo, Cheddi Gastiaburu, Gary Fernandez  
 **Docente:** Ing. Ricardo Rodríguez-Ulloa  
-**Corte de avance técnico:** 22 de noviembre de 2026 (integración del Modelo Axiológico de Parra Luna sobre `panel_distrital_hvc_2014_2024.csv`)  
+**Corte de avance técnico:** 23 de noviembre de 2026 (Regla Fija 4 de Equilibrio Axiológico Parra Luna, gobernanza HITL con huellas `SHA-256`, auditoría consolidada `/governance/audit` y suite `24/24`)  
 
 ---
 
@@ -19,13 +19,14 @@ El sistema **SentinelNutri-HVC** materializa este equilibrio mediante dos mecani
 1. **Atenuador de Variedad Ambiental (`CatBoost + SHAP`):** Comprime `1 100` registros históricos distritales (`2014–2024`, $100\text{ distritos} \times 11\text{ años}$, $26$ variables en la matriz consolidada) distribuidos en cinco dimensiones —antropométrica/nutricional, socioeconómica, acceso a servicios de agua y salud, ejecución presupuestal del Programa Articulado Nutricional `0001` / programas MIDIS y régimen climático de heladas del SENAMHI— en una probabilidad calibrada de riesgo crítico y una tasa proyectada de DCI por distrito. El modelo entrenado (`catboost_dci_hvc.cbm`, $364\,624\text{ bytes}$) se aloja en `data/models/` y en el HDD del Equipo 2.
 2. **Amplificador de Variedad de Gestión (Agente Supervisor en `n8n` + LLM Gateway con Failover):** Transforma las predicciones y los valores SHAP en informes ejecutivos y recomendaciones diferenciadas por provincia y sector (**Salud/DIRESA**, **Agua y Saneamiento/DRVCS**, **Agricultura/MIDIS/MEF**) alineadas a los Objetivos Estratégicos Institucionales (**OEI**) del **PEI 2020–2027 Ampliado** del GORE Huancavelica. La orquestación en `n8n` (`AI Agent v3.1`) opera con herramientas `@n8n/n8n-nodes-langchain.toolCode` conectadas al microservicio FastAPI (`:8000`), priorizando **Ollama (`llama3.2` con backend Vulkan en GTX 1050)** para la invocación local de herramientas y **Gemini (`gemini-flash-lite-latest`, nivel gratuito de Google AI Studio)** para la síntesis narrativa rápida y conmutación automática por fallo (*failover* de 3 niveles hasta plantilla determinista MSV).
 
-### 5.2. Las 6 Herramientas del Agente Supervisor y las 3 Reglas Fijas Cibernéticas
+### 5.2. Las 6 Herramientas del Agente Supervisor y las 4 Reglas Fijas Cibernético-Axiológicas
 
-Siguiendo los criterios de gobernanza algorítmica para el sector público de la CEPAL (Clavijo, 2026), el Agente Supervisor dispone de **6 herramientas** (`extraer_fuentes`, `consultar_bd`, `predecir_riesgo`, `explicar_riesgo`, `redactar_informe` y `notificar`) con salidas compactadas para proteger su ventana de contexto y un nodo normalizador (`Normalizar Salida S4 para Reglas Fijas`), pero **tres decisiones críticas permanecen en Reglas Fijas deterministas** fuera del alcance del LLM:
+Siguiendo los criterios de gobernanza algorítmica para el sector público de la CEPAL (Clavijo, 2026) y el principio de equilibrio axiológico de Parra Luna (2017, 2018), el Agente Supervisor dispone de **6 herramientas** (`extraer_fuentes`, `consultar_bd`, `predecir_riesgo`, `explicar_riesgo`, `redactar_informe` y `notificar`) con salidas compactadas para proteger su ventana de contexto y un nodo normalizador (`Normalizar Salida S4 para Reglas Fijas`), pero **cuatro decisiones críticas permanecen en Reglas Fijas deterministas** estrictamente fuera del alcance del LLM:
 
 - **Regla Fija 1 (Inferencia Numérica Determinista):** La proyección de DCI y la probabilidad de riesgo las calcula exclusivamente el motor `CatBoost` (`/predict`), impidiendo cualquier estimación numérica inventada por el LLM.
-- **Regla Fija 2 (Canal Algedónico Automatizado $\text{S1/S4} \rightarrow \text{S5}$):** Un nodo condicional fijo (`IF`) evalúa si la DCI proyectada supera el umbral crítico del **$25,0\,\%$**. Cuando se supera, la señal algedónica se despacha directamente al **Sistema 5 (Consejo Regional)** mediante Telegram Bot API real (`sendMessage` con reintentos) sin posibilidad de omisión ni demora por parte del agente.
-- **Regla Fija 3 (Aprobación Humana en el Canal de Control $\text{S4} \rightarrow \text{S3}$):** Toda recomendación dirigida al **Sistema 3 (Gerencia Regional de Desarrollo Social)** nace en estado `PENDIENTE_APROBACION` (`publicado_en_canal_control_s3 = False`) y requiere aprobación humana explícita mediante nodo `sendAndWait` en Telegram (compuerta `¿Aprobado por Humano S3?`) antes de confirmarse vía `POST /hitl/aprobar/{alert_id}` hacia `APROBADO_S3`.
+- **Regla Fija 2 (Canal Algedónico Automatizado $\text{S1/S4} \rightarrow \text{S5}$):** Un nodo condicional fijo (`IF`) evalúa si la DCI proyectada supera el umbral crítico del **$25,0\,\%$**. Cuando se supera, la señal algedónica se despacha directamente al **Sistema 5 (Consejo Regional)** mediante Telegram Bot API real (`sendMessage` con reintentos) y queda trazada con huella criptográfica `SHA-256` (`huella_auditoria_sha256`) sin posibilidad de omisión ni demora por parte del agente.
+- **Regla Fija 3 (Aprobación Humana en el Canal de Control $\text{S4} \rightarrow \text{S3}$):** Toda recomendación dirigida al **Sistema 3 (Gerencia Regional de Desarrollo Social)** nace en estado `PENDIENTE_APROBACION` (`publicado_en_canal_control_s3 = False`) y requiere aprobación humana explícita con autoridad identificable (`approver_name >= 3` caracteres) mediante nodo `sendAndWait` en Telegram (compuerta `¿Aprobado por Humano S3?`) antes de confirmarse vía `POST /hitl/aprobar/{alert_id}` hacia `APROBADO_S3` con huella de resolución `SHA-256` (`huella_resolucion_sha256`).
+- **Regla Fija 4 (Equilibrio Axiológico PRVU y Abanico Equilibrador):** Evaluada de forma determinista en [`parra_luna_axiological.py`](../src/sentinelnutri/domain/rules/parra_luna_axiological.py) (`evaluate_axiological_governance_rule`), detecta colapsos estructurales ($\text{ISDH}_{\text{HVC,geom}} < 45{,}0\,\%$ o $\sigma_Y \ge 0{,}22$), **espejismos asistenciales** ($\text{Se} \ge 85\,\%$ coexistiendo con $\text{JD} < 40\,\%$ o $\text{CN} < 35\,\%$), **alertas tempranas pre-algedónicas** (colapso axiológico previo a superar $25\,\%$ de DCI) y mapea el cuello de botella PRVU de cada distrito a su OEI/ODS y sector responsable del GORE Huancavelica.
 
 ### 5.3. Sustento Teórico, Operativo y Estadístico del Sistema de Indicadores Vigentes
 
@@ -151,7 +152,7 @@ Para impedir que el atenuador opere como una «caja negra», la herramienta `exp
 
 ### 6.4. Indicadores Operativos y de Gobernanza Cibernética Verificados hasta la Fecha
 
-Además de los indicadores territoriales y predictivos, el despliegue dual en el Equipo 2 y la batería automatizada de pruebas permiten sustentar **seis indicadores operativos** medidos en ejecución real:
+Además de los indicadores territoriales y predictivos, el despliegue dual en el Equipo 2 y la batería automatizada de pruebas permiten sustentar **siete indicadores operativos** medidos en ejecución real:
 
 **Tabla 5**  
 *Indicadores Operativos de Operación Cibernética, Cumplimiento Normativo y Verificación (Estado Actual)*
@@ -160,10 +161,11 @@ Además de los indicadores territoriales y predictivos, el despliegue dual en el
 | :--- | :---: | :--- |
 | **Cobertura de catálogo territorial MSV** | **$100 / 100$ distritos** ($1\,100$ filas `2014–2024`) | Tablas `cat_ubigeo_hvc` y `serie_historica_distrital` (SQLite y PostgreSQL 16) |
 | **Tasa de disparo del Canal Algedónico $\text{S5}$** | **$5,0\,\%$** ($5/100$ exportado) · **$4,0\,\%$** ($4/100$ vivo PG) | Regla Fija 2 determinista ($> 25,0\,\%$) en `/predict` y n8n |
-| **Efectividad del Guardarraíl Ley N.º 29733** | **$100\,\%$ de rechazo nominal** (`HTTP 422`) | Bloqueo comprobado en vivo ante `dni`/`DNI_Menor` y ajuste `"direccion" -> "efecto"` (`cbda0d1`) |
-| **Integridad de vigilancia `SHA-256` (Tool 1)** | **$6 / 6$ portales** auditados por huella | SIEN-HIS, ENDES, INEI Pobreza, MEF PAN, MIDIS y SENAMHI en `registro_cargas` |
-| **Disponibilidad del Gateway LLM (Tool 5)** | **3 niveles operativos** (`gemini-flash-lite-latest` activo) | Verificado en vivo en ensayo LAN: respuesta real Gemini y failover automático Ollama $\rightarrow$ Gemini |
-| **Confiabilidad automatizada (`Red-Team QA`)** | **$22 / 22$ pruebas aprobadas (`100\,\%`)** | Suite `tests/run_all_tests.py` ejecutada tras la sincronización de commits (`165e0ee`) |
+| **Efectividad del Guardarraíl Ley N.º 29733** | **$100\,\%$ de rechazo nominal** (`HTTP 422`) | Bloqueo estricto en entrada + sanitización defensiva de salida LLM (`Tool 5`) y ajuste `"direccion" -> "efecto"` (`cbda0d1`) |
+| **Integridad de vigilancia `SHA-256` (Tool 1 y Tool 6)** | **$6 / 6$ portales** + huellas en alertas/HITL | Trazabilidad criptográfica `SHA-256` en `registro_cargas`, despacho de alertas y resoluciones HITL |
+| **Auditoría consolidada de gobernanza (`PG 16` live)** | **$30$ alertas · $100,0\,\%$ resolución HITL** | Endpoint `GET /governance/audit` (`13` rutas OpenAPI): `20` `ALGEDONICO_DIRECTO_S5`, `10` `APROBADO_S3`, `0` pendientes |
+| **Disponibilidad del Gateway LLM (Tool 5)** | **3 niveles operativos** (`gemini-flash-lite-latest` activo) | Verificado en vivo en ensayo LAN: respuesta real Gemini, enriquecimiento axiológico opcional y failover automático Ollama $\rightarrow$ Gemini |
+| **Confiabilidad automatizada (`Red-Team QA` + Parra Luna)** | **$24 / 24$ pruebas aprobadas ($100\,\%$)** | Suite `tests/run_all_tests.py` verificada tras integrar Regla Fija 4, auditoría `SHA-256` y endpoints de gobernanza |
 
 ---
 
@@ -329,6 +331,25 @@ Cuatro conclusiones cibernéticas y axiológicas se desprenden directamente de l
 2. **Desequilibrio axiológico extremo en el Canal Algedónico $\text{S5}$:** Los 5 distritos críticos $\text{S5}$ presentan una desviación $\sigma_Y = 0,2322$ (un $+41,0\,\%$ mayor que los distritos $\text{S3}$, $\sigma_Y = 0,1647$). El caso extremo es **Santa Ana (`090411`, puesto #100/100)**, que pese a registrar una cobertura casi total de programas sociales (**`Se` = $99,20\,\%$**), colapsa en **Adaptación Natural (`CN` = $10,62\,\%$)** y **Justicia Distributiva en agua/saneamiento (`JD` = $31,29\,\%$)**, arrojando un $\text{ISDH}_{\text{HVC}}$ geométrico de apenas **$35,15\,\%$** (frente al líder regional **Izcuchaca `090109`**, con $\text{ISDH}_{\text{HVC}}$ geométrico de **$72,69\,\%$** y $\sigma_Y = 0,0753$).
 3. **Superioridad diagnóstica de la media geométrica para $\text{S3}$:** Mientras el índice aritmético muestra una brecha $\text{S5}$ vs $\text{S3}$ de $-11,54\text{ pp}$ ($45,31\,\%$ vs $56,85\,\%$), el índice geométrico amplía la señal a **$-14,13\text{ pp}$** ($40,98\,\%$ vs $55,11\,\%$), demostrando que la asistencia social (`Se`) no compensa la ausencia de agua segura (`JD`, OEI.04) ni la exposición a heladas (`CN`, OEI.10).
 4. **Alta validez convergente empírica:** El $\text{ISDH}_{\text{HVC}}$ exhibe una correlación inversa muy fuerte con la tasa observada de DCI tanto en la serie completa `2014–2024` (**Pearson $r = -0,8997$, Spearman $\rho = -0,9007$**) como en el corte transversal `2024` (**Pearson $r = -0,9669$, Spearman $\rho = -0,9529$**), superando en magnitud el coeficiente de referencia reportado por Parra Luna ($\rho = 0,86$; Parra Luna, 2018, p. 9).
+
+#### 7.5.4. Regla Fija 4: Equilibrio Axiológico Determinista, Espejismo Asistencial y Alerta Pre-Algedónica
+
+Para transformar el diagnóstico axiológico de Parra Luna en una **regla cibernética accionable por el Sistema 3 y el Sistema 4** —fuera de la discrecionalidad del LLM—, se implementó la **Regla Fija 4** (`evaluate_axiological_governance_rule`), expuesta individualmente vía `GET /evaluation/parra_luna/{ubigeo}`, agregada en `GET /governance/audit`, integrada en la Sala 5 del Dashboard Streamlit y unificada como fuente única de verdad en [`export_artifacts_service.py`](../src/sentinelnutri/application/export_artifacts_service.py) (`export_parra_luna_artifacts`). Sus resultados sobre los $100$ distritos en el corte `2024` se sintetizan en la **Tabla 9**:
+
+**Tabla 9**  
+*Resultados de la Regla Fija 4 (Equilibrio Axiológico PRVU y Abanico Equilibrador) sobre los 100 Distritos de Huancavelica (Corte 2024 Exportado)*
+
+| Categoría / Indicador Determinista de Regla Fija 4 | Criterio Operativo Fijo (Fuera del LLM) | Distritos (`n / 100`) | Implicancia para la Gobernanza Cibernética ($\text{S3}$ / $\text{S5}$) |
+| :--- | :--- | :---: | :--- |
+| **Estado: `EQUILIBRADO`** | $\text{ISDH}_{\text{HVC,geom}} \ge 52\,\%$, $\sigma_Y < 0,18$, sin espejismo ni rezago PAN | **39** | Monitoreo rutinario $\text{S3}$ y consolidación de buenas prácticas (líder: `Izcuchaca`, $\sigma_Y = 0,0753$). |
+| **Estado: `DESEQUILIBRIO_MODERADO`** | $\text{ISDH}_{\text{HVC,geom}} < 52\,\%$, $\sigma_Y \ge 0,18$ o $\text{Ejec. PAN} < 75\,\%$ | **52** | Requiere reasignación focalizada $\text{S2}$/$\text{S3}$ sobre su dimensión cuello de botella PRVU. |
+| **Estado: `DESEQUILIBRIO_CRITICO_AXIOLOGICO`** | $\text{ISDH}_{\text{HVC,geom}} < 45\,\%$, $\sigma_Y \ge 0,22$ o espejismo con $\text{ISDH} < 50\,\%$ | **9** | Intervención multisectorial prioritaria (`OEI.04` + `OEI.10` + `OEI.01`). |
+| **Espejismo Asistencial Detectado** | $\text{Se} \ge 85\,\%$ junto con $\text{JD} < 40\,\%$ o $\text{CN} < 35\,\%$ | **7** | `Santa Ana`, `Pilpichaca` (×2), `Huachocolpa`, `Ccochaccasa`, `Anta` y `Andabamba`: programas sociales altos ocultan colapso en agua/heladas. |
+| **Alerta Temprana Pre-Algedónica** | `DESEQUILIBRIO_CRITICO_AXIOLOGICO` con $\text{DCI}_{2024} \le 25,0\,\%$ | **6** | `Anta`, `Huayllahuara`, `Ccochaccasa`, `Ayaví`, `Nuevo Occoro` y `Huachocolpa`: detecta vulnerabilidad antes del disparo $\text{S5}$ (`Ccochaccasa` y `Huachocolpa` superaron luego $25\,\%$ en proyección `CatBoost`). |
+| **Penalización Presupuestal PAN `0001`** | $\text{Ejecución PAN} < 75,0\,\%$ ($X > 1,25$) | **30** | Evidencia pérdida de eficiencia transformadora ($T = Y/X$) corregible vía gestión MEF/GRDS (`OEI.03`). |
+| **Cuello de Botella PRVU Dominante** | $\arg\min_{d \in \text{PRVU}} y_d$ por distrito | **`JD`: 78 · `CN`: 19** (`CO`: 2, `Se`: 1) | El **$97\,\%$** de los distritos tiene su principal cuello de botella en **agua segura/saneamiento (`OEI.04`/`ODS 6`)** o **heladas (`OEI.10`/`ODS 13`)**, convergiendo con los valores $|\text{SHAP}|$ de la Tabla 4. |
+
+*Nota.* Fuente: cálculo determinista mediante `evaluate_axiological_governance_rule` exportado en `data/exports/resumen_parra_luna_hvc.json` y `data/exports/indicadores_parra_luna_hvc_2024.csv`. Respecto a la exposición externa de webhooks HITL, el script [`03_setup_cloudflare_tunnel.ps1`](../deploy/scripts_equipo2/03_setup_cloudflare_tunnel.ps1) automatiza tanto el modo *Quick Tunnel* (`-QuickTunnel`, activo en vivo durante las pruebas) como el despliegue del Túnel Nombrado permanente, quedando únicamente pendiente la provisión de `CLOUDFLARE_TUNNEL_TOKEN` y un dominio propio en Cloudflare Zero Trust.
 
 #### Referencias Adicionales del Marco Axiológico (APA 7)
 

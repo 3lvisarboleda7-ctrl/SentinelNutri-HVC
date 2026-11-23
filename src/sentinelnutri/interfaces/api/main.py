@@ -27,7 +27,12 @@ from sentinelnutri.application import (
     Tool5RedactarInformeUseCase,
     Tool6NotificarUseCase,
 )
-from sentinelnutri.domain.rules.parra_luna_axiological import summarize_parra_luna_panel
+from sentinelnutri.domain.rules.fixed_thresholds import ALGEDONIC_DCI_THRESHOLD_PCT
+from sentinelnutri.domain.rules.parra_luna_axiological import (
+    compute_parra_luna_scores,
+    evaluate_axiological_governance_rule,
+    summarize_parra_luna_panel,
+)
 from sentinelnutri.domain.rules.privacy_guard import PrivacyViolationError
 from sentinelnutri.infrastructure.ml_xai import CatBoostShapPredictor
 from sentinelnutri.infrastructure.notifications import (
@@ -245,6 +250,107 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             summary = {k: v for k, v in summary.items() if k != "scores_2024"}
             summary["total_distritos_2024"] = len(preds)
         return summary
+
+    @api.get("/evaluation/parra_luna/{ubigeo}", tags=["Semana 7: Evaluación y Gobernanza (AUC, F1, SHAP)"])
+    def endpoint_evaluation_parra_luna_district(ubigeo: str) -> Dict[str, Any]:
+        """Auditoría axiológica determinista (Regla Fija 4) y progresión 2014->2024 para un distrito."""
+        clean_ubigeo = _validate_ubigeo_or_raise(ubigeo)
+        records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        if not records:
+            tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
+            records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        rows = [asdict(r) if not isinstance(r, dict) else r for r in records]
+        scores_all = compute_parra_luna_scores(rows, reference_rows=rows)
+        dist_scores = [s for s in scores_all if s.ubigeo == clean_ubigeo]
+        score_2024 = next((s for s in dist_scores if s.anio == 2024), None)
+        score_2014 = next((s for s in dist_scores if s.anio == 2014), None)
+        if score_2024 is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No se encontraron registros históricos 2024 para el ubigeo '{clean_ubigeo}'.",
+            )
+        decision = evaluate_axiological_governance_rule(score_2024)
+        return {
+            "ubigeo": clean_ubigeo,
+            "distrito": score_2024.distrito,
+            "provincia": score_2024.provincia,
+            "perfil_2024": score_2024.to_dict(),
+            "perfil_2014": score_2014.to_dict() if score_2014 else None,
+            "delta_isdh_geom_2014_2024_pp": (
+                round((score_2024.isdh_hvc_geom - score_2014.isdh_hvc_geom) * 100.0, 2)
+                if score_2014
+                else None
+            ),
+            "regla_fija_4_equilibrio_axiologico": decision.to_dict(),
+        }
+
+    @api.get("/governance/audit", tags=["Semana 7: Evaluación y Gobernanza (AUC, F1, SHAP)"])
+    def endpoint_governance_audit() -> Dict[str, Any]:
+        """Auditoría consolidada de gobernanza cibernética MSV (Reglas Fijas 1-4, HITL, Ley 29733 y SHA-256)."""
+        records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        if not records:
+            tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
+            records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        preds = repo.get_latest_predictions()
+        if not preds:
+            tool3.execute(anio_corte=2024)
+            preds = repo.get_latest_predictions()
+
+        alerts = repo.get_all_alerts()
+        loads = repo.get_recent_loads(limit=100)
+
+        by_channel: Dict[str, int] = {"S5_ALGEDONICO": 0, "S3_CONTROL": 0}
+        by_status: Dict[str, int] = {
+            "ALGEDONICO_DIRECTO_S5": 0,
+            "PENDIENTE_APROBACION": 0,
+            "APROBADO_S3": 0,
+            "RECHAZADO": 0,
+        }
+        for a in alerts:
+            ch = str(a.get("canal_destino", ""))
+            st_val = str(a.get("estado_aprobacion_humana", ""))
+            if ch in by_channel:
+                by_channel[ch] += 1
+            if st_val in by_status:
+                by_status[st_val] += 1
+
+        hitl_candidates = by_status["PENDIENTE_APROBACION"] + by_status["APROBADO_S3"] + by_status["RECHAZADO"]
+        hitl_resolved = by_status["APROBADO_S3"] + by_status["RECHAZADO"]
+        hitl_resolution_rate = round((hitl_resolved / hitl_candidates) * 100.0, 2) if hitl_candidates > 0 else 100.0
+
+        s5_ubigeos = [p.ubigeo for p in preds if p.supera_umbral_algedonico]
+        rows = [asdict(r) if not isinstance(r, dict) else r for r in records]
+        pl_summary = summarize_parra_luna_panel(rows, s5_ubigeos=s5_ubigeos)
+        ax_gov = pl_summary["reglas_axiologicas_gobernanza_2024"]
+
+        return {
+            "sistema": "SentinelNutri-HVC (Sistema 4 MSV — GORE Huancavelica)",
+            "cumplimiento_ley_29733": {
+                "activo": True,
+                "politica": "Bloqueo estricto de PII nominal antes de LLM + sanitización defensiva de salida",
+            },
+            "reglas_fijas_activas": {
+                "regla_1_motor_numerico": "CatBoost+SHAP exclusivo (/predict); prohibido cálculo por LLM",
+                "regla_2_canal_algedonico_s5": f"DCI proyectada > {ALGEDONIC_DCI_THRESHOLD_PCT:.1f}% -> S5 directo sin bloqueo",
+                "regla_3_compuerta_hitl_s3": "Publicación S3 bloqueada hasta aprobación humana nominal (approver_name >= 3 chars)",
+                "regla_4_equilibrio_axiologico_parra_luna": ax_gov["regla"],
+            },
+            "auditoria_alertas_msv": {
+                "total_alertas_registradas": len(alerts),
+                "por_canal_msv": by_channel,
+                "por_estado_hitl": by_status,
+                "tasa_resolucion_hitl_pct": hitl_resolution_rate,
+            },
+            "trazabilidad_ingesta_sha256": {
+                "total_cargas_auditadas": len(loads),
+                "fuentes_distintas": sorted({str(ld.get("fuente", "")) for ld in loads if ld.get("fuente")}),
+                "ultima_carga": loads[0] if loads else None,
+            },
+            "gobernanza_axiologica_2024": ax_gov["resumen_estados_2024"],
+            "frecuencia_cuello_botella_prvu": ax_gov["frecuencia_cuello_botella_prvu"],
+            "distritos_s5_algedonicos_activos": len(s5_ubigeos),
+            "distritos_alerta_pre_algedonica": len(ax_gov["distritos_alerta_pre_algedonica"]),
+        }
 
     return api
 
