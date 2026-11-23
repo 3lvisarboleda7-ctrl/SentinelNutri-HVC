@@ -127,7 +127,8 @@
 ### FASE 5 (Semana 6 del Cronograma): Cloudflare Tunnel, Aprobación desde Celular y Dashboard Streamlit
 
 #### En el `[EQUIPO 2 · Servidor Local (Windows 10 · SSD)]`
-- [ ] *(Pendiente de dominio propio / Zero Trust)* Crear el túnel nombrado permanente en **Cloudflare Zero Trust** (`Networks -> Tunnels`), copiar el token en `config/.env.equipo2` (`CLOUDFLARE_TUNNEL_TOKEN`) y ejecutar `.\deploy\scripts_equipo2\03_setup_cloudflare_tunnel.ps1` (mientras tanto está automatizado el modo gratuito `.\deploy\scripts_equipo2\03_setup_cloudflare_tunnel.ps1 -QuickTunnel`).
+- [x] Crear el túnel nombrado gestionado remotamente **`sentinelnutri-hvc-equipo2`** (`7fc719f5-cd65-454f-a9d8-317269c7ebb5`) en la cuenta de Cloudflare (`3lvisarboleda7@gmail.com`), guardar `CLOUDFLARE_TUNNEL_TOKEN` en `config/.env.equipo2` (gitignored) y levantar el contenedor oficial `sentinelnutri_cloudflare_tunnel` en estado **`healthy`** (4 conexiones QUIC registradas).
+- [ ] *(Solo cuando se agregue un dominio propio a Cloudflare DNS)* Vincular el registro CNAME del subdominio elegido hacia `7fc719f5-cd65-454f-a9d8-317269c7ebb5.cfargotunnel.com` y la regla de ingreso hacia `http://n8n:5678` (mientras tanto sigue operativo `sentinelnutri_quick_tunnel` para webhooks HTTPS HITL).
 - [x] Levantar el Dashboard Cibernético Streamlit (`:8501`) conectado a `sentinelnutri_postgres` y FastAPI (`:8000`).
 - [x] Ejecutar y validar el script `.\deploy\scripts_equipo2\04_backup_postgres_to_hdd.ps1` volcando una copia de seguridad completa de PostgreSQL (`2,18 MB`) en el **HDD de 1 TB (`D:\SentinelNutri\hdd\backups\`)**.
 

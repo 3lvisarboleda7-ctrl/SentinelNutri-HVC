@@ -131,7 +131,7 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 
 - **Host detectado:** `DESKTOP-H3C8P9R` · i7-7700HQ · GTX 1050 4 GB (Driver 566.36) · Windows 10 Home · Repo en `D:\3lvix\SentinelNutri-HVC` · `.venv` con CPython 3.12 (`uv`).
 - **IP LAN del Equipo 2:** `192.168.1.6` (asignada por DHCP: verificar con `ipconfig` si cambia de red). Desde el Equipo 1: `http://192.168.1.6:5678` (n8n), `:8501` (Streamlit), `:8000/docs` (API).
-- **Proyecto Docker aislado:** `-p sentinelnutri` con `deploy/docker-compose.equipo2.yml` + `config/.env.equipo2` (gitignored). Los 4 contenedores están activos y encapsulados en Docker: `sentinelnutri_postgres` (`:5432`), `sentinelnutri_api_engine` (`:8000`), `sentinelnutri_streamlit_msv` (`:8501`) y `sentinelnutri_n8n_supervisor` (`:5678`). **No tocar** contenedores ajenos (p. ej. `contextapp-fase1-*`).
+- **Proyecto Docker aislado:** `-p sentinelnutri` con `deploy/docker-compose.equipo2.yml` + `config/.env.equipo2` (gitignored). Los 5 servicios de Compose (`sentinelnutri_postgres` `:5432`, `sentinelnutri_api_engine` `:8000`, `sentinelnutri_streamlit_msv` `:8501`, `sentinelnutri_n8n_supervisor` `:5678` y `sentinelnutri_cloudflare_tunnel`) están activos junto con `sentinelnutri_quick_tunnel`. **No tocar** contenedores ajenos (p. ej. `contextapp-fase1-*`).
 - **Ollama:** `v0.40.16` con `OLLAMA_VULKAN=1` y `CUDA_VISIBLE_DEVICES=-1` (el backend CUDA falla con el driver 566.36; Vulkan usa la GTX 1050). Modelos en `D:\SentinelNutri\hdd\ollama_models` (`llama3.2` Q4_K_M). Arranque automático al iniciar sesión configurado en Windows Startup (`SentinelNutri_Ollama_GPU.vbs`). En frío desde HDD puede superar 30 s (`LLM_OLLAMA_TIMEOUT_SEC=30.0`, `keep_alive=15m`).
 - **Gemini:** Google AI Studio retiró `gemini-2.0-flash` (`404`). El modelo operativo verificado con la clave gratuita actual es `gemini-flash-lite-latest` (~1.7 s en vivo, `LLM_GEMINI_TIMEOUT_SEC=15.0`).
 - **n8n (`sentinelnutri_n8n_supervisor`, v2.47.3):** propietario `3lvisarboleda7@gmail.com`. Workflows `ofxz76BJS918zdeq` (Ciclo Supervisor, ahora con 16 nodos incluyendo `Normalizar Salida S4 para Reglas Fijas`, cuerpos JSON en Tools 1/3/4/5/6, prefijos `=` en mensajes Telegram S5/S3 y `gemini-flash-lite-latest`) y `27ZPF1SbAx1tCSxv` (Vigilancia de scrapers, también con prefijo `=`). Variables: `N8N_SECURE_COOKIE=false` (login por LAN) y `N8N_BLOCK_ENV_ACCESS_IN_NODE=false`.
@@ -157,11 +157,12 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-23 | `Equipo 2` | Mejoras de Reglas Axiológicas (**Regla Fija 4**: equilibrio axiológico, espejismo asistencial, alerta pre-algedónica, cuellos de botella PRVU -> OEI/ODS), Gobernanza (`SHA-256` en alertas/HITL, sanitización salida LLM Ley 29733, `GET /evaluation/parra_luna/{ubigeo}`, `GET /governance/audit`), Arquitectura (`export_parra_luna_artifacts` DRY, caché en Salas 2/4, Sala 5 enriquecida, `03_setup_cloudflare_tunnel.ps1 -QuickTunnel`), suite `24/24 PASS` e informe APA 7 PDF regenerado. |
 
 ### Pendientes Reales del Equipo 2
-- [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`).
+- [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`, `cloudflared`).
 - [x] Ollama GPU GTX 1050 operativo con autostart en Windows 10.
 - [x] Workflows n8n operativos y conmutación LLM verificada.
-- [x] Credenciales configuradas en vivo (`GEMINI_API_KEY` y `TELEGRAM_BOT_TOKEN`).
-- [ ] Cloudflare Named Tunnel permanente (`CLOUDFLARE_TUNNEL_TOKEN` + dominio propio en Zero Trust; Quick Tunnel automatizado vía `03_setup_cloudflare_tunnel.ps1 -QuickTunnel`).
+- [x] Credenciales configuradas en vivo (`GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` y `CLOUDFLARE_TUNNEL_TOKEN`).
+- [x] Túnel Nombrado Cloudflare `sentinelnutri-hvc-equipo2` (`7fc719f5-cd65-454f-a9d8-317269c7ebb5`, `remote_config: true`) creado en la cuenta `3lvisarboleda7@gmail.com` y conectado en estado `healthy` (4 conexiones QUIC en `sentinelnutri_cloudflare_tunnel`).
+- [ ] Agregar un dominio propio (zona DNS) en Cloudflare para asociar el Public Hostname permanente (CNAME hacia `7fc719f5-cd65-454f-a9d8-317269c7ebb5.cfargotunnel.com` -> `http://n8n:5678`); mientras tanto `sentinelnutri_quick_tunnel` mantiene activos los webhooks HTTPS HITL.
 
 ---
 
