@@ -9,11 +9,12 @@ import streamlit as st
 from sentinelnutri.domain.rules.parra_luna_axiological import (
     EXCLUDED_PRVU_DIMENSIONS,
     PRVU_DIMENSIONS,
-    compute_parra_luna_scores,
     evaluate_axiological_governance_rule,
-    summarize_parra_luna_panel,
 )
-from sentinelnutri.interfaces.dashboard.app import init_services
+from sentinelnutri.interfaces.dashboard.app import (
+    get_cached_parra_luna_bundle,
+    init_services,
+)
 
 st.set_page_config(
     page_title="Modelo Axiológico Parra Luna (ISDH-HVC) | SentinelNutri-HVC",
@@ -29,17 +30,10 @@ st.caption(
     "y evaluación determinista de equilibrio axiológico (Regla Fija 4)."
 )
 
-series = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
-preds = repo.get_latest_predictions()
-if not preds:
-    tool3.execute(anio_corte=2024)
-    preds = repo.get_latest_predictions()
-
-s5_ubigeos = [p.ubigeo for p in preds if p.supera_umbral_algedonico]
-rows = [asdict(r) if not isinstance(r, dict) else r for r in series]
-summary = summarize_parra_luna_panel(rows, s5_ubigeos=s5_ubigeos)
-scores_all_objs = compute_parra_luna_scores(rows, reference_rows=rows)
-score_obj_2024_by_ubigeo = {s.ubigeo: s for s in scores_all_objs if s.anio == 2024}
+pl_bundle = get_cached_parra_luna_bundle(repo, tool3)
+summary = pl_bundle["summary"]
+s5_ubigeos = pl_bundle["s5_ubigeos"]
+score_obj_2024_by_ubigeo = pl_bundle["score_obj_2024_by_ubigeo"]
 
 g2014 = summary["progreso_longitudinal"]["anio_2014"]
 g2024 = summary["progreso_longitudinal"]["anio_2024"]

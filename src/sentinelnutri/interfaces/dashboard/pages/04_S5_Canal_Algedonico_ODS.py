@@ -78,5 +78,25 @@ g4.metric(
     sum(1 for a in alerts_all if a.get("estado_aprobacion_humana") == "PENDIENTE_APROBACION"),
 )
 
+if alerts_all:
+    df_alerts = pd.DataFrame(alerts_all)
+    cols_show = [
+        c
+        for c in (
+            "id",
+            "ubigeo",
+            "provincia",
+            "distrito",
+            "canal_destino",
+            "estado_aprobacion_humana",
+            "aprobado_por",
+            "huella_auditoria_sha256",
+            "huella_resolucion_sha256",
+            "fecha_creacion",
+        )
+        if c in df_alerts.columns
+    ]
+    st.dataframe(df_alerts[cols_show].head(15), use_container_width=True)
+
 st.subheader("Registro de Cargas (Control de Fecha + Huella Digital SHA-256)")
 st.dataframe(repo.get_recent_loads(limit=20), use_container_width=True)

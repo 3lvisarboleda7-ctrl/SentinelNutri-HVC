@@ -110,8 +110,8 @@ Mapeadas 1 a 1 con la **Tabla 5** del documento de perfil:
   - `02_entrenamiento_catboost_shap_colab.ipynb` (listo para entrenar CatBoost+SHAP en Colab y descargar `catboost_dci_hvc.cbm` + gráficos PNG de 300 DPI).
   - `03_evaluacion_xai_y_gobernanza.ipynb`
 - **Infraestructura Equipo 2 (`deploy/` y `database/`):**
-  - `deploy/docker-compose.equipo2.yml` y scripts PowerShell en `deploy/scripts_equipo2/` (`01_setup_ssd_hdd_dirs.ps1`, `02_install_ollama_gpu.ps1`, `03_setup_cloudflare_tunnel.ps1`, `04_backup_postgres_to_hdd.ps1`).
-  - Migraciones SQL en `database/migrations/` (`V1__init_msv_schema.sql`, `V2__seed_ubigeos_huancavelica.sql`) y vistas en `database/queries/msv_views.sql`.
+  - `deploy/docker-compose.equipo2.yml` (con `healthcheck` en `postgres`, `api_engine`, `dashboard` y `n8n`) y scripts PowerShell en `deploy/scripts_equipo2/` (`01_setup_ssd_hdd_dirs.ps1`, `02_install_ollama_gpu.ps1`, `03_setup_cloudflare_tunnel.ps1`, `04_backup_postgres_to_hdd.ps1` con hash `SHA-256` y rotación automática).
+  - Migraciones SQL en `database/migrations/` (`V1__init_msv_schema.sql`, `V2__seed_ubigeos_huancavelica.sql`, `V3__add_alert_audit_sha256_columns.sql`) y vistas en `database/queries/msv_views.sql`.
 
 ---
 

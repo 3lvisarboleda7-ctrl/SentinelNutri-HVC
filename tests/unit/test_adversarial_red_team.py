@@ -395,6 +395,11 @@ def test_red_team_6_n8n_workflows_structural_and_rules_audit() -> None:
     assert "?? true" not in approved_expr and "=== true" in approved_expr
     gate_targets = [e["node"] for e in conns_w1[hitl_node["name"]]["main"][0]]
     assert hitl_cb["name"] not in gate_targets, "El callback S3 debe pasar por la compuerta de aprobación"
+    gate_node_name = "¿Aprobado por Humano S3? (Regla Fija 3)"
+    false_targets = [e["node"] for e in conns_w1[gate_node_name]["main"][1]]
+    assert "Registrar Rechazo HITL S3 (/hitl/aprobar/{alert_id})" in false_targets, (
+        "La rama Decline (False) de la compuerta HITL debe registrar el rechazo en PostgreSQL"
+    )
 
     # 2. Auditoría de 02_vigilancia_fallos_scrapers.json
     nodes_w2 = {n["name"]: n for n in w2["nodes"]}

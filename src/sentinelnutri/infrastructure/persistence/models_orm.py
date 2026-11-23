@@ -110,6 +110,8 @@ class AlertasYRecomendacionesMsvORM(Base):
         String(30), nullable=False, default="PENDIENTE_APROBACION"
     )
     aprobado_por: Mapped[str] = mapped_column(String(80), nullable=True)
+    huella_auditoria_sha256: Mapped[str] = mapped_column(String(64), nullable=True, index=True)
+    huella_resolucion_sha256: Mapped[str] = mapped_column(String(64), nullable=True)
     fecha_creacion: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=_utc_now)
     fecha_resolucion: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 

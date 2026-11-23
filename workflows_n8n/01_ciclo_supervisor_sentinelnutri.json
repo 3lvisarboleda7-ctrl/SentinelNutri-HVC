@@ -192,7 +192,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json || {};\nlet parsed = {};\nif (typeof raw.output === 'string') {\n  const m = raw.output.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e) { parsed = {}; }\n  }\n} else if (typeof raw.dci_proyectada_pct === 'number') {\n  parsed = { ...raw };\n}\n\nconst needsFallback = !parsed.ubigeo || !parsed.distrito || typeof parsed.dci_proyectada_pct !== 'number' || !parsed.id_alerta;\nif (needsFallback) {\n  const predRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/predict',\n    body: { anio_corte: 2024 },\n    json: true,\n  });\n  const rows = (predRes.distritos_criticos_s5 && predRes.distritos_criticos_s5.length) ? predRes.distritos_criticos_s5 : (predRes.predicciones_distritales || []);\n  rows.sort((a, b) => Number(b.dci_proyectada_pct || 0) - Number(a.dci_proyectada_pct || 0));\n  const top = rows[0] || { ubigeo: '090411', distrito: 'Santa Ana', provincia: 'Castrovirreyna', dci_proyectada_pct: 29.29 };\n  let explainCtx = top;\n  try {\n    explainCtx = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://api_engine:8000/tools/explicar_riesgo/${top.ubigeo}`,\n      json: true,\n    });\n  } catch (e) {\n    explainCtx = { ubigeo: top.ubigeo, distrito: top.distrito, provincia: top.provincia, red_salud: top.red_salud, dci_actual_pct: top.dci_actual_pct, dci_proyectada_pct: top.dci_proyectada_pct };\n  }\n  const infRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/redactar_informe',\n    body: { district_context: explainCtx, prefer_provider: 'gemini' },\n    json: true,\n  });\n  const inf = infRes.informe || {};\n  const notRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/notificar',\n    body: { report_payload: inf },\n    json: true,\n  });\n  parsed = {\n    ubigeo: inf.ubigeo || top.ubigeo,\n    distrito: inf.distrito || top.distrito,\n    provincia: inf.provincia || top.provincia,\n    dci_proyectada_pct: Number(inf.dci_proyectada_pct ?? top.dci_proyectada_pct ?? 25.0),\n    id_alerta: Number(notRes.id_alerta || 1),\n    canal_destino: inf.canal_destino || 'S5_ALGEDONICO',\n    sintesis_narrativa_s4: inf.sintesis_narrativa_s4 || (typeof raw.output === 'string' ? raw.output.slice(0, 400) : 'Síntesis S4 generada.'),\n  };\n}\nreturn [{ json: parsed }];"
+        "jsCode": "const raw = $input.first().json || {};\nlet parsed = {};\nif (typeof raw.output === 'string') {\n  const m = raw.output.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e) { parsed = {}; }\n  }\n} else if (typeof raw.dci_proyectada_pct === 'number') {\n  parsed = { ...raw };\n}\n\nconst needsFallback = !parsed.ubigeo || !parsed.distrito || typeof parsed.dci_proyectada_pct !== 'number' || !parsed.id_alerta;\nif (needsFallback) {\n  const predRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/predict',\n    body: { anio_corte: 2024 },\n    json: true,\n  });\n  const rows = (predRes.distritos_criticos_s5 && predRes.distritos_criticos_s5.length) ? predRes.distritos_criticos_s5 : (predRes.predicciones_distritales || []);\n  rows.sort((a, b) => Number(b.dci_proyectada_pct || 0) - Number(a.dci_proyectada_pct || 0));\n  const top = rows[0] || { ubigeo: '090411', distrito: 'Santa Ana', provincia: 'Castrovirreyna', dci_proyectada_pct: 29.29 };\n  let explainCtx = top;\n  try {\n    explainCtx = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://api_engine:8000/tools/explicar_riesgo/${top.ubigeo}`,\n      json: true,\n    });\n  } catch (e) {\n    explainCtx = { ubigeo: top.ubigeo, distrito: top.distrito, provincia: top.provincia, red_salud: top.red_salud, dci_actual_pct: top.dci_actual_pct, dci_proyectada_pct: top.dci_proyectada_pct };\n  }\n  const infRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/redactar_informe',\n    body: { district_context: explainCtx, prefer_provider: 'gemini' },\n    json: true,\n  });\n  const inf = infRes.informe || {};\n  const notRes = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://api_engine:8000/tools/notificar',\n    body: { report_payload: inf },\n    json: true,\n  });\n  parsed = {\n    ubigeo: inf.ubigeo || top.ubigeo,\n    distrito: inf.distrito || top.distrito,\n    provincia: inf.provincia || top.provincia,\n    dci_proyectada_pct: Number(inf.dci_proyectada_pct ?? top.dci_proyectada_pct ?? 25.0),\n    id_alerta: Number(notRes.id_alerta || 1),\n    canal_destino: inf.canal_destino || 'S5_ALGEDONICO',\n    sintesis_narrativa_s4: inf.sintesis_narrativa_s4 || (typeof raw.output === 'string' ? raw.output.slice(0, 400) : 'Síntesis S4 generada.'),\n  };\n}\ntry {\n  const plRes = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `http://api_engine:8000/evaluation/parra_luna/${parsed.ubigeo}`,\n    json: true,\n  });\n  const rf4 = plRes.regla_fija_4_equilibrio_axiologico || {};\n  const p24 = plRes.perfil_2024 || {};\n  parsed.isdh_geom_pct = p24.isdh_hvc_geom_pct ?? 40.0;\n  parsed.estado_equilibrio_axiologico = rf4.estado_equilibrio_axiologico || 'DESEQUILIBRIO_CRITICO_AXIOLOGICO';\n  parsed.cuello_de_botella_label = rf4.cuello_de_botella_label || 'Adaptación Natural (y7)';\n  parsed.accion_equilibradora_s3 = rf4.accion_equilibradora_s3 || 'Intervención multisectorial prioritaria.';\n} catch (e) {\n  parsed.isdh_geom_pct = parsed.isdh_geom_pct ?? 40.0;\n  parsed.estado_equilibrio_axiologico = parsed.estado_equilibrio_axiologico || 'DESEQUILIBRIO_CRITICO_AXIOLOGICO';\n  parsed.cuello_de_botella_label = parsed.cuello_de_botella_label || 'Adaptación Natural (y7)';\n}\nreturn [{ json: parsed }];"
       },
       "id": "normalize-supervisor-output",
       "name": "Normalizar Salida S4 para Reglas Fijas",
@@ -228,7 +228,7 @@
       "parameters": {
         "operation": "sendAndWait",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID_S3_APROBACION }}",
-        "message": "=📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?",
+        "message": "=📋 [APROBACIÓN HUMANA S4 -> S3 CONTROL GORE-HVC]\nSe ha generado una recomendación para el distrito {{ $json.distrito }} (DCI proyectada: {{ $json.dci_proyectada_pct }}%).\n📐 Regla Fija 4 (Parra Luna): ISDH={{ $json.isdh_geom_pct }}% | {{ $json.estado_equilibrio_axiologico }} (Cuello PRVU: {{ $json.cuello_de_botella_label }}).\n¿Aprueba su publicación en el Canal de Control S3 (Gerencia Regional de Desarrollo Social)?",
         "approvalOptions": {
           "values": {
             "approvalType": "double"
@@ -260,7 +260,7 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID_S5_CONSEJO_REGIONAL || $env.TELEGRAM_CHAT_ID_S5_CONSEJO }}",
-        "text": "=🚨 [CANAL ALGEDÓNICO DIRECTO S1/S4 -> S5 CONSEJO REGIONAL HVC]\nDistrito Crítico: {{ $json.distrito }} (Ubigeo {{ $json.ubigeo }})\nDCI Proyectada: {{ $json.dci_proyectada_pct }}% (> 25.0%)\nSíntesis S4: {{ $json.sintesis_narrativa_s4 }}",
+        "text": "=🚨 [CANAL ALGEDÓNICO DIRECTO S1/S4 -> S5 CONSEJO REGIONAL HVC]\nDistrito Crítico: {{ $json.distrito }} (Ubigeo {{ $json.ubigeo }})\nDCI Proyectada: {{ $json.dci_proyectada_pct }}% (> 25.0%)\n📐 Regla Fija 4 (Parra Luna): ISDH={{ $json.isdh_geom_pct }}% | {{ $json.estado_equilibrio_axiologico }} (Cuello PRVU: {{ $json.cuello_de_botella_label }})\nSíntesis S4: {{ $json.sintesis_narrativa_s4 }}",
         "additionalFields": {}
       },
       "id": "rule-fixed-2-s5-algedonic-dispatch",
@@ -306,7 +306,34 @@
       "typeVersion": 4.2,
       "position": [
         1640,
-        400
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://api_engine:8000/hitl/aprobar/{{ $('Regla Fija 2: Nodo IF · Umbral de Riesgo (DCI proyectada > 25% -> S5)').item.json.id_alerta }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "approved",
+              "value": "={{ false }}"
+            },
+            {
+              "name": "approver_name",
+              "value": "Responsable GRDS-S3 (Rechazado vía Cloudflare Tunnel)"
+            }
+          ]
+        }
+      },
+      "id": "rule-fixed-3-hitl-reject-callback",
+      "name": "Registrar Rechazo HITL S3 (/hitl/aprobar/{alert_id})",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        500
       ]
     },
     {
@@ -495,7 +522,13 @@
             "index": 0
           }
         ],
-        []
+        [
+          {
+            "node": "Registrar Rechazo HITL S3 (/hitl/aprobar/{alert_id})",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   }

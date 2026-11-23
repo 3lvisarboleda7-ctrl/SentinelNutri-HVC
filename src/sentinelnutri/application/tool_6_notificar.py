@@ -95,10 +95,8 @@ class Tool6NotificarUseCase:
             estado_aprobacion_humana=initial_status,
         )
 
-        alert_id = self._repo.save_alert_report(alert_entity)
         audit_hash = compute_alert_audit_hash(
             {
-                "id_alerta": alert_id,
                 "ubigeo": alert_entity.ubigeo,
                 "provincia": alert_entity.provincia,
                 "distrito": alert_entity.distrito,
@@ -113,6 +111,8 @@ class Tool6NotificarUseCase:
                 "ods_vinculados": alert_entity.ods_vinculados,
             }
         )
+        alert_entity.huella_auditoria_sha256 = audit_hash
+        alert_id = self._repo.save_alert_report(alert_entity)
 
         return {
             "tool": "notificar",
@@ -156,23 +156,23 @@ class Tool6NotificarUseCase:
             )
 
         new_status = ApprovalStatus.APROBADO_S3 if approved else ApprovalStatus.RECHAZADO
+        prelim_hash = compute_alert_audit_hash(
+            {
+                "id_alerta": alert_id,
+                "estado_aprobacion_humana": new_status.value,
+                "aprobado_por": clean_approver,
+            }
+        )
         updated = self._repo.update_alert_approval(
             alert_id=alert_id,
             status=new_status,
             approved_by=clean_approver,
+            resolution_hash=prelim_hash,
         )
         if not updated:
             raise ValueError(f"No se encontró la alerta con ID {alert_id}.")
 
-        resolution_hash = compute_alert_audit_hash(
-            {
-                "id_alerta": alert_id,
-                "ubigeo": updated.ubigeo,
-                "canal_destino": updated.canal_destino.value,
-                "estado_aprobacion_humana": updated.estado_aprobacion_humana.value,
-                "aprobado_por": updated.aprobado_por,
-            }
-        )
+        resolution_hash = updated.huella_resolucion_sha256 or prelim_hash
 
         return {
             "id_alerta": alert_id,

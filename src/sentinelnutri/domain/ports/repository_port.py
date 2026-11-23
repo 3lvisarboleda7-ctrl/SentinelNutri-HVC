@@ -63,6 +63,7 @@ class RepositoryPort(ABC):
         alert_id: int,
         status: ApprovalStatus,
         approved_by: str,
+        resolution_hash: Optional[str] = None,
     ) -> Optional[MSVAlertReport]:
-        """Actualiza el estado de aprobación humana (HITL) de una recomendación."""
+        """Actualiza el estado de aprobación humana (HITL) de una recomendación y su huella SHA-256."""
 

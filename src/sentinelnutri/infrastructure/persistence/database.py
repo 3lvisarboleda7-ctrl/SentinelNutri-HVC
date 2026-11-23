@@ -209,6 +209,8 @@ CREATE TABLE IF NOT EXISTS alertas_y_recomendaciones_msv (
     proveedor_llm TEXT NOT NULL,
     estado_aprobacion_humana TEXT NOT NULL DEFAULT 'PENDIENTE_APROBACION',
     aprobado_por TEXT,
+    huella_auditoria_sha256 TEXT,
+    huella_resolucion_sha256 TEXT,
     fecha_creacion TEXT NOT NULL,
     fecha_resolucion TEXT,
     FOREIGN KEY (ubigeo) REFERENCES cat_ubigeo_hvc(ubigeo) ON DELETE RESTRICT
@@ -292,13 +294,27 @@ def create_db_engine_and_session(database_url: str | None = None) -> Tuple[str, 
     if url.startswith("postgresql"):
         pg_factory = _create_postgres_connection_factory(url)
         with pg_factory() as conn:
+            conn.execute(
+                "ALTER TABLE alertas_y_recomendaciones_msv ADD COLUMN IF NOT EXISTS huella_auditoria_sha256 VARCHAR(64);"
+            )
+            conn.execute(
+                "ALTER TABLE alertas_y_recomendaciones_msv ADD COLUMN IF NOT EXISTS huella_resolucion_sha256 VARCHAR(64);"
+            )
             conn.executemany(
                 """
                 INSERT INTO cat_ubigeo_hvc (
                     ubigeo, provincia, distrito, red_salud, altitud_msnm,
                     latitud, longitud, poblacion_menor_5, ruralidad_pct
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT (ubigeo) DO NOTHING
+                ON CONFLICT (ubigeo) DO UPDATE SET
+                    provincia = EXCLUDED.provincia,
+                    distrito = EXCLUDED.distrito,
+                    red_salud = EXCLUDED.red_salud,
+                    altitud_msnm = EXCLUDED.altitud_msnm,
+                    latitud = EXCLUDED.latitud,
+                    longitud = EXCLUDED.longitud,
+                    poblacion_menor_5 = EXCLUDED.poblacion_menor_5,
+                    ruralidad_pct = EXCLUDED.ruralidad_pct
                 """,
                 [
                     (
@@ -337,6 +353,13 @@ def create_db_engine_and_session(database_url: str | None = None) -> Tuple[str, 
     with get_connection() as conn:
         conn.execute("PRAGMA journal_mode = WAL;")
         conn.executescript(SQLITE_DDL)
+        existing_cols = {
+            r["name"] for r in conn.execute("PRAGMA table_info(alertas_y_recomendaciones_msv);").fetchall()
+        }
+        if "huella_auditoria_sha256" not in existing_cols:
+            conn.execute("ALTER TABLE alertas_y_recomendaciones_msv ADD COLUMN huella_auditoria_sha256 TEXT;")
+        if "huella_resolucion_sha256" not in existing_cols:
+            conn.execute("ALTER TABLE alertas_y_recomendaciones_msv ADD COLUMN huella_resolucion_sha256 TEXT;")
         conn.executemany(
             """
             INSERT OR IGNORE INTO cat_ubigeo_hvc (

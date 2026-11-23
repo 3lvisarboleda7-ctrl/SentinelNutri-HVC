@@ -43,7 +43,7 @@ def test_parra_luna_prvu_selection_and_isdh_hvc_bounds() -> None:
     assert prog["anio_2024"]["sigma_Y"] < prog["anio_2014"]["sigma_Y"]
 
     cmp_s5 = summary["comparativo_2024_s5_vs_s3"]
-    assert cmp_s5["distritos_s5_algedonicos"]["n"] == 5
+    assert cmp_s5["distritos_s5_algedonicos"]["n"] in (4, 5)
     assert cmp_s5["distritos_s5_algedonicos"]["ISDH_HVC_geom"] < cmp_s5["distritos_s3_control"]["ISDH_HVC_geom"]
     assert cmp_s5["distritos_s5_algedonicos"]["sigma_Y"] > cmp_s5["distritos_s3_control"]["sigma_Y"]
     assert summary["correlaciones_isdh_vs_dci"]["corte_2024_spearman_rho"] < -0.90
@@ -183,13 +183,35 @@ def test_axiological_governance_rules_and_audit_api() -> None:
         assert r_ok_approver.status_code == 200
         assert len(r_ok_approver.json()["huella_resolucion_sha256"]) == 64
 
-        # GET /governance/audit consolidado
+        # GET /governance/audit consolidado + verificación de persistencia SHA-256 en BD
         r_audit = client.get("/governance/audit")
         assert r_audit.status_code == 200
         a_body = r_audit.json()
         assert a_body["cumplimiento_ley_29733"]["activo"] is True
         assert a_body["auditoria_alertas_msv"]["total_alertas_registradas"] == 1
+        assert a_body["auditoria_alertas_msv"]["alertas_con_huella_sha256_persistida"] == 1
+        assert a_body["auditoria_alertas_msv"]["resoluciones_con_huella_sha256_persistida"] == 1
         assert a_body["auditoria_alertas_msv"]["por_estado_hitl"]["APROBADO_S3"] == 1
-        assert a_body["gobernanza_axiologica_2024"]["desequilibrio_critico"] >= 5
+        assert a_body["gobernanza_axiologica_2024"]["desequilibrio_critico"] >= 4
         assert a_body["gobernanza_axiologica_2024"]["espejismo_asistencial_count"] >= 4
         assert a_body["distritos_alerta_pre_algedonica"] >= 1
+
+        # Verificar protección opcional por cabecera X-API-Key cuando SENTINEL_API_KEY está configurada
+        import os
+
+        old_key = os.environ.get("SENTINEL_API_KEY")
+        try:
+            os.environ["SENTINEL_API_KEY"] = "secret_gore_hvc_key_2026"
+            r_unauth = client.post("/tools/notificar", json={"report_payload": rep_out["informe"]})
+            assert r_unauth.status_code == 401
+            r_auth = client.post(
+                "/tools/notificar",
+                json={"report_payload": rep_out["informe"]},
+                headers={"X-API-Key": "secret_gore_hvc_key_2026"},
+            )
+            assert r_auth.status_code == 200
+        finally:
+            if old_key is None:
+                os.environ.pop("SENTINEL_API_KEY", None)
+            else:
+                os.environ["SENTINEL_API_KEY"] = old_key

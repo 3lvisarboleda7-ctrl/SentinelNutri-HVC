@@ -41,4 +41,6 @@ class MSVAlertReport:
     estado_aprobacion_humana: ApprovalStatus = ApprovalStatus.PENDIENTE_APROBACION
     aprobado_por: Optional[str] = None
     id_alerta: Optional[int] = None
+    huella_auditoria_sha256: Optional[str] = None
+    huella_resolucion_sha256: Optional[str] = None
 

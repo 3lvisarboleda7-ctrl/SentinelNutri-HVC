@@ -13,10 +13,12 @@ y por los recuadros de Reglas Fijas (Figura 1):
 8. GET  /evaluation/metrics      (Validación Cruzada Estratificada: AUC >= 0.90, F1, SHAP global)
 """
 
+import os
+import secrets
 import sqlite3
 from dataclasses import asdict
 from typing import Any, Dict, Optional
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, Header, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from sentinelnutri.application import (
@@ -129,6 +131,17 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             )
         return clean
 
+    def _verify_api_key_if_configured(x_api_key: Optional[str]) -> None:
+        expected = os.getenv("SENTINEL_API_KEY", "").strip()
+        if not expected:
+            return
+        provided = (x_api_key or "").strip()
+        if not provided or not secrets.compare_digest(provided, expected):
+            raise HTTPException(
+                status_code=401,
+                detail="Acceso no autorizado: cabecera X-API-Key ausente o inválida.",
+            )
+
     @api.get("/health", tags=["Infraestructura"])
     def health_check() -> Dict[str, object]:
         districts = repo.get_all_districts()
@@ -138,12 +151,15 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             "distritos_monitoreados": len(districts),
             "umbral_algedonico_fijo_pct": 25.0,
             "cumplimiento_ley_29733": True,
+            "api_key_protection_enabled": bool(os.getenv("SENTINEL_API_KEY", "").strip()),
         }
 
     @api.post("/tools/extraer_fuentes", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
     def endpoint_tool_1_extraer_fuentes(
         req: ExtraerFuentesRequest = Body(default_factory=ExtraerFuentesRequest),
+        x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
     ) -> Dict[str, object]:
+        _verify_api_key_if_configured(x_api_key)
         return tool1.execute(
             mode=req.mode,
             start_year=req.start_year,
@@ -198,7 +214,11 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @api.post("/tools/notificar", tags=["Herramientas del Agente Supervisor (Tabla 5)"])
-    def endpoint_tool_6_notificar(req: NotificarRequest) -> Dict[str, Any]:
+    def endpoint_tool_6_notificar(
+        req: NotificarRequest,
+        x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+    ) -> Dict[str, Any]:
+        _verify_api_key_if_configured(x_api_key)
         try:
             raw_ubigeo = req.report_payload.get("ubigeo", "090101")
             _validate_ubigeo_or_raise(str(raw_ubigeo))
@@ -209,7 +229,12 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @api.post("/hitl/aprobar/{alert_id}", tags=["Regla Fija 3: Aprobación Humana (HITL)"])
-    def endpoint_human_approval(alert_id: int, req: HumanApprovalRequest) -> Dict[str, Any]:
+    def endpoint_human_approval(
+        alert_id: int,
+        req: HumanApprovalRequest,
+        x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+    ) -> Dict[str, Any]:
+        _verify_api_key_if_configured(x_api_key)
         try:
             return tool6.resolve_human_approval(
                 alert_id=alert_id,
@@ -337,6 +362,12 @@ def create_app(database_url: Optional[str] = None, raw_storage_dir: Optional[str
             },
             "auditoria_alertas_msv": {
                 "total_alertas_registradas": len(alerts),
+                "alertas_con_huella_sha256_persistida": sum(
+                    1 for a in alerts if a.get("huella_auditoria_sha256")
+                ),
+                "resoluciones_con_huella_sha256_persistida": sum(
+                    1 for a in alerts if a.get("huella_resolucion_sha256")
+                ),
                 "por_canal_msv": by_channel,
                 "por_estado_hitl": by_status,
                 "tasa_resolucion_hitl_pct": hitl_resolution_rate,

@@ -29,10 +29,14 @@ if all_series:
         ]
     )
 
+    prov_options_s2 = ["Todas las Provincias (7 Redes de Salud)"] + sorted(df_series["provincia"].unique().tolist())
+    sel_prov_s2 = st.selectbox("Filtrar por Red Provincial de Salud (S2):", prov_options_s2, index=0)
+    df_series_view = df_series if sel_prov_s2.startswith("Todas") else df_series[df_series["provincia"] == sel_prov_s2]
+
     col1, col2 = st.columns(2)
     with col1:
         fig_t, ax_t = plt.subplots(figsize=(6.8, 4.0), dpi=130)
-        for prov, grp in df_series.groupby("provincia"):
+        for prov, grp in df_series_view.groupby("provincia"):
             yearly = grp.groupby("anio")["dci_pct"].mean()
             ax_t.plot(yearly.index, yearly.values, marker="o", markersize=3.5, linewidth=1.6, label=prov)
         ax_t.axhline(25.0, color="#c0392b", linestyle="--", linewidth=1.3, label="Umbral S5 (25.0%)")
@@ -46,7 +50,7 @@ if all_series:
         plt.close(fig_t)
 
     with col2:
-        df_2024 = df_series[df_series["anio"] == 2024]
+        df_2024 = df_series_view[df_series_view["anio"] == 2024]
         fig_s, ax_s = plt.subplots(figsize=(6.8, 4.0), dpi=130)
         sc = ax_s.scatter(
             df_2024["ejecucion_pan"],

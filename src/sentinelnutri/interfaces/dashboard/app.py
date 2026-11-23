@@ -11,6 +11,7 @@ Materializa en una sola interfaz los canales del Modelo de Sistema Viable del GO
    registro de cargas (hash SHA-256) y alineación con ODS 2, 3 y 6.
 """
 
+from dataclasses import asdict
 from typing import Any, Dict, Optional
 import os
 import matplotlib.pyplot as plt
@@ -25,6 +26,10 @@ from sentinelnutri.application import (
     Tool5RedactarInformeUseCase,
     Tool6NotificarUseCase,
 )
+from sentinelnutri.domain.rules.parra_luna_axiological import (
+    compute_parra_luna_scores,
+    summarize_parra_luna_panel,
+)
 from sentinelnutri.infrastructure.ml_xai import CatBoostShapPredictor
 from sentinelnutri.infrastructure.persistence import (
     SqlAlchemyRepository,
@@ -33,6 +38,7 @@ from sentinelnutri.infrastructure.persistence import (
 from sentinelnutri.infrastructure.scrapers import MultiSourceScraperOrchestrator
 
 _EVAL_METRICS_CACHE: Dict[str, Dict[str, Any]] = {}
+_PARRA_LUNA_CACHE: Dict[str, Dict[str, Any]] = {}
 
 
 def init_services(database_url: Optional[str] = None):
@@ -64,6 +70,31 @@ def get_cached_evaluation_metrics(
         series = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
         _EVAL_METRICS_CACHE[cache_key] = predictor.train_and_evaluate(series)
     return _EVAL_METRICS_CACHE[cache_key]
+
+
+def get_cached_parra_luna_bundle(
+    repo: SqlAlchemyRepository,
+    tool3: Tool3PredecirRiesgoUseCase,
+    cache_key: str = "default",
+) -> Dict[str, Any]:
+    """Calcula y almacena en caché el resumen axiológico de Parra Luna (1 100 filas) y los objetos 2024."""
+    if cache_key not in _PARRA_LUNA_CACHE:
+        series = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+        preds = repo.get_latest_predictions()
+        if not preds:
+            tool3.execute(anio_corte=2024)
+            preds = repo.get_latest_predictions()
+        s5_ubigeos = [p.ubigeo for p in preds if p.supera_umbral_algedonico]
+        rows = [asdict(r) if not isinstance(r, dict) else r for r in series]
+        summary = summarize_parra_luna_panel(rows, s5_ubigeos=s5_ubigeos)
+        scores_all_objs = compute_parra_luna_scores(rows, reference_rows=rows)
+        score_obj_2024_by_ubigeo = {s.ubigeo: s for s in scores_all_objs if s.anio == 2024}
+        _PARRA_LUNA_CACHE[cache_key] = {
+            "summary": summary,
+            "s5_ubigeos": s5_ubigeos,
+            "score_obj_2024_by_ubigeo": score_obj_2024_by_ubigeo,
+        }
+    return _PARRA_LUNA_CACHE[cache_key]
 
 
 def build_dashboard_rooms_snapshot(database_url: Optional[str] = None) -> Dict[str, Any]:

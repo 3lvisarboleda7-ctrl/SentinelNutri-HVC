@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # DOCKER COMPOSE DE PRODUCCIÃ“N â€” EQUIPO 2 (Servidor Local Windows 10)
 # Hardware: Intel Core i7-7700HQ | 16 GB RAM | GPU GTX 1050 4GB | SSD 447GB + HDD 1TB
 # SSD: C:/SentinelNutri/ssd/* (Servicios rÃ¡pidos)
@@ -63,6 +63,11 @@ services:
       - ${HDD_DIRESA_SHARED:-D:/SentinelNutri/hdd/diresa_convenio_ley29733}:/data/diresa_ley29733
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     networks:
       - msv_net
 
@@ -101,6 +106,11 @@ services:
       - ${HDD_DIRESA_SHARED:-D:/SentinelNutri/hdd/diresa_convenio_ley29733}:/data/diresa_ley29733:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5678/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     networks:
       - msv_net
 
@@ -119,6 +129,11 @@ services:
       ALGEDONIC_DCI_THRESHOLD: ${ALGEDONIC_DCI_THRESHOLD:-0.25}
     ports:
       - "8501:8501"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     networks:
       - msv_net
 

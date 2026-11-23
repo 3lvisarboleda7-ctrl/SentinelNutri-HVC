@@ -5,8 +5,11 @@ Clientes de Notificación para los Canales Cibernéticos del MSV:
 - Gmail SMTP: Envío de boletines ejecutivos y señales algedónicas por correo electrónico.
 """
 
+from email.message import EmailMessage
 import json
 import os
+import smtplib
+import ssl
 from typing import Dict, List, Optional
 import urllib.parse
 import urllib.request
@@ -95,12 +98,37 @@ class TelegramNotificationAdapter:
 
 
 class GmailNotificationAdapter:
-    """Adaptador de correo electrónico para notificaciones formales institucionales."""
+    """Adaptador de correo electrónico SMTP SSL real (smtp.gmail.com:465) con fallback de trazabilidad."""
 
     def __init__(self, username: str | None = None, password: str | None = None) -> None:
-        self.username = username or os.getenv("GMAIL_USER", "")
-        self.password = password or os.getenv("GMAIL_APP_PASSWORD", "")
+        self.username = (username or os.getenv("GMAIL_USER", "")).strip().strip('"')
+        self.password = (password or os.getenv("GMAIL_APP_PASSWORD", "")).strip().strip('"')
+        self.smtp_host = os.getenv("GMAIL_SMTP_HOST", "smtp.gmail.com").strip()
+        self.smtp_port = int(os.getenv("GMAIL_SMTP_PORT", "465"))
         self.sent_emails: List[Dict[str, object]] = []
+
+    def _send_via_smtp_ssl(self, recipient: str, subject: str, body: str) -> bool:
+        if (
+            not self.username
+            or not self.password
+            or not recipient
+            or "tu_" in self.password.lower()
+            or "placeholder" in self.password.lower()
+        ):
+            return False
+        msg = EmailMessage()
+        msg["From"] = self.username
+        msg["To"] = recipient
+        msg["Subject"] = subject
+        msg.set_content(body)
+        try:
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port, timeout=8, context=context) as server:
+                server.login(self.username, self.password)
+                server.send_message(msg)
+            return True
+        except Exception:
+            return False
 
     def send_algedonic_email_s5(
         self,
@@ -110,22 +138,35 @@ class GmailNotificationAdapter:
         dci_proyectada_pct: float,
         sintesis: str,
     ) -> Dict[str, object]:
+        to_addr = os.getenv("GMAIL_RECIPIENT_S5", "consejo.regional@regionhuancavelica.gob.pe")
+        subject = f"[ALERTA S5] DCI Proyectada Crítica en {distrito}: {dci_proyectada_pct:.2f}%"
+        body = (
+            f"SEÑAL ALGEDÓNICA S1/S4 -> S5 (CONSEJO REGIONAL DE HUANCAVELICA)\n"
+            f"Distrito: {distrito} ({provincia} - Ubigeo {ubigeo})\n"
+            f"Proyección DCI: {dci_proyectada_pct:.2f}% (> 25.0% Umbral Crítico)\n\n"
+            f"Diagnóstico S4:\n{sintesis}\n"
+        )
+        delivered = self._send_via_smtp_ssl(to_addr, subject, body)
         entry = {
             "channel": "GMAIL_S5_ALGEDONICO",
-            "to": os.getenv("GMAIL_RECIPIENT_S5", "consejo.regional@regionhuancavelica.gob.pe"),
-            "subject": f"[ALERTA S5] DCI Proyectada Crítica en {distrito}: {dci_proyectada_pct:.2f}%",
-            "body": f"Distrito: {distrito} ({provincia} - {ubigeo})\nProyección: {dci_proyectada_pct:.2f}%\n{sintesis}",
+            "to": to_addr,
+            "subject": subject,
+            "body": body,
+            "delivered_smtp": delivered,
+            "status": "DELIVERED_SMTP" if delivered else "SIMULATED_FALLBACK",
         }
         self.sent_emails.append(entry)
         return entry
 
     def send_email_alert(self, recipient: str, subject: str, body: str) -> Dict[str, object]:
+        delivered = self._send_via_smtp_ssl(recipient, subject, body)
         entry = {
             "channel": "GMAIL_SMTP",
             "recipient": recipient,
             "subject": subject,
             "body": body,
-            "status": "SENT_OR_SIMULATED",
+            "delivered_smtp": delivered,
+            "status": "DELIVERED_SMTP" if delivered else "SENT_OR_SIMULATED",
         }
         self.sent_emails.append(entry)
         return entry

@@ -352,8 +352,8 @@ class SqlAlchemyRepository(RepositoryPort):
                     ubigeo, provincia, nivel_riesgo, canal_destino, sintesis_narrativa_s4,
                     recomendacion_salud, recomendacion_agua_saneamiento, recomendacion_agricultura_midis,
                     oei_pei_vinculados, ods_vinculados, proveedor_llm, estado_aprobacion_humana,
-                    aprobado_por, fecha_creacion
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    aprobado_por, huella_auditoria_sha256, fecha_creacion
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     report.ubigeo,
@@ -369,6 +369,7 @@ class SqlAlchemyRepository(RepositoryPort):
                     report.proveedor_llm,
                     report.estado_aprobacion_humana.value,
                     report.aprobado_por,
+                    report.huella_auditoria_sha256,
                     _now_str(),
                 ),
             )
@@ -380,15 +381,16 @@ class SqlAlchemyRepository(RepositoryPort):
         alert_id: int,
         status: ApprovalStatus,
         approved_by: str,
+        resolution_hash: Optional[str] = None,
     ) -> Optional[MSVAlertReport]:
         with self._get_conn() as conn:
             conn.execute(
                 """
                 UPDATE alertas_y_recomendaciones_msv
-                SET estado_aprobacion_humana = ?, aprobado_por = ?, fecha_resolucion = ?
+                SET estado_aprobacion_humana = ?, aprobado_por = ?, huella_resolucion_sha256 = ?, fecha_resolucion = ?
                 WHERE id = ?
                 """,
-                (status.value, approved_by, _now_str(), alert_id),
+                (status.value, approved_by, resolution_hash, _now_str(), alert_id),
             )
             conn.commit()
             row = conn.execute(
@@ -419,6 +421,8 @@ class SqlAlchemyRepository(RepositoryPort):
                 proveedor_llm=row["proveedor_llm"],
                 estado_aprobacion_humana=ApprovalStatus(row["estado_aprobacion_humana"]),
                 aprobado_por=row["aprobado_por"],
+                huella_auditoria_sha256=row["huella_auditoria_sha256"] if "huella_auditoria_sha256" in row.keys() else None,
+                huella_resolucion_sha256=row["huella_resolucion_sha256"] if "huella_resolucion_sha256" in row.keys() else None,
             )
 
     def get_all_alerts(self) -> List[Dict[str, object]]:

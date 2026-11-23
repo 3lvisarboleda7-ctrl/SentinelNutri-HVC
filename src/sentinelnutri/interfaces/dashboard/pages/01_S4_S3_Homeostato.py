@@ -39,6 +39,10 @@ df_preds = pd.DataFrame(
     ]
 )
 
+prov_filter_options = ["Todas las Provincias (100 Distritos)"] + sorted(df_preds["provincia"].unique().tolist())
+selected_prov = st.selectbox("Filtrar por Red Provincial de Salud (Coordinación S2):", prov_filter_options, index=0)
+df_view = df_preds if selected_prov.startswith("Todas") else df_preds[df_preds["provincia"] == selected_prov]
+
 col1, col2 = st.columns([1.4, 1])
 
 with col1:
@@ -71,22 +75,22 @@ with col1:
 with col2:
     fig_map, ax_map = plt.subplots(figsize=(5.5, 4.2), dpi=130)
     sc = ax_map.scatter(
-        df_preds["lon"],
-        df_preds["lat"],
-        c=df_preds["dci_proyectada"],
+        df_view["lon"],
+        df_view["lat"],
+        c=df_view["dci_proyectada"],
         cmap="RdYlGn_r",
-        s=45 + (df_preds["dci_proyectada"] - 10).clip(lower=0) * 3,
+        s=45 + (df_view["dci_proyectada"] - 10).clip(lower=0) * 3,
         alpha=0.85,
         edgecolors="#2c3e50",
         linewidths=0.5,
     )
     cbar = plt.colorbar(sc, ax=ax_map)
     cbar.set_label("DCI Proyectada S4 (%)", fontsize=8)
-    crit = df_preds[df_preds["algedonico"]]
+    crit = df_view[df_view["algedonico"]]
     if not crit.empty:
         ax_map.scatter(crit["lon"], crit["lat"], facecolors="none", edgecolors="#8b0000", s=140, linewidths=1.6, label="Alerta S5 (>25%)")
         ax_map.legend(fontsize=7.5, loc="lower left")
-    ax_map.set_title("Mapa Territorial de Riesgo (100 Distritos)", fontsize=10, fontweight="bold")
+    ax_map.set_title(f"Mapa Territorial de Riesgo ({len(df_view)} Distritos)", fontsize=10, fontweight="bold")
     ax_map.set_xlabel("Longitud", fontsize=8)
     ax_map.set_ylabel("Latitud", fontsize=8)
     ax_map.grid(True, linestyle="--", alpha=0.25)
@@ -95,7 +99,7 @@ with col2:
     plt.close(fig_map)
 
 st.dataframe(
-    df_preds[
+    df_view[
         ["ubigeo", "provincia", "distrito", "red_salud", "altitud", "dci_actual", "dci_proyectada", "riesgo", "algedonico"]
     ].rename(
         columns={
