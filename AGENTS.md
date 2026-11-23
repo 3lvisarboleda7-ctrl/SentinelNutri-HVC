@@ -120,7 +120,7 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 - `data/exports/panel_distrital_hvc_2014_2024.csv`: Panel histórico consolidado de `1 100` registros (100 distritos × 11 años × 24 columnas), listo para subir a Google Colab.
 - `data/exports/metrics_report.json`: Reporte completo de validación ($\text{AUC-ROC} = 0,9993 \ge 0,90$, $\text{F1} = 0,8917$, matriz de confusión, importancia global SHAP y resumen de las 7 provincias S2).
 - `data/exports/matriz_gobernanza_oei_ods_hvc.csv`: Matriz de los 100 distritos con proyección DCI, canal MSV (`S5_ALGEDONICO` vs `S3_CONTROL`), factor SHAP principal, recomendaciones sectoriales (Salud, Agua, Agricultura) y vinculación con los **OEI del PEI 2020–2027** y **ODS 2, 3 y 6**.
-- `docs/figures/`: 5 figuras académicas en `300 DPI` (`fig1` a `fig5_perfil_axiologico_parra_luna_hvc.png`) + 11 capturas en vivo del Equipo 2 (`equipo2_live_01_*` a `equipo2_live_11_telegram_*`, incluyendo las 5 Salas Streamlit, FastAPI, n8n y Telegram S5/HITL S3) listas para los Capítulos 5, 6 y 7 del informe.
+- `docs/figures/`: 6 figuras técnicas en `300 DPI` / `2×` (`fig1` a `fig6_estructura_flujo_n8n_msv.png`) + 11 capturas en vivo del Equipo 2 (`equipo2_live_01_*` a `equipo2_live_11_telegram_*`, incluyendo las 5 Salas Streamlit, FastAPI, n8n y Telegram S5/HITL S3) listas para los Capítulos 5, 6 y 7 del informe.
 - `data/exports/indicadores_parra_luna_hvc_2024.csv` y `data/exports/resumen_parra_luna_hvc.json`: Perfil axiológico PRVU e $\text{ISDH}_{\text{HVC}}$ de los 100 distritos (`2014–2024`, generados por `scripts/generar_parra_luna_hvc.py`).
 
 ---
@@ -155,6 +155,7 @@ Generados automáticamente por [`src/sentinelnutri/application/export_artifacts_
 | 2026-11-22 | `4d2f72a` / `cac1cb3` | Integración completa del Modelo Axiológico de Parra Luna (`parra_luna_axiological.py`, `GET /evaluation/parra_luna`, Sala 5 en Streamlit `:8501`, `fig5` 300 DPI, captura en vivo `equipo2_live_08`, Sección 7.5 del informe y suite `23/23 PASS`). |
 | 2026-11-23 | `Equipo 1` | Pull de Equipo 2 (`ad3f348`: Telegram `equipo2_live_09..11`), diagrama de arquitectura `stack-diagram` (`docs/arquitectura_sentinelnutri_hvc.html` + PNGs) y actualización completa del artículo APA 7 (`entregables/articulo/SentinelNutri_HVC_Articulo_APA_7.{docx,pdf}`, 28 pp.). |
 | 2026-11-23 | `Equipo 2` | Mejoras de Reglas Axiológicas (**Regla Fija 4**: equilibrio axiológico, espejismo asistencial, alerta pre-algedónica, cuellos de botella PRVU -> OEI/ODS), Gobernanza (`SHA-256` en alertas/HITL, sanitización salida LLM Ley 29733, `GET /evaluation/parra_luna/{ubigeo}`, `GET /governance/audit`), Arquitectura (`export_parra_luna_artifacts` DRY, caché en Salas 2/4, Sala 5 enriquecida, `03_setup_cloudflare_tunnel.ps1 -QuickTunnel`), suite `24/24 PASS` e informe APA 7 PDF regenerado. |
+| 2026-11-23 | `Equipo 1` | Agrega Subsección `5.2.1` + `Tabla 1` + `Figura 1` (`docs/figures/fig6_estructura_flujo_n8n_msv.png`) con la topología completa de los flujos `n8n` (`17 + 2` nodos y rama `Decline`) en `docs/CAPITULOS_5_6_7_INFORME_FINAL_APA7.{md,pdf}`. |
 
 ### Pendientes Reales del Equipo 2
 - [x] Contenedores Docker levantados y aislados (`postgres`, `api_engine`, `n8n`, `dashboard`, `cloudflared`).
