@@ -266,7 +266,7 @@ def _create_postgres_connection_factory(pg_url: str) -> Any:
             if needs_returning:
                 pg_sql = stripped.rstrip(";") + " RETURNING id"
             cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-            cur.execute(pg_sql, params)
+            cur.execute(pg_sql, params if params else None)
             lastrowid = None
             if needs_returning:
                 row = cur.fetchone()

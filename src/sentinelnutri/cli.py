@@ -8,8 +8,11 @@ Comandos:
   y simula un ciclo completo del Agente Supervisor con las 6 herramientas y las 3 reglas fijas.
 """
 
+from dataclasses import asdict
 import argparse
 import json
+import os
+from pathlib import Path
 import sys
 
 from sentinelnutri.application import (
@@ -22,6 +25,8 @@ from sentinelnutri.application import (
 )
 from sentinelnutri.application.export_artifacts_service import export_all_equipo1_artifacts
 from sentinelnutri.config import detect_current_node
+from sentinelnutri.domain.rules.fixed_thresholds import ALGEDONIC_DCI_THRESHOLD_PCT
+from sentinelnutri.domain.rules.parra_luna_axiological import summarize_parra_luna_panel
 from sentinelnutri.infrastructure.ml_xai import CatBoostShapPredictor
 from sentinelnutri.infrastructure.notifications import (
     GmailNotificationAdapter,
@@ -84,20 +89,86 @@ def run_bootstrap() -> int:
     return 0
 
 
-def run_verify_env() -> int:
-    import os
+def _load_node_env_dict(env_file_path: str) -> dict[str, str]:
+    values: dict[str, str] = {}
+    p = Path(env_file_path)
+    if p.exists():
+        for raw_line in p.read_text(encoding="utf-8", errors="replace").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            values[k.strip()] = v.strip().strip('"')
+    return values
 
+
+def run_verify_env() -> int:
     node = detect_current_node()
+    actual_env_path = node.recommended_env_file.replace(".example", "")
+    file_env = _load_node_env_dict(actual_env_path)
+
+    def _has_var(key: str) -> bool:
+        val = (os.getenv(key) or file_env.get(key) or "").strip()
+        return bool(val and not val.lower().startswith("tu_") and "placeholder" not in val.lower())
+
     checks = {
         "node_id": node.node_id,
-        "recommended_env_file": node.recommended_env_file,
-        "GEMINI_API_KEY": "CONFIGURADO" if os.getenv("GEMINI_API_KEY") else "PENDIENTE (Usando plantilla/fallback)",
-        "TELEGRAM_BOT_TOKEN": "CONFIGURADO" if os.getenv("TELEGRAM_BOT_TOKEN") else "SIMULACION_LOCAL (Dry-Run)",
-        "GMAIL_APP_PASSWORD": "CONFIGURADO" if os.getenv("GMAIL_APP_PASSWORD") else "SIMULACION_LOCAL (Dry-Run)",
-        "CLOUDFLARE_TUNNEL_TOKEN": "CONFIGURADO" if os.getenv("CLOUDFLARE_TUNNEL_TOKEN") else "PENDIENTE_EN_EQUIPO_2",
-        "OLLAMA_BASE_URL": os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        "recommended_env_file": actual_env_path,
+        "env_file_exists": Path(actual_env_path).exists(),
+        "GEMINI_API_KEY": "CONFIGURADO" if _has_var("GEMINI_API_KEY") else "PENDIENTE (Usando plantilla/fallback)",
+        "TELEGRAM_BOT_TOKEN": "CONFIGURADO" if _has_var("TELEGRAM_BOT_TOKEN") else "SIMULACION_LOCAL (Dry-Run)",
+        "GMAIL_APP_PASSWORD": "CONFIGURADO" if _has_var("GMAIL_APP_PASSWORD") else "SIMULACION_LOCAL (Dry-Run)",
+        "CLOUDFLARE_TUNNEL_TOKEN": "CONFIGURADO" if _has_var("CLOUDFLARE_TUNNEL_TOKEN") else "PENDIENTE_EN_EQUIPO_2",
+        "OLLAMA_BASE_URL": os.getenv("OLLAMA_BASE_URL") or file_env.get("OLLAMA_BASE_URL") or "http://localhost:11434",
     }
     print(json.dumps(checks, ensure_ascii=False, indent=2))
+    return 0
+
+
+def run_audit_governance() -> int:
+    """Ejecuta desde terminal la auditoría consolidada de las 4 Reglas Fijas, Parra Luna y huellas SHA-256."""
+    _, session_factory = create_db_engine_and_session()
+    repo = SqlAlchemyRepository(session_factory)
+    scraper = MultiSourceScraperOrchestrator(repository=repo)
+    predictor = CatBoostShapPredictor()
+    tool1 = Tool1ExtraerFuentesUseCase(repo, scraper)
+    tool3 = Tool3PredecirRiesgoUseCase(repo, predictor)
+
+    records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+    if not records:
+        tool1.execute(mode="backfill", start_year=2014, end_year=2024, force_rebuild=True)
+        records = repo.get_historical_series(anio_inicio=2014, anio_fin=2024)
+    preds = repo.get_latest_predictions()
+    if not preds:
+        tool3.execute(anio_corte=2024)
+        preds = repo.get_latest_predictions()
+
+    alerts = repo.get_all_alerts()
+    loads = repo.get_recent_loads(limit=100)
+    s5_ubigeos = [p.ubigeo for p in preds if p.supera_umbral_algedonico]
+    rows = [asdict(r) if not isinstance(r, dict) else r for r in records]
+    pl = summarize_parra_luna_panel(rows, s5_ubigeos=s5_ubigeos)
+    ax_gov = pl["reglas_axiologicas_gobernanza_2024"]
+
+    report = {
+        "sistema": "SentinelNutri-HVC (Auditoría CLI de Gobernanza Cibernética y Axiológica)",
+        "reglas_fijas_activas": {
+            "regla_1_prediccion": "CatBoost+SHAP exclusivo (/predict)",
+            "regla_2_umbral_algedonico_s5_pct": ALGEDONIC_DCI_THRESHOLD_PCT,
+            "regla_3_compuerta_hitl_s3": "Aprobación humana nominal obligatoria + huella SHA-256",
+            "regla_4_equilibrio_axiologico_parra_luna": ax_gov["regla"],
+        },
+        "distritos_s5_algedonicos_2024": len(s5_ubigeos),
+        "gobernanza_axiologica_2024": ax_gov["resumen_estados_2024"],
+        "frecuencia_cuello_botella_prvu": ax_gov["frecuencia_cuello_botella_prvu"],
+        "alertas_auditadas_bd": {
+            "total": len(alerts),
+            "con_huella_auditoria_sha256": sum(1 for a in alerts if a.get("huella_auditoria_sha256")),
+            "con_huella_resolucion_sha256": sum(1 for a in alerts if a.get("huella_resolucion_sha256")),
+        },
+        "cargas_auditadas_sha256": len(loads),
+    }
+    print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -105,7 +176,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="CLI de SentinelNutri-HVC")
     parser.add_argument(
         "command",
-        choices=["whoami", "verify-env", "bootstrap", "export-artifacts"],
+        choices=["whoami", "verify-env", "bootstrap", "export-artifacts", "audit-governance"],
         help="Comando a ejecutar",
     )
     parser.add_argument("--env", default="dev", help="Entorno de ejecución")
@@ -121,6 +192,8 @@ def main() -> None:
         summary = export_all_equipo1_artifacts()
         print(json.dumps(summary, ensure_ascii=False, indent=2))
         sys.exit(0)
+    if args.command == "audit-governance":
+        sys.exit(run_audit_governance())
 
 
 if __name__ == "__main__":

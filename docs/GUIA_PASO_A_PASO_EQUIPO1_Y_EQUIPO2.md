@@ -6,10 +6,12 @@ Esta guía resume los comandos exactos para completar el despliegue entre tus do
 
 ## Parte A — En el `EQUIPO 1` (Esta Laptop Windows 11 · `Hostname: ELVIS`)
 
-### Paso 1. Verificar estado de las credenciales y del nodo
+### Paso 1. Verificar estado de las credenciales, del nodo y de la gobernanza MSV
 ```powershell
 $env:PYTHONPATH="src;."; python -m sentinelnutri.cli whoami
 $env:PYTHONPATH="src;."; python -m sentinelnutri.cli verify-env
+$env:PYTHONPATH="src;."; python -m sentinelnutri.cli audit-governance
+$env:PYTHONPATH="src;."; python tests/run_all_tests.py
 ```
 
 ### Paso 2. Repositorio en GitHub (Ya conectado y publicado)
@@ -51,13 +53,13 @@ cd C:\SentinelNutri\repo
    notepad config\.env.equipo2
    ```
    *(Coloca allí tu `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `GMAIL_APP_PASSWORD` y `CLOUDFLARE_TUNNEL_TOKEN`).*
-2. Levanta los servicios en Docker Desktop del Equipo 2:
+2. Levanta los servicios aislados (`-p sentinelnutri`) en Docker Desktop del Equipo 2:
    ```powershell
-   docker compose -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d --build
+   docker compose -p sentinelnutri -f deploy/docker-compose.equipo2.yml --env-file config/.env.equipo2 up -d --build
    ```
 
 ### Paso 4. Acceder desde el `EQUIPO 1` por Red Local (LAN)
 Desde el navegador de tu **Equipo 1**, abre:
 - **Orquestador Agéntico `n8n`:** `http://<IP_LAN_EQUIPO_2>:5678` (importa los 2 archivos JSON de `workflows_n8n/`).
-- **Documentación Interactiva FastAPI (`/predict` y 6 Herramientas):** `http://<IP_LAN_EQUIPO_2>:8000/docs`
-- **Dashboard Cibernético Streamlit (S2, S3, S3*, S4, S5):** `http://<IP_LAN_EQUIPO_2>:8501`
+- **Documentación Interactiva FastAPI (`13` endpoints: `/predict`, 6 Herramientas, `/evaluation/parra_luna/{ubigeo}` y `/governance/audit`):** `http://<IP_LAN_EQUIPO_2>:8000/docs`
+- **Dashboard Cibernético Streamlit (5 Salas: Homeostato S3–S4, Auditoría S3\* SHAP, Coordinación S2, Canal Algedónico S5 y Modelo Axiológico Parra Luna):** `http://<IP_LAN_EQUIPO_2>:8501`
